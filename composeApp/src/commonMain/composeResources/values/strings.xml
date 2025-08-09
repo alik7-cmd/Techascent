@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">AppHub</string>
+
+    <string name="title_home">Prayer Time</string>
+    <string name="title_calendar">Calendar</string>
+    <string name="title_settings">Settings</string>
+
+    <string name="title_error">Oops! An Error Occurred</string>
+    <string name="message_error">An error occurred while processing your request. We’re on it! In the meantime, make sure your internet connection is stable and try again shortly.</string>
+    <string name="button_text_error">Retry</string>
+
+    <string name="text_sunset">Sunset</string>
+    <string name="text_sunrise">Sunrise</string>
+    <string name="text_fajr">Fajr</string>
+    <string name="text_salat_ud_duha">Salat ud-Duha</string>
+    <string name="text_dhuhr">Dhuhr</string>
+    <string name="text_asr">Asr</string>
+    <string name="text_maghrib">Maghrib</string>
+    <string name="text_isha">Isha</string>
+    <string name="text_iftar">Iftar</string>
+    <string name="text_suhur">Suhur</string>
+    <string name="text_remaining_time">Remaining time of</string>"
+
+    <string name="warning_prayer_time">Prayer times are sourced from aladhan.com. While generally reliable, times may vary by location and calculation method. Please verify with your local mosque for accuracy.</string>
+
+    <string name="title_location_picker">Why We Need Your Location Permission</string>
+    <string name="message_location_picker">Prayer times are based on the position of the sun, which varies depending on where you are in the world. By accessing your location, the app can determine the precise time for each prayer — including Fajr, Dhuhr, Asr, Maghrib, and Isha — based on your local timezone, latitude, and longitude.</string>
+    <string name="button_text_location_picker">Allow location</string>
+    <string name="button_open_settings">Open Settings</string>"
+    <string name="text_compass_suggestion">To find the correct Qibla direction, make sure your location services are enabled so the app can detect your current position. Hold your phone flat and follow the on-screen arrow, which points directly toward the Kaaba in Mecca. For best accuracy, avoid metal objects nearby and calibrate your compass if needed by moving your device in a figure-eight motion. With these simple steps, you’ll always be able to face the right direction for prayer.</string>
+
+
+    <string name="title_tasbeeh">Tasbeeh</string>
+    <string name="message_tasbeeh">The Prophet Muhammad ﷺ used to count tasbeeh on his right hand, encouraging us to do the same. He said, Count on your fingers, for they will be asked and will speak. (Abu Dawood) Let’s follow his Sunnah and remember Allah with our right hand daily. </string>
+    <string name="reset_warning_title">Reset Warning</string>
+    <string name="reset_warning_message">This will reset all data. Continue?</string>
+    <string name="reset_warning_confirm_text">Proceed</string>
+    <string name="reset_warning_cancel_text">Cancel</string>
+    <string name="text_reset_counter">Reset Counter</string>
+
+    <string name="title_quibla">Quibla</string>
+
+    <string name="title_appearance">Appearance</string>
+    <string name="title_widgets">Widgets</string>
+    <string name="sub_title_widgets">Redirects to the device settings</string>
+    <string name="title_language">Language</string>
+    <string name="title_about_us">About us</string>
+    <string name="title_rate_us">Rate us</string>
+    <string name="sub_title_rate_us">Your constructive feedback helps to improve us</string>
+
+
+
+
+
+
+
+</resources>
