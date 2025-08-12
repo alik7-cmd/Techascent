@@ -6,6 +6,10 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import org.techascent.shared.data.PrayerTimesResponse
 
+private const val LATITUDE = "latitude"
+private const val LONGITUDE = "longitude"
+private const val METHOD = "method"
+
 class PrayerApiImpl(private val client: HttpClient) : PrayerApi {
     override suspend fun getPrayerTimes(
         date: String,
@@ -13,11 +17,10 @@ class PrayerApiImpl(private val client: HttpClient) : PrayerApi {
         longitude: Double,
         method: Int
     ): PrayerTimesResponse {
-        return client.get("/v1/timings/$date") {
-            parameter("latitude", latitude)
-            parameter("longitude", longitude)
-            parameter("method", method)
+        return client.get("https://api.aladhan.com/v1/timings/$date") {
+            parameter(key = LATITUDE, value = latitude)
+            parameter(key = LONGITUDE, value = longitude)
+            parameter(key = METHOD, value = method)
         }.body()
     }
-
 }

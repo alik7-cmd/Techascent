@@ -20,9 +20,9 @@ fun provideHttpClient(): HttpClient {
             level = LogLevel.ALL
         }
 
-        defaultRequest {
+        /*defaultRequest {
             url("https://api.aladhan.com")
             //header("Accept", "application/json")
-        }
+        }*/
     }
 }
