@@ -82,9 +82,9 @@ fun NavGraphBuilder.mainNavGraph(
                 innerPadding = innerPadding
             )
         }
-        composable(route = Screen.CalendarView.route) {
+        /*composable(route = Screen.CalendarView.route) {
             CalendarView()
-        }
+        }*/
         /*composable(route = Screen.SettingsView.route) {
             SettingsView(
                 innerPadding = innerPadding

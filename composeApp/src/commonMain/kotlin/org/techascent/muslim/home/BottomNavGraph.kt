@@ -23,6 +23,7 @@ import apphub.composeapp.generated.resources.title_calendar
 import apphub.composeapp.generated.resources.title_home
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
 import org.techascent.composa.icon.ComposaIcon
 import org.techascent.composa.theming.ComposaTheme
@@ -42,12 +43,12 @@ val navigationItemsLists = listOf(
         title = Res.string.title_home,
         route = Screen.PrayerView.route,
     ),
-    NavigationItem(
+    /*NavigationItem(
         unSelectedIcon = Res.drawable.ic_calendar,
         selectedIcon = Res.drawable.ic_calendar,
         title = Res.string.title_calendar,
         route = Screen.CalendarView.route,
-    ),
+    ),*/
     /*NavigationItem(
         unSelectedIcon = Res.drawable.ic_settings_2,
         selectedIcon = Res.drawable.ic_settings_2,
@@ -108,14 +109,14 @@ fun NavigationSideBar(
                 onClick = { onItemClick(navigationItem) },
                 icon = {
                     ComposaIcon(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(ComposaSpacing.Large),
                         icon = DrawableData(
                             imageRes = if (navigationItem.route == currentRoute) navigationItem.selectedIcon else navigationItem.unSelectedIcon,
                             tint = ComposaTheme.color.textNeutral,
                         )
                     )
                 },
-                modifier = Modifier.padding(vertical = 12.dp),
+                modifier = Modifier.padding(vertical = ComposaSpacing.Medium),
                 label = {
                     Text(
                         text = stringResource(navigationItem.title),
