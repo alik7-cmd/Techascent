@@ -5,7 +5,7 @@ import org.techascent.shared.data.mapper.HalalResult
 
 data class HalalScannerUiState(
     val barcode : String = "",
-    val loading: Boolean = true,
+    val loading: Boolean = false,
     val resultText: String? = null,
     val productName: String? = null,
     val cameraPermitted: PermissionState = PermissionState.NotDetermined,

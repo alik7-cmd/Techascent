@@ -17,10 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.ic_barcode
 import apphub.composeapp.generated.resources.ic_ecternal_link
 import apphub.composeapp.generated.resources.ic_quibla
 import apphub.composeapp.generated.resources.ic_tasbeeh
 import apphub.composeapp.generated.resources.text_salat_ud_duha
+import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_quibla
 import apphub.composeapp.generated.resources.title_tasbeeh
 import org.jetbrains.compose.resources.StringResource
@@ -47,12 +49,14 @@ fun LazyListScope.successContent(
     uiModel: PrayerTimeUiModel,
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
+    onNavigateHalalScanner: () -> Unit,
     onHandleEvent: (PrayerTimeEvent) -> Unit
 ) {
     currentSalatContent(uiModel = uiModel)
     actionButtonRow(
         onNavigateToTasbeeh = onNavigateToTasbeeh,
-        onNavigateToCompass = onNavigateToCompass
+        onNavigateToCompass = onNavigateToCompass,
+        onNavigateHalalScanner = onNavigateHalalScanner
     )
     infoBox(
         message = uiModel.warningMessage,
@@ -64,7 +68,9 @@ fun LazyListScope.successContent(
 }
 
 private fun LazyListScope.actionButtonRow(
-    onNavigateToTasbeeh: () -> Unit, onNavigateToCompass: () -> Unit
+    onNavigateToTasbeeh: () -> Unit,
+    onNavigateToCompass: () -> Unit,
+    onNavigateHalalScanner: () -> Unit
 ) {
     item {
         LazyRow(
@@ -90,6 +96,17 @@ private fun LazyListScope.actionButtonRow(
                     ),
                     actionText = stringResource(resource = Res.string.title_quibla),
                     onClick = onNavigateToCompass
+                )
+            }
+
+            item {
+                ActionButton(
+                    icon = DrawableData(
+                        imageRes = Res.drawable.ic_barcode,
+                        tint = ComposaTheme.color.iconNeutralinverse
+                    ),
+                    actionText = stringResource(resource = Res.string.title_halal_scanner),
+                    onClick = onNavigateHalalScanner
                 )
             }
         }

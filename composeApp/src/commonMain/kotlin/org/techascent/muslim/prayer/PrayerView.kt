@@ -31,6 +31,7 @@ import org.techascent.muslim.prayer.state.PrayerTimeUiState
 internal fun PrayerView(
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
+    onNavigateHalalScanner: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val viewModel = koinViewModel<PrayerTimeViewModel>()
@@ -45,6 +46,7 @@ internal fun PrayerView(
         PrayerScreen(
             onNavigateToTasbeeh = onNavigateToTasbeeh,
             onNavigateToCompass = onNavigateToCompass,
+            onNavigateHalalScanner = onNavigateHalalScanner,
             innerPadding = innerPadding
         )
     }
@@ -56,6 +58,7 @@ private fun PrayerScreen(
     viewModel: PrayerTimeViewModel = koinViewModel<PrayerTimeViewModel>(),
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
+    onNavigateHalalScanner: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -63,6 +66,7 @@ private fun PrayerScreen(
         uiState = uiState,
         onNavigateToTasbeeh = onNavigateToTasbeeh,
         onNavigateToCompass = onNavigateToCompass,
+        onNavigateHalalScanner = onNavigateHalalScanner,
         onHandleEvent = viewModel::onHandleEvent,
         innerPadding = innerPadding
     )
@@ -74,6 +78,7 @@ private fun PrayerContent(
     uiState: PrayerTimeUiState,
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
+    onNavigateHalalScanner: () -> Unit,
     onHandleEvent: (PrayerTimeEvent) -> Unit,
     innerPadding: PaddingValues
 ) {
@@ -94,6 +99,7 @@ private fun PrayerContent(
                     uiModel = uiState.data,
                     onNavigateToTasbeeh = onNavigateToTasbeeh,
                     onNavigateToCompass = onNavigateToCompass,
+                    onNavigateHalalScanner = onNavigateHalalScanner,
                     onHandleEvent = onHandleEvent
                 )
 

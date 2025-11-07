@@ -32,7 +32,7 @@ sealed class Screen(val route: String) {
     data object SettingsView : Screen(route = SETTINGS_VIEW)
     data object TasbeehView : Screen(route = TASBEEH_VIEW)
     data object CompassView : Screen(route = COMPASS_VIEW)
-    data object HalalScannerView: Screen(route = HALAL_SCANNER_VIEW)
+    data object HalalScannerView : Screen(route = HALAL_SCANNER_VIEW)
 }
 
 @Composable
@@ -85,7 +85,8 @@ fun NavGraphBuilder.mainNavGraph(
         composable(route = Screen.PrayerView.route) {
             PrayerView(
                 onNavigateToTasbeeh = { rootNavController.navigate(Screen.TasbeehView.route) },
-                onNavigateToCompass = { rootNavController.navigate(Screen.HalalScannerView.route) },
+                onNavigateToCompass = { rootNavController.navigate(Screen.CompassView.route) },
+                onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) },
                 innerPadding = innerPadding
             )
         }
@@ -96,6 +97,12 @@ fun NavGraphBuilder.mainNavGraph(
             SettingsView(
                 innerPadding = innerPadding
             )
+        }*/
+
+        /*// From B, navigate to C
+        navController.navigate("C") {
+            // This will remove B from the back stack
+            popUpTo("B") { inclusive = true }
         }*/
     }
 }
