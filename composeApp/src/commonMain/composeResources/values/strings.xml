@@ -36,6 +36,7 @@
     <string name="reset_warning_message">This will reset all data. Continue?</string>
     <string name="reset_warning_confirm_text">Proceed</string>
     <string name="reset_warning_cancel_text">Cancel</string>
+    <string name="text_okay">Okay</string>
     <string name="text_reset_counter">Reset Counter</string>
 
     <string name="title_quibla">Quibla</string>

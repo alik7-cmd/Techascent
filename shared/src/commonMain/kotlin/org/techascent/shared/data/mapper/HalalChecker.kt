@@ -1,7 +1,5 @@
 package org.techascent.shared.data.mapper
 
-import kotlinx.serialization.json.*
-import org.techascent.shared.data.OpenFoodFactsResponse
 import org.techascent.shared.data.Product
 
 

@@ -65,6 +65,7 @@ actual fun showNativeResetDialog(
     val context = appContext ?: return
     AlertDialog.Builder(context)
         .setTitle(title)
+        .setCancelable(false)
         .setMessage(message)
         .setPositiveButton(confirmText) { _, _ -> onConfirm() }
         .setNegativeButton(cancelText) { _, _ -> onCancel() }

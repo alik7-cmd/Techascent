@@ -69,7 +69,9 @@ fun RootNavGraph(
         }
 
         composable(Screen.HalalScannerView.route) {
-            HalalScannerView()
+            HalalScannerView(
+                onNavigateBack = { rootNavController.popBackStack() }
+            )
         }
     }
 }

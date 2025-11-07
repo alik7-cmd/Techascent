@@ -11,7 +11,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +33,12 @@ import apphub.composeapp.generated.resources.text_salat_ud_duha
 import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_quibla
 import apphub.composeapp.generated.resources.title_tasbeeh
+import dev.icerock.moko.permissions.DeniedAlwaysException
+import dev.icerock.moko.permissions.DeniedException
+import dev.icerock.moko.permissions.Permission
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.button.action.ActionButton
@@ -73,10 +87,23 @@ private fun LazyListScope.actionButtonRow(
     onNavigateHalalScanner: () -> Unit
 ) {
     item {
+        // 1. Create the permissions controller factory.
+        // This is a lightweight object.
+        val factory = rememberPermissionsControllerFactory()
+        // 2. Create the controller instance. `remember` ensures it survives recompositions.
+        val controller = remember(factory) {
+            factory.createPermissionsController()
+        }
+        // 3. Bind the controller's lifecycle to this composable.
+        // This is crucial for handling permission results correctly.
+        BindEffect(controller)
+
+        // Keep the LazyRow for horizontal scrolling of buttons.
         LazyRow(
             modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
             horizontalArrangement = spacedBy(ComposaSpacing.Medium)
         ) {
+            // ... (Tasbeeh and Quibla buttons remain the same) ...
             item {
                 ActionButton(
                     icon = DrawableData(
@@ -99,19 +126,63 @@ private fun LazyListScope.actionButtonRow(
                 )
             }
 
+            // 4. Update the Halal Scanner button
             item {
+                val coroutineScope = rememberCoroutineScope()
+                var showSettingsDialog by remember { mutableStateOf(false) }
+
                 ActionButton(
                     icon = DrawableData(
                         imageRes = Res.drawable.ic_barcode,
                         tint = ComposaTheme.color.iconNeutralinverse
                     ),
                     actionText = stringResource(resource = Res.string.title_halal_scanner),
-                    onClick = onNavigateHalalScanner
+                    onClick = {
+                        coroutineScope.launch {
+                            try {
+                                controller.providePermission(Permission.CAMERA)
+                                onNavigateHalalScanner()
+                            } catch (e: DeniedException) {
+                                println("Camera permission denied.")
+                                showSettingsDialog = true
+                            } catch (e: DeniedAlwaysException) {
+                                // 8. Handle the case where the permission is permanently denied.
+                                // We'll trigger a dialog to guide the user to settings.
+                                showSettingsDialog = true
+                            }
+                        }
+                    }
                 )
+
+                // 9. Show a dialog if the permission was permanently denied.
+                if (showSettingsDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showSettingsDialog = false },
+                        title = { Text("Permission Required") },
+                        text = { Text("Camera permission is required to use the Halal Scanner. Please enable it in the app settings.") },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    showSettingsDialog = false
+                                    // 10. Open the app settings so the user can grant the permission.
+                                    controller.openAppSettings()
+                                }
+                            ) {
+                                Text("Open Settings")
+                            }
+                        },
+                        dismissButton = {
+                            Button(onClick = { showSettingsDialog = false }) {
+                                Text("Cancel")
+                            }
+                        }
+                    )
+                }
             }
         }
     }
 }
+
 
 @OptIn(ExperimentalTime::class)
 private fun LazyListScope.salatTimeContent(
