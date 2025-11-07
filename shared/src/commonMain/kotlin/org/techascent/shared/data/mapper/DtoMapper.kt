@@ -7,6 +7,7 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
 import org.techascent.shared.data.OpenFoodFactsResponse
 import org.techascent.shared.data.PrayerTimesResponse
 import org.techascent.shared.data.Product
@@ -94,7 +95,7 @@ fun OpenFoodFactsResponse.toDto(): ProductDto {
         labelsTags = this.product?.labelsTags,
         ingredientsText = this.product?.ingredients_text,
         imageUrl = this.product?.image_url,
-        isHalal = this.product?.let { isProductHalal(it) } ?: false
+        halalResult = HalalChecker.assessHalalStatus(this.product!!)
     )
 }
 

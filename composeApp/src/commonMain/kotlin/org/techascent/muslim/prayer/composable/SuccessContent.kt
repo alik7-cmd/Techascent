@@ -41,6 +41,7 @@ import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import kotlin.ranges.coerceAtLeast
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 fun LazyListScope.successContent(
     uiModel: PrayerTimeUiModel,
@@ -95,6 +96,7 @@ private fun LazyListScope.actionButtonRow(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 private fun LazyListScope.salatTimeContent(
     uiModel: PrayerTimeUiModel
 ) {

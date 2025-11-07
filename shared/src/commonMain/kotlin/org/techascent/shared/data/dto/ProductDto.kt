@@ -1,10 +1,12 @@
 package org.techascent.shared.data.dto
 
+import org.techascent.shared.data.mapper.HalalResult
+
 data class ProductDto(
     val brands: String? = null,
     val labels: String? = null,
     val labelsTags: List<String>? = null,
     val ingredientsText: String? = null,
     val imageUrl: String? = null,
-    val isHalal : Boolean
+    val halalResult: HalalResult
 )

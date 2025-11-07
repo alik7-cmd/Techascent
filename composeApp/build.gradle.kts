@@ -80,6 +80,7 @@ kotlin {
             implementation(libs.datastore)
             implementation(libs.navigation.compose)
             implementation(libs.screen.size)
+            implementation(libs.kscan)
 
             /*implementation(libs.lifecycle.viewmodel)
             implementation(libs.lifecycle.viewmodel.compose)*/

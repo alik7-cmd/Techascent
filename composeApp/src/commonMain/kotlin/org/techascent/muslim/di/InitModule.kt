@@ -10,6 +10,7 @@ import org.techascent.muslim.city.CityPickerViewModel
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.compass.CompassViewModel
 import org.techascent.muslim.getPlatformLocationService
+import org.techascent.muslim.halalscanner.HalalScannerViewModel
 import org.techascent.muslim.method.MethodViewModel
 import org.techascent.muslim.prayer.PrayerTimeViewModel
 import org.techascent.muslim.provideDataStore
@@ -28,6 +29,7 @@ val appModule = module {
     /*viewModel { LocationPickerViewModel(controller = get ()) }*/
     viewModel { CompassViewModel() }
     viewModel { CityPickerViewModel() }
+    viewModel { HalalScannerViewModel(repository = get()) }
 }
 
 fun initializeKoin() {
