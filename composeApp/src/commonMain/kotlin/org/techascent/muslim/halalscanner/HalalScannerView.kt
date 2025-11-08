@@ -6,25 +6,22 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import apphub.composeapp.generated.resources.Res
-import apphub.composeapp.generated.resources.reset_warning_cancel_text
-import apphub.composeapp.generated.resources.text_okay
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.ncgroup.kscan.BarcodeFormats
 import org.ncgroup.kscan.BarcodeResult
 import org.ncgroup.kscan.ScannerView
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.halalscanner.composable.InformationContent
+import org.techascent.muslim.halalscanner.composable.LoadingContent
 import org.techascent.muslim.halalscanner.state.HalalScannerUiState
-import org.techascent.muslim.showNativeResetDialog
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -33,7 +30,6 @@ internal fun HalalScannerView(
 ) {
     val viewModel = koinViewModel<HalalScannerViewModel>()
     ComposaTheme {
-        // Pass the innerPadding from the parent Scaffold
         HalalScannerScreen(
             viewModel = viewModel,
             onFetchProduct = viewModel::fetchProductByBarcode,
@@ -58,6 +54,7 @@ private fun HalalScannerScreen(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun HalalScannerContent(
     uiState: HalalScannerUiState,
@@ -85,7 +82,6 @@ private fun HalalScannerContent(
                 ),
                 showUi = true
             ) { result ->
-                // Only trigger a new fetch if not currently loading
                 when (result) {
                     is BarcodeResult.OnSuccess -> {
                         println("Barcode: ${result.barcode.data}, format: ${result.barcode.format}")
@@ -97,32 +93,25 @@ private fun HalalScannerContent(
                     }
 
                     is BarcodeResult.OnCanceled -> {
+                        onNavigateBack()
+                        println("OnCanceled: canceled by user")
                     }
                 }
             }
 
             when (uiState) {
-                is HalalScannerUiState.Error -> {
-
-                }
-
-                is HalalScannerUiState.Init -> {
-
-                }
-
-                is HalalScannerUiState.Loading -> CircularProgressIndicator()
+                is HalalScannerUiState.Error, HalalScannerUiState.Init -> Unit
+                is HalalScannerUiState.Loading -> LoadingContent()
                 is HalalScannerUiState.Success -> {
-                    val halalResult = uiState.data.halalResult
-                    showNativeResetDialog(
-                        title = halalResult.status.name,
-                        message = halalResult.reason,
-                        confirmText = stringResource(Res.string.text_okay),
-                        cancelText = "",
-                        onConfirm = onNavigateBack,
-                        onCancel = {}
+                    println("uiState is ${uiState.data.toString()}")
+                    InformationContent(
+                        productUiState = uiState.data,
+                        onNavigateBack = onNavigateBack
                     )
                 }
             }
         }
     }
 }
+
+

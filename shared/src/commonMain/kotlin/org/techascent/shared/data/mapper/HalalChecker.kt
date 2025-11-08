@@ -5,7 +5,6 @@ import org.techascent.shared.data.Product
 
 data class HalalResult(
     val status: HalalStatus,
-    val reason: String
 )
 
 enum class HalalStatus {
@@ -43,7 +42,7 @@ object HalalChecker {
         if (allTags.any { tag -> halalKeywords.any { keyword -> tag.contains(keyword) } }) {
             return HalalResult(
                 HalalStatus.HALAL_CERTIFIED,
-                "Certified or labeled as halal."
+                /*"Certified or labeled as halal."*/
             )
         }
 
@@ -51,7 +50,7 @@ object HalalChecker {
         if (nonHalalIndicators.any { ingredients.contains(it) }) {
             return HalalResult(
                 HalalStatus.NOT_HALAL,
-                "Contains non-halal ingredients (e.g. pork, alcohol)."
+               /* "Contains non-halal ingredients (e.g. pork, alcohol)."*/
             )
         }
 
@@ -59,7 +58,7 @@ object HalalChecker {
         if (doubtfulENumbers.any { ingredients.contains(it) }) {
             return HalalResult(
                 HalalStatus.HALAL_DOUBTFUL,
-                "Contains additives that may come from animal sources (e.g. E471)."
+               /* "Contains additives that may come from animal sources (e.g. E471)."*/
             )
         }
 
@@ -67,14 +66,14 @@ object HalalChecker {
         if (ingredients.isNotBlank()) {
             return HalalResult(
                 HalalStatus.HALAL_POSSIBLE,
-                "No haram ingredients detected, but not certified halal."
+                /*"No haram ingredients detected, but not certified halal."*/
             )
         }
 
         // 🤷 Not enough info
         return HalalResult(
             HalalStatus.UNKNOWN,
-            "Insufficient data to determine halal status."
+            /*"Insufficient data to determine halal status."*/
         )
     }
 }

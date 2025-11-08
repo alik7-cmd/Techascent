@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.techascent.muslim.halalscanner.state.HalalScannerUiState
+import org.techascent.muslim.halalscanner.state.toUiState
 import org.techascent.shared.data.repository.halalscanner.HalalScannerRepository
 import org.techascent.shared.network.ResultState
 
@@ -27,7 +28,7 @@ class HalalScannerViewModel(
 
                 is ResultState.Loading -> _uiState.value = HalalScannerUiState.Loading
 
-                is ResultState.Success -> _uiState.value = HalalScannerUiState.Success(state.data)
+                is ResultState.Success -> _uiState.value = HalalScannerUiState.Success(state.data.toUiState())
             }
         }
     }

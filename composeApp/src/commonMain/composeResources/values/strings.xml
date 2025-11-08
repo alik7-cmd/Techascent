@@ -51,8 +51,21 @@
     <string name="sub_title_rate_us">Your constructive feedback helps to improve us</string>
 
 
+    <string name="text_halal_certified">Halal Certified</string>
+    <string name="text_halal_possible">Halal Possible</string>
+    <string name="text_halal_doubtful">Halal Doubtful</string>
+    <string name="text_not_halal">Not Halal</string>
+    <string name="text_unknown_status">Unknown</string>
+
+    <string name="text_halal_certified_reason">Certified or labeled as halal</string>
+    <string name="text_halal_possible_reason">No haram ingredients detected, but not certified halal.</string>
+    <string name="text_halal_doubtful_reason">Contains additives that may come from animal sources (e.g. E471)</string>
+    <string name="text_not_halal_reason">Contains non-halal ingredients (e.g. pork, alcohol)</string>
+    <string name="text_unknown_status_reason">Insufficient data to determine halal status.</string>
 
 
+    <string name="text_cancel">Cancel</string>
+    <string name="text_scan_again">Scan Again</string>
 
 
 

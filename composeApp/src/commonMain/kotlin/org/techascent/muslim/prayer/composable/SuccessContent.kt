@@ -72,11 +72,11 @@ fun LazyListScope.successContent(
         onNavigateToCompass = onNavigateToCompass,
         onNavigateHalalScanner = onNavigateHalalScanner
     )
-    infoBox(
+    /*infoBox(
         message = uiModel.warningMessage,
         url = uiModel.apiUrl,
         onHandleEvent = onHandleEvent
-    )
+    )*/
     salatTimeContent(uiModel = uiModel)
     spacer()
 }
