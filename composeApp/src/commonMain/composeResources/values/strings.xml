@@ -57,16 +57,31 @@
     <string name="text_not_halal">Not Halal</string>
     <string name="text_unknown_status">Unknown</string>
 
-    <string name="text_halal_certified_reason">Certified or labeled as halal</string>
-    <string name="text_halal_possible_reason">No haram ingredients detected, but not certified halal.</string>
-    <string name="text_halal_doubtful_reason">Contains additives that may come from animal sources (e.g. E471)</string>
-    <string name="text_not_halal_reason">Contains non-halal ingredients (e.g. pork, alcohol)</string>
-    <string name="text_unknown_status_reason">Insufficient data to determine halal status.</string>
+    <string name="text_halal_certified_reason">
+This product has been officially certified or clearly labeled as halal by a recognized authority or organization. Its ingredients and production process comply with halal standards.
+</string>
+
+    <string name="text_halal_possible_reason">
+No haram or questionable ingredients were found in this product. However, it does not carry an official halal certification label, so its halal status cannot be fully guaranteed.
+</string>
+
+    <string name="text_halal_doubtful_reason">
+This product includes one or more ingredients or additives that may come from animal sources, such as E471 or E472. Because the exact origin of these substances is unclear, the halal status is uncertain.
+</string>
+
+    <string name="text_not_halal_reason">
+This product contains ingredients that are clearly not halal, such as pork, alcohol, or their derivatives. It should be avoided by those following halal dietary requirements.
+</string>
+
+    <string name="text_unknown_status_reason">
+There isn’t enough reliable information about this product’s ingredients or manufacturing process to determine its halal status. Additional data or verification may be needed.
+</string>
 
 
     <string name="text_cancel">Cancel</string>
     <string name="text_scan_again">Scan Again</string>
 
+    <string name="text_product_not_found">We couldn’t find this product or retrieve its Halal status from OpenFoodFacts. Please check the product details or try again later.</string>
 
 
 </resources>

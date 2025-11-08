@@ -23,6 +23,7 @@ import org.ncgroup.kscan.BarcodeFormats
 import org.ncgroup.kscan.BarcodeResult
 import org.ncgroup.kscan.ScannerView
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.halalscanner.composable.ErrorContent
 import org.techascent.muslim.halalscanner.composable.InformationContent
 import org.techascent.muslim.halalscanner.composable.LoadingContent
 import org.techascent.muslim.halalscanner.state.HalalScannerUiState
@@ -118,7 +119,10 @@ private fun HalalScannerContent(
                 modifier = Modifier.fillMaxSize()
             ) {
                 when (uiState) {
-                    is HalalScannerUiState.Error, HalalScannerUiState.Init -> Unit
+                    is HalalScannerUiState.Error -> ErrorContent(
+                        onNavigateBack = onNavigateBack
+                    )
+
                     is HalalScannerUiState.Loading -> LoadingContent()
                     is HalalScannerUiState.Success -> {
                         InformationContent(
@@ -126,6 +130,8 @@ private fun HalalScannerContent(
                             onNavigateBack = onNavigateBack
                         )
                     }
+
+                    is HalalScannerUiState.Init -> Unit
                 }
             }
 

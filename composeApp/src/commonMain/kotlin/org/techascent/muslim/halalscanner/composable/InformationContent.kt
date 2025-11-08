@@ -13,12 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
-import apphub.composeapp.generated.resources.ic_ecternal_link
 import apphub.composeapp.generated.resources.ic_halal
 import apphub.composeapp.generated.resources.text_cancel
 import apphub.composeapp.generated.resources.text_scan_again
