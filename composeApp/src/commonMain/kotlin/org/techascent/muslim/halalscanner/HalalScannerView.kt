@@ -1,5 +1,6 @@
 package org.techascent.muslim.halalscanner
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -10,6 +11,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -74,42 +78,57 @@ private fun HalalScannerContent(
                 .padding(paddingValues), // Use the new padding
             contentAlignment = Alignment.Center
         ) {
-            ScannerView(
-                modifier = Modifier.fillMaxSize(),
-                codeTypes = listOf(
-                    BarcodeFormats.FORMAT_QR_CODE,
-                    BarcodeFormats.FORMAT_EAN_13,
-                ),
-                showUi = true
-            ) { result ->
-                when (result) {
-                    is BarcodeResult.OnSuccess -> {
-                        println("Barcode: ${result.barcode.data}, format: ${result.barcode.format}")
-                        onFetchProduct(result.barcode.data)
-                    }
+            var shouldShowScanner by remember { mutableStateOf(true) }
 
-                    is BarcodeResult.OnFailed -> {
-                        println("Error: ${result.exception.message}")
-                    }
+            AnimatedVisibility(
+                visible = shouldShowScanner,
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+            ) {
+                ScannerView(
+                    modifier = Modifier.fillMaxSize(),
+                    codeTypes = listOf(
+                        BarcodeFormats.FORMAT_QR_CODE,
+                        BarcodeFormats.FORMAT_EAN_13,
+                    ),
+                    showUi = true
+                ) { result ->
+                    when (result) {
+                        is BarcodeResult.OnSuccess -> {
+                            println("Barcode: ${result.barcode.data}, format: ${result.barcode.format}")
+                            shouldShowScanner = false
+                            onFetchProduct(result.barcode.data)
+                        }
 
-                    is BarcodeResult.OnCanceled -> {
-                        onNavigateBack()
-                        println("OnCanceled: canceled by user")
+                        is BarcodeResult.OnFailed -> {
+                            shouldShowScanner = false
+                            println("Error: ${result.exception.message}")
+                        }
+
+                        is BarcodeResult.OnCanceled -> {
+                            shouldShowScanner = false
+                            onNavigateBack()
+                            println("OnCanceled: canceled by user")
+                        }
                     }
                 }
             }
 
-            when (uiState) {
-                is HalalScannerUiState.Error, HalalScannerUiState.Init -> Unit
-                is HalalScannerUiState.Loading -> LoadingContent()
-                is HalalScannerUiState.Success -> {
-                    println("uiState is ${uiState.data.toString()}")
-                    InformationContent(
-                        productUiState = uiState.data,
-                        onNavigateBack = onNavigateBack
-                    )
+            AnimatedVisibility(
+                visible = !shouldShowScanner,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                when (uiState) {
+                    is HalalScannerUiState.Error, HalalScannerUiState.Init -> Unit
+                    is HalalScannerUiState.Loading -> LoadingContent()
+                    is HalalScannerUiState.Success -> {
+                        InformationContent(
+                            productUiState = uiState.data,
+                            onNavigateBack = onNavigateBack
+                        )
+                    }
                 }
             }
+
         }
     }
 }
