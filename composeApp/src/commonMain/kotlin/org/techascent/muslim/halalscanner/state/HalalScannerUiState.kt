@@ -27,7 +27,7 @@ data class ProductUiState(
     val brands: String? = null,
     val labels: String? = null,
     val labelsTags: List<String>? = null,
-    val ingredientsText: String? = null,
+    val ingredientsText: List<String>? = null,
     val imageUrl: String? = null,
     val halalUiState: HalalUiState
 )
@@ -42,7 +42,7 @@ fun ProductDto.toUiState() = ProductUiState(
     brands = brands,
     labels = labels,
     labelsTags = labelsTags,
-    ingredientsText = ingredientsText,
+    ingredientsText = ingredientsText?.let { getIngredientsList(it) },
     imageUrl = imageUrl,
     halalUiState = HalalUiState(
         status = halalResult.status,
@@ -50,6 +50,13 @@ fun ProductDto.toUiState() = ProductUiState(
         halalStatusRes = getTitleByStatus(status = halalResult.status),
     )
 )
+
+private fun getIngredientsList(
+    ingredientsText: String
+): List<String>? {
+    val parts = ingredientsText.split(",")
+    return parts.chunked(3).map { it.joinToString(",") }
+}
 
 private fun getTitleByStatus(
     status: HalalStatus
