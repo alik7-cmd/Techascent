@@ -7,13 +7,17 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
+import org.techascent.shared.data.OpenFoodFactsResponse
 import org.techascent.shared.data.PrayerTimesResponse
+import org.techascent.shared.data.Product
 import org.techascent.shared.data.common.truncateToMinute
 import org.techascent.shared.data.dto.IftarTimeDto
 import org.techascent.shared.data.dto.LocationDto
 import org.techascent.shared.data.dto.PrayerName
 import org.techascent.shared.data.dto.PrayerTimeDto
 import org.techascent.shared.data.dto.PrayerTimeInterval
+import org.techascent.shared.data.dto.ProductDto
 
 fun PrayerTimesResponse.toDto(): PrayerTimeDto {
     val timings = this.data.timings
@@ -82,5 +86,35 @@ fun PrayerTimesResponse.toDto(): PrayerTimeDto {
             longitude = this.data.meta.longitude
         )
     )
+}
+
+fun OpenFoodFactsResponse.toDto(): ProductDto {
+    return ProductDto(
+        brands = this.product?.brands,
+        labels = this.product?.labels,
+        labelsTags = this.product?.labelsTags,
+        ingredientsText = this.product?.ingredients_text,
+        imageUrl = this.product?.image_url,
+        halalResult = HalalChecker.assessHalalStatus(this.product!!)
+    )
+}
+
+fun isProductHalal(product: Product): Boolean {
+    // labelsTags often contains "en:halal" or similar
+    val tags = product.labelsTags?.map { it.lowercase() } ?: emptyList()
+    if (tags.any { it.contains("halal") }) return true
+
+    // labels textual
+    val labels = product.labels?.lowercase()
+    if (labels != null && labels.contains("halal")) return true
+
+    // ingredients / product name fallback
+    val ing = product.ingredients_text?.lowercase()
+    if (ing != null && ing.contains("halal")) return true
+
+    val name = product.productName?.lowercase()
+    if (name != null && name.contains("halal")) return true
+
+    return false
 }
 

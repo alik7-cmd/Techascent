@@ -33,6 +33,7 @@ import platform.Foundation.NSUTF8StringEncoding
 import platform.CoreLocation.CLGeocoder
 import platform.CoreLocation.CLLocation
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.techascent.muslim.prayer.uimodel.AddressInfo
 import platform.CoreLocation.CLPlacemark
 import platform.Foundation.dictionaryWithValuesForKeys
 import kotlin.coroutines.resume
@@ -169,7 +170,7 @@ actual fun getPlatformLocationService(): LocationService {
     return IOSLocationService()
 }
 
-actual suspend fun getPlaceName(latitude: Double, longitude: Double): String {
+actual suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInfo {
     return suspendCancellableCoroutine { continuation ->
         val geocoder = CLGeocoder()
         val location = CLLocation(latitude = latitude, longitude = longitude)
@@ -181,7 +182,6 @@ actual suspend fun getPlaceName(latitude: Double, longitude: Double): String {
             }
 
             val placemark = placemarks[0] as? CLPlacemark
-
             val keys = listOf("name", "locality", "country")
             val valuesMap = placemark?.dictionaryWithValuesForKeys(keys) as? Map<*, *>
 
@@ -189,8 +189,17 @@ actual suspend fun getPlaceName(latitude: Double, longitude: Double): String {
             val locality = valuesMap?.get("locality") as? String
             val country = valuesMap?.get("country") as? String
 
-            val result = listOfNotNull(name, locality, country).joinToString(", ")
-            continuation.resume(result.ifBlank { "Unknown location" })
+            val address = listOfNotNull(name, locality, country).joinToString(", ")
+
+
+            continuation.resume(
+                AddressInfo(
+                    district = placemark?.subAdministrativeArea,
+                    city = placemark?.locality,
+                    country = placemark?.country,
+                    address = address
+                )
+            )
         }
     }
 }

@@ -1,4 +1,4 @@
-import org.gradle.kotlin.dsl.implementation
+
 import org.gradle.kotlin.dsl.libs
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -38,6 +38,8 @@ kotlin {
                 implementation(compose.components.uiToolingPreview)
                 implementation(libs.androidx.lifecycle)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
+                implementation(libs.coil.compose)
+                implementation(libs.coil.network.ktor)
             }
         }
 
@@ -45,13 +47,16 @@ kotlin {
             dependencies {
                 implementation(compose.preview)
                 implementation(libs.androidx.activity.compose)
+                // Ktor client dependency required for Coil
+                implementation(libs.ktor.client.android)
             }
         }
 
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
-
+                // Ktor client dependency required for iOS
+                implementation(libs.ktor.client.darwin)
             }
         }
 

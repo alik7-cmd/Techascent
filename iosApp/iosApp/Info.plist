@@ -7,5 +7,8 @@
 
 	<key>NSLocationWhenInUseUsageDescription</key>
         <string>This app requires location access to show direction of quibla.</string>
+
+    <key>NSCameraUsageDescription</key>
+    <string>This app requires camera access to scan product barcodes.</string>
 </dict>
 </plist>

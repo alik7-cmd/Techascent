@@ -4,6 +4,7 @@
     <string name="title_home">Prayer Time</string>
     <string name="title_calendar">Calendar</string>
     <string name="title_settings">Settings</string>
+    <string name="text_try_again">Try Again</string>
 
     <string name="title_error">Oops! An Error Occurred</string>
     <string name="message_error">An error occurred while processing your request. We’re on it! In the meantime, make sure your internet connection is stable and try again shortly.</string>
@@ -36,9 +37,11 @@
     <string name="reset_warning_message">This will reset all data. Continue?</string>
     <string name="reset_warning_confirm_text">Proceed</string>
     <string name="reset_warning_cancel_text">Cancel</string>
+    <string name="text_okay">Okay</string>
     <string name="text_reset_counter">Reset Counter</string>
 
     <string name="title_quibla">Quibla</string>
+    <string name="title_halal_scanner">Halal Scanner</string>
 
     <string name="title_appearance">Appearance</string>
     <string name="title_widgets">Widgets</string>
@@ -49,9 +52,37 @@
     <string name="sub_title_rate_us">Your constructive feedback helps to improve us</string>
 
 
+    <string name="text_halal_certified">Halal Certified</string>
+    <string name="text_halal_possible">Halal Possible</string>
+    <string name="text_halal_doubtful">Halal Doubtful</string>
+    <string name="text_not_halal">Not Halal</string>
+    <string name="text_unknown_status">Unknown</string>
+
+    <string name="text_halal_certified_reason">
+This product has been officially certified or clearly labeled as halal by a recognized authority or organization. Its ingredients and production process comply with halal standards.
+</string>
+
+    <string name="text_halal_possible_reason">
+No haram or questionable ingredients were found in this product. However, it does not carry an official halal certification label, so its halal status cannot be fully guaranteed.
+</string>
+
+    <string name="text_halal_doubtful_reason">
+This product includes one or more ingredients or additives that may come from animal sources, such as E471 or E472. Because the exact origin of these substances is unclear, the halal status is uncertain.
+</string>
+
+    <string name="text_not_halal_reason">
+This product contains ingredients that are clearly not halal, such as pork, alcohol, or their derivatives. It should be avoided by those following halal dietary requirements.
+</string>
+
+    <string name="text_unknown_status_reason">
+There isn’t enough reliable information about this product’s ingredients or manufacturing process to determine its halal status. Additional data or verification may be needed.
+</string>
 
 
+    <string name="text_cancel">Cancel</string>
+    <string name="text_scan_again">Scan Again</string>
 
+    <string name="text_product_not_found">We couldn’t find this product or retrieve its Halal status from OpenFoodFacts. Please check the product details or try again later.</string>
 
 
 </resources>

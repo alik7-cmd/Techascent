@@ -31,7 +31,7 @@ data class PrayerTimeUiModel(
     val sunset: String,
     val currentDateTime: String,
     val apiUrl: String = "https://aladhan.com/about",
-    val placeName: String
+    val addressInfo: AddressInfo
 )
 
 data class PrayerTimeIntervalModel(
@@ -47,6 +47,13 @@ data class IftarTimeUiModel(
     val lastTimeOfSahri: String?
 )
 
+data class AddressInfo(
+    val district: String?,
+    val city: String?,
+    val country: String?,
+    val address : String
+)
+
 internal suspend fun PrayerTimeDto.toUiModel(): PrayerTimeUiModel {
     return PrayerTimeUiModel(
         intervals = intervals.map { it.toUiModel() },
@@ -60,7 +67,7 @@ internal suspend fun PrayerTimeDto.toUiModel(): PrayerTimeUiModel {
             iftarStartTime = iftarTime?.startTime?.toHourMinuteString(false),
             lastTimeOfSahri = iftarTime?.endTime?.toHourMinuteString(false),
         ),
-        placeName = getPlaceName(location.latitude, location.longitude)
+        addressInfo = getPlaceName(location.latitude, location.longitude)
         //currentWaqtEnd = currentPrayer?.endTime?.toInstant(TimeZone.currentSystemDefault())
     )
 

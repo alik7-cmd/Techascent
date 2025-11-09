@@ -21,7 +21,7 @@ import org.techascent.shared.network.ResultState
 
 class PrayerTimeViewModel(
     val repository: PrayerTimesRepository,
-    val locationService: LocationService
+    val locationService: LocationService,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PrayerTimeUiState> =

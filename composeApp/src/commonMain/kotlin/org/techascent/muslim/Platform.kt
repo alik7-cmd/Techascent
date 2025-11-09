@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
 import org.techascent.muslim.common.location.LocationService
+import org.techascent.muslim.prayer.uimodel.AddressInfo
 
 expect fun playBeep()
 
@@ -26,4 +27,4 @@ expect suspend fun readCsvFile(filename: String): List<String>
 
 expect fun getPlatformLocationService(): LocationService
 
-expect suspend fun getPlaceName(latitude: Double, longitude: Double): String
+expect suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInfo

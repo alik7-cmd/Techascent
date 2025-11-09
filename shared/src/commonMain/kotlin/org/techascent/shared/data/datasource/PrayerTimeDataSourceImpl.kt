@@ -1,6 +1,8 @@
 package org.techascent.shared.data.datasource
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import org.techascent.shared.data.PrayerTimesResponse
 import org.techascent.shared.data.api.PrayerApi
 import org.techascent.shared.data.cache.CacheService
@@ -20,17 +22,30 @@ class PrayerTimeDataSourceImpl(
         date: String,
         method: PrayerCalculationMethod,
         onMapData: (PrayerTimesResponse) -> PrayerTimeDto
-    ): Flow<ResultState<PrayerTimeDto>> {
-        return baseRemoteCall(
-            onCallRemoteApi = {
-                api.getPrayerTimes(
-                    date = date,
-                    latitude = latitude,
-                    longitude = longitude,
-                    method = method.toCode()
+    ): Flow<ResultState<PrayerTimeDto>> = flow {
+        val cacheKey = "$latitude-$longitude-$date-${method.toCode()}"
+        val cached = cacheService.get(cacheKey)
+        if (cached != null) {
+            emit(ResultState.Success(onMapData(cached)))
+        } else {
+            emitAll(
+                baseRemoteCall(
+                    onCallRemoteApi = {
+                        api.getPrayerTimes(
+                            date = date,
+                            latitude = latitude,
+                            longitude = longitude,
+                            method = method.toCode()
+                        )
+                    },
+                    onMapData = { response ->
+                        // Save in cache before mapping
+                        cacheService.put(cacheKey, response)
+                        onMapData(response)
+                    }
                 )
-            },
-            onMapData = onMapData
-        )
+            )
+        }
     }
+
 }

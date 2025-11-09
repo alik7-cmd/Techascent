@@ -87,7 +87,7 @@ internal fun LazyListScope.currentSalatContent(
                             }
 
                             IconWithText(
-                                text = uiModel.placeName,
+                                text = uiModel.addressInfo.address,
                                 drawableData = null,
                                 textStyle = ComposaTheme.typography.footnote,
                                 textColor = ComposaTheme.color.textNeutralOnDark

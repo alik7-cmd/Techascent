@@ -19,6 +19,7 @@ import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.techascent.muslim.common.location.LocationService
+import org.techascent.muslim.prayer.uimodel.AddressInfo
 import java.io.File
 import java.util.Locale
 import kotlin.math.*
@@ -65,6 +66,7 @@ actual fun showNativeResetDialog(
     val context = appContext ?: return
     AlertDialog.Builder(context)
         .setTitle(title)
+        .setCancelable(false)
         .setMessage(message)
         .setPositiveButton(confirmText) { _, _ -> onConfirm() }
         .setNegativeButton(cancelText) { _, _ -> onCancel() }
@@ -138,15 +140,24 @@ actual fun getPlatformLocationService(): LocationService {
     return AndroidLocationService(appContext!!)
 }
 
-actual suspend fun getPlaceName(latitude: Double, longitude: Double): String {
-    val context = appContext ?: return "Unknown location"
+actual suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInfo {
+    val defaultAddress = AddressInfo(
+        district = null,
+        city = null,
+        country = null,
+        address = "Unknown Location"
+    )
+    val context = appContext ?: return defaultAddress
     return withContext(Dispatchers.IO) {
         val geocoder = Geocoder(context, Locale.getDefault())
         val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-        if (addresses != null && addresses.isNotEmpty()) {
-            addresses[0].getAddressLine(0) ?: "Unknown location"
-        } else {
-            "Unknown location"
-        }
+        addresses?.firstOrNull()?.let {
+            AddressInfo(
+                district = it.subAdminArea,
+                city = it.locality,
+                country = it.countryName,
+                address = addresses[0].getAddressLine(0)
+            )
+        } ?: defaultAddress
     }
 }

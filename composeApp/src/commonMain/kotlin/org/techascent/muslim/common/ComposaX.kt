@@ -17,8 +17,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.Res
-import apphub.composeapp.generated.resources.computer_error
-import org.techascent.composa.button.text.ComposaButtonText
+import apphub.composeapp.generated.resources.ic_looking
+import apphub.composeapp.generated.resources.text_try_again
+import org.jetbrains.compose.resources.stringResource
+import org.techascent.composa.button.primary.ComposaButton
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
 import org.techascent.composa.icon.ComposaIcon
@@ -57,13 +59,14 @@ fun IconWithText(
 fun ErrorPoster(
     title: String?,
     description: String,
-    onRetry: () -> Unit = {}
+    buttonText: String,
+    onRetry: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(ComposaSpacing.Medium),
-        verticalArrangement = spacedBy(ComposaSpacing.Small)
+        verticalArrangement = spacedBy(ComposaSpacing.Medium)
     ) {
 
         ComposaIcon(
@@ -71,15 +74,9 @@ fun ErrorPoster(
                 .size(200.dp)
                 .align(CenterHorizontally),
             icon = DrawableData(
-                imageRes = Res.drawable.computer_error,
+                imageRes = Res.drawable.ic_looking,
                 tint = ComposaTheme.color.textNeutral
             ),
-        )
-
-        ComposaButtonText(
-            text = "Retry",
-            onClick = onRetry,
-            modifier = Modifier.align(CenterHorizontally),
         )
 
         title?.let {
@@ -96,11 +93,18 @@ fun ErrorPoster(
             modifier = Modifier.align(CenterHorizontally),
             text = description,
             textAlign = TextAlign.Center,
-            style = ComposaTheme.typography.body,
+            style = ComposaTheme.typography.footnote,
             color = ComposaTheme.color.textNeutral
         )
 
-
+        onRetry?.let {
+            ComposaButton(
+                text = buttonText,
+                onClick = it,
+                iconTint = Color.Unspecified,
+                modifier = Modifier.align(CenterHorizontally),
+            )
+        }
     }
 }
 
