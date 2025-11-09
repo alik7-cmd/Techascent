@@ -1,4 +1,4 @@
-import org.gradle.kotlin.dsl.implementation
+
 import org.gradle.kotlin.dsl.libs
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -38,8 +38,8 @@ kotlin {
                 implementation(compose.components.uiToolingPreview)
                 implementation(libs.androidx.lifecycle)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation("io.coil-kt.coil3:coil-compose:3.3.0")
-                implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
+                implementation(libs.coil.compose)
+                implementation(libs.coil.network.okhttp)
             }
         }
 
