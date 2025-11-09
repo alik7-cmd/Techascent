@@ -57,6 +57,7 @@
     <string name="sub_title_rate_us">Your constructive feedback helps to improve us</string>
 
 
+    <string name="text_scan_title">Scan product barcode</string>
     <string name="text_halal_certified">Halal Certified</string>
     <string name="text_halal_possible">Halal Possible</string>
     <string name="text_halal_doubtful">Halal Doubtful</string>

@@ -20,11 +20,13 @@ import androidx.compose.ui.Modifier
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.text_cancel
 import apphub.composeapp.generated.resources.text_product_not_found
+import apphub.composeapp.generated.resources.text_scan_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.ncgroup.kscan.BarcodeFormats
 import org.ncgroup.kscan.BarcodeResult
+import org.ncgroup.kscan.ScannerUiOptions
 import org.ncgroup.kscan.ScannerView
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.halalscanner.composable.InformationContent
@@ -95,7 +97,9 @@ private fun HalalScannerContent(
                         BarcodeFormats.FORMAT_QR_CODE,
                         BarcodeFormats.FORMAT_EAN_13,
                     ),
-                    showUi = true
+                    scannerUiOptions = ScannerUiOptions(
+                        headerTitle = stringResource(Res.string.text_scan_title)
+                    )
                 ) { result ->
                     when (result) {
                         is BarcodeResult.OnSuccess -> {
