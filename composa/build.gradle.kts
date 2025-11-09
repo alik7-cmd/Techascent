@@ -39,7 +39,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(libs.coil.compose)
-                implementation(libs.coil.network.okhttp)
+                implementation(libs.coil.network.ktor)
             }
         }
 
@@ -47,13 +47,16 @@ kotlin {
             dependencies {
                 implementation(compose.preview)
                 implementation(libs.androidx.activity.compose)
+                // Ktor client dependency required for Coil
+                implementation(libs.ktor.client.android)
             }
         }
 
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
-
+                // Ktor client dependency required for iOS
+                implementation(libs.ktor.client.darwin)
             }
         }
 
