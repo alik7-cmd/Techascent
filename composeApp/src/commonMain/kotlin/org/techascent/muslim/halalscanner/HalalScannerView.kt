@@ -17,6 +17,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.text_cancel
+import apphub.composeapp.generated.resources.text_product_not_found
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.ncgroup.kscan.BarcodeFormats
@@ -27,6 +31,7 @@ import org.techascent.muslim.halalscanner.composable.ErrorContent
 import org.techascent.muslim.halalscanner.composable.InformationContent
 import org.techascent.muslim.halalscanner.composable.LoadingContent
 import org.techascent.muslim.halalscanner.state.HalalScannerUiState
+import org.techascent.muslim.prayer.composable.ErrorCard
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -119,8 +124,10 @@ private fun HalalScannerContent(
                 modifier = Modifier.fillMaxSize()
             ) {
                 when (uiState) {
-                    is HalalScannerUiState.Error -> ErrorContent(
-                        onNavigateBack = onNavigateBack
+                    is HalalScannerUiState.Error -> ErrorCard(
+                        description = stringResource(Res.string.text_product_not_found),
+                        buttonText = stringResource(Res.string.text_cancel),
+                        onRetry = onNavigateBack
                     )
 
                     is HalalScannerUiState.Loading -> LoadingContent()

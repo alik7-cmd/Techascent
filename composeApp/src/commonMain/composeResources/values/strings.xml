@@ -4,6 +4,7 @@
     <string name="title_home">Prayer Time</string>
     <string name="title_calendar">Calendar</string>
     <string name="title_settings">Settings</string>
+    <string name="text_try_again">Try Again</string>
 
     <string name="title_error">Oops! An Error Occurred</string>
     <string name="message_error">An error occurred while processing your request. We’re on it! In the meantime, make sure your internet connection is stable and try again shortly.</string>

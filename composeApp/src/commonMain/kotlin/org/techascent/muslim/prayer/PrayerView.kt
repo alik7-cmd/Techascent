@@ -47,6 +47,7 @@ internal fun PrayerView(
             onNavigateToTasbeeh = onNavigateToTasbeeh,
             onNavigateToCompass = onNavigateToCompass,
             onNavigateHalalScanner = onNavigateHalalScanner,
+            onFetchPrayers = viewModel::getPrayerTimes,
             innerPadding = innerPadding
         )
     }
@@ -59,6 +60,7 @@ private fun PrayerScreen(
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
+    onFetchPrayers: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -67,6 +69,7 @@ private fun PrayerScreen(
         onNavigateToTasbeeh = onNavigateToTasbeeh,
         onNavigateToCompass = onNavigateToCompass,
         onNavigateHalalScanner = onNavigateHalalScanner,
+        onFetchPrayers = onFetchPrayers,
         onHandleEvent = viewModel::onHandleEvent,
         innerPadding = innerPadding
     )
@@ -79,6 +82,7 @@ private fun PrayerContent(
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
+    onFetchPrayers: () -> Unit,
     onHandleEvent: (PrayerTimeEvent) -> Unit,
     innerPadding: PaddingValues
 ) {
@@ -103,7 +107,9 @@ private fun PrayerContent(
                     onHandleEvent = onHandleEvent
                 )
 
-                is PrayerTimeUiState.Error -> errorContent()
+                is PrayerTimeUiState.Error -> errorContent(
+                    onRetry = onFetchPrayers
+                )
             }
         }
     }
