@@ -10,4 +10,13 @@ interface PrayerApi {
         longitude: Double,
         school: Int
     ): PrayerTimesResponse
+
+    suspend fun getPrayerTimesByMonth(
+        year: Int,
+        month: Int,
+        city: String,
+        country: String,
+        method: Int,
+        school: Int
+    ): PrayerTimesResponse
 }
