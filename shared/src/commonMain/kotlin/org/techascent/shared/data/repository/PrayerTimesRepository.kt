@@ -1,6 +1,7 @@
 package org.techascent.shared.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import org.techascent.shared.data.PrayerTimeMonthlyResponse
 import org.techascent.shared.data.dto.PrayerTimeDto
 import org.techascent.shared.data.enum.PrayerCalculationMethod
 import org.techascent.shared.data.enum.School
@@ -13,4 +14,14 @@ interface PrayerTimesRepository {
         date: String,
         school: School,
     ): Flow<ResultState<PrayerTimeDto>>
+
+    suspend fun getPrayerTimesByMonth(
+        year: Int,
+        month: Int,
+        city: String,
+        country: String,
+        method: Int,
+        school: Int,
+        onMapData: (PrayerTimeMonthlyResponse) -> List<PrayerTimeDto>
+    ): Flow<ResultState<List<PrayerTimeDto>>?>
 }

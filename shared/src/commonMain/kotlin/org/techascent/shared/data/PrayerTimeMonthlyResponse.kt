@@ -7,19 +7,9 @@ data class PrayerTimeMonthlyResponse(
     @SerialName("code")
     val code: Int?,
     @SerialName("data")
-    val `data`: List<Data>?,
+    val `data`: List<PrayerData>?,
     @SerialName("status")
     val status: String?
-)
-
-@kotlinx.serialization.Serializable
-data class Data(
-    @SerialName("date")
-    val date: Date?,
-    @SerialName("meta")
-    val meta: Meta?,
-    @SerialName("timings")
-    val timings: Timings?
 )
 
 @kotlinx.serialization.Serializable

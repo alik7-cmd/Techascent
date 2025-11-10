@@ -24,7 +24,7 @@ val prayerModule = module {
     single<PrayerApi> { PrayerApiImpl(get()) }
     single<CacheService<String, Any>> { DefaultCacheService(maxSize = 100) }
     single<PrayerTimesRepository> { PrayerTimesRepositoryImpl(get()) }
-    single<PrayerTimeDataSource> { PrayerTimeDataSourceImpl(api = get(), cacheService = get()) }
+    single<PrayerTimeDataSource> { PrayerTimeDataSourceImpl(api = get(), cacheService = get(), dao = get()) }
 
     single<HalalScannerApi> { HalalScannerApiImpl(get()) }
     single<HalalScannerRepository> { HalalScannerRepositoryImpl(dataSource = get()) }

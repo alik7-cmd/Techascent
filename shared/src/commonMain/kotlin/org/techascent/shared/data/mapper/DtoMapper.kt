@@ -9,6 +9,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import org.techascent.shared.data.OpenFoodFactsResponse
+import org.techascent.shared.data.PrayerData
 import org.techascent.shared.data.PrayerTimesResponse
 import org.techascent.shared.data.Product
 import org.techascent.shared.data.common.truncateToMinute
@@ -19,9 +20,9 @@ import org.techascent.shared.data.dto.PrayerTimeDto
 import org.techascent.shared.data.dto.PrayerTimeInterval
 import org.techascent.shared.data.dto.ProductDto
 
-fun PrayerTimesResponse.toDto(): PrayerTimeDto {
-    val timings = this.data.timings
-    val timezone = TimeZone.of(this.data.meta.timezone)
+fun PrayerData.toDto(): PrayerTimeDto {
+    val timings = this.timings
+    val timezone = TimeZone.of(this.meta.timezone)
 
     // Current date and time in given timezone
     val nowDateTime = Clock.System.now().toLocalDateTime(timezone).truncateToMinute()
@@ -69,7 +70,7 @@ fun PrayerTimesResponse.toDto(): PrayerTimeDto {
     }
 
     // Hijri date string from API response
-    val hijriDate = this.data.date.hijri.date
+    val hijriDate = this.date.hijri.date
 
     return PrayerTimeDto(
         intervals = intervals,
@@ -82,8 +83,8 @@ fun PrayerTimesResponse.toDto(): PrayerTimeDto {
             endTime = imsak
         ),
         location = LocationDto(
-            latitude = this.data.meta.latitude,
-            longitude = this.data.meta.longitude
+            latitude = this.meta.latitude,
+            longitude = this.meta.longitude
         )
     )
 }

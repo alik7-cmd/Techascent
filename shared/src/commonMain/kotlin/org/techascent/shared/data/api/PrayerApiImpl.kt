@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import org.techascent.shared.data.PrayerTimeMonthlyResponse
 import org.techascent.shared.data.PrayerTimesResponse
 
 private const val LATITUDE = "latitude"
@@ -34,7 +35,7 @@ class PrayerApiImpl(private val client: HttpClient) : PrayerApi {
         country: String,
         method: Int,
         school: Int
-    ): PrayerTimesResponse {
+    ): PrayerTimeMonthlyResponse {
         return client.get("https://api.aladhan.com/v1/timings/$year/$month") {
             parameter(key = CITY, value = city)
             parameter(key = COUNTRY, value = country)

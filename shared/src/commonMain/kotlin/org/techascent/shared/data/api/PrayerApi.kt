@@ -1,5 +1,6 @@
 package org.techascent.shared.data.api
 
+import org.techascent.shared.data.PrayerTimeMonthlyResponse
 import org.techascent.shared.data.PrayerTimesResponse
 
 
@@ -18,5 +19,5 @@ interface PrayerApi {
         country: String,
         method: Int,
         school: Int
-    ): PrayerTimesResponse
+    ): PrayerTimeMonthlyResponse
 }
