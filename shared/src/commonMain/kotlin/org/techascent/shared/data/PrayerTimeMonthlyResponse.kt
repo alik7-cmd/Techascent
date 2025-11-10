@@ -35,26 +35,6 @@ data class Date(
 )
 
 @kotlinx.serialization.Serializable
-data class Meta(
-    @SerialName("latitude")
-    val latitude: Double?,
-    @SerialName("latitudeAdjustmentMethod")
-    val latitudeAdjustmentMethod: String?,
-    @SerialName("longitude")
-    val longitude: Double?,
-    @SerialName("method")
-    val method: Method?,
-    @SerialName("midnightMode")
-    val midnightMode: String?,
-    @SerialName("offset")
-    val offset: Offset?,
-    @SerialName("school")
-    val school: String?,
-    @SerialName("timezone")
-    val timezone: String?
-)
-
-@kotlinx.serialization.Serializable
 data class Gregorian(
     @SerialName("date")
     val date: String?,
@@ -158,14 +138,6 @@ data class Offset(
     val sunrise: Int?,
     @SerialName("Sunset")
     val sunset: Int?
-)
-
-@kotlinx.serialization.Serializable
-data class Location(
-    @SerialName("latitude")
-    val latitude: Double?,
-    @SerialName("longitude")
-    val longitude: Double?
 )
 
 @kotlinx.serialization.Serializable
