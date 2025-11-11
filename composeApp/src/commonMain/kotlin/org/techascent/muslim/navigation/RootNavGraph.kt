@@ -89,9 +89,6 @@ fun NavGraphBuilder.mainNavGraph(
     ) {
         composable(route = Screen.PrayerView.route) {
             PrayerView(
-                onNavigateToTasbeeh = { rootNavController.navigate(Screen.TasbeehView.route) },
-                onNavigateToCompass = { rootNavController.navigate(Screen.CompassView.route) },
-                onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) },
                 innerPadding = innerPadding
             )
         }

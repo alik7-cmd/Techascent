@@ -22,7 +22,7 @@
     <string name="text_suhur">Suhur</string>
     <string name="text_remaining_time">Remaining time of</string>"
 
-    <string name="warning_prayer_time">Prayer times are sourced from aladhan.com. While generally reliable, times may vary by location and calculation method. Please verify with your local mosque for accuracy.</string>
+    <string name="warning_prayer_time">Your prayer times are based on the Hanafi school of thought. The option to change this setting will be available soon.</string>
 
     <string name="title_location_picker">Why We Need Your Location Permission</string>
     <string name="message_location_picker">Prayer times are based on the position of the sun, which varies depending on where you are in the world. By accessing your location, the app can determine the precise time for each prayer — including Fajr, Dhuhr, Asr, Maghrib, and Isha — based on your local timezone, latitude, and longitude.</string>
@@ -43,6 +43,9 @@
     <string name="title_quibla">Quibla</string>
     <string name="title_halal_scanner">Halal Scanner</string>
 
+    <string name="text_permission_title">Permission Required</string>
+    <string name="text_permission_description">Camera permission is required to use the Halal Scanner. Please enable it in the app settings.</string>
+
     <string name="title_appearance">Appearance</string>
     <string name="title_widgets">Widgets</string>
     <string name="sub_title_widgets">Redirects to the device settings</string>
@@ -58,7 +61,7 @@
     <string name="text_not_halal">Not Halal</string>
     <string name="text_unknown_status">Unknown</string>
 
-    <string name="text_halal_scanner_more">Halal Scanner and More</string>
+    <string name="text_halal_scanner_more">Halal Scanner &amp; More</string>
 
     <string name="text_halal_certified_reason">
 This product has been officially certified or clearly labeled as halal by a recognized authority or organization. Its ingredients and production process comply with halal standards.

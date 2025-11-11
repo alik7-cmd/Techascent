@@ -29,9 +29,6 @@ import org.techascent.muslim.prayer.state.PrayerTimeUiState
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 internal fun PrayerView(
-    onNavigateToTasbeeh: () -> Unit,
-    onNavigateToCompass: () -> Unit,
-    onNavigateHalalScanner: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val viewModel = koinViewModel<PrayerTimeViewModel>()
@@ -44,9 +41,6 @@ internal fun PrayerView(
         }
 
         PrayerScreen(
-            onNavigateToTasbeeh = onNavigateToTasbeeh,
-            onNavigateToCompass = onNavigateToCompass,
-            onNavigateHalalScanner = onNavigateHalalScanner,
             onFetchPrayers = viewModel::getPrayerTimes,
             innerPadding = innerPadding
         )
@@ -57,20 +51,13 @@ internal fun PrayerView(
 @Composable
 private fun PrayerScreen(
     viewModel: PrayerTimeViewModel = koinViewModel<PrayerTimeViewModel>(),
-    onNavigateToTasbeeh: () -> Unit,
-    onNavigateToCompass: () -> Unit,
-    onNavigateHalalScanner: () -> Unit,
     onFetchPrayers: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
     PrayerContent(
         uiState = uiState,
-        onNavigateToTasbeeh = onNavigateToTasbeeh,
-        onNavigateToCompass = onNavigateToCompass,
-        onNavigateHalalScanner = onNavigateHalalScanner,
         onFetchPrayers = onFetchPrayers,
-        onHandleEvent = viewModel::onHandleEvent,
         innerPadding = innerPadding
     )
 }
@@ -79,11 +66,7 @@ private fun PrayerScreen(
 @Composable
 private fun PrayerContent(
     uiState: PrayerTimeUiState,
-    onNavigateToTasbeeh: () -> Unit,
-    onNavigateToCompass: () -> Unit,
-    onNavigateHalalScanner: () -> Unit,
     onFetchPrayers: () -> Unit,
-    onHandleEvent: (PrayerTimeEvent) -> Unit,
     innerPadding: PaddingValues
 ) {
     Scaffold(
@@ -101,10 +84,6 @@ private fun PrayerContent(
                 is PrayerTimeUiState.Loading -> loadingContent()
                 is PrayerTimeUiState.Success -> successContent(
                     uiModel = uiState.data,
-                    onNavigateToTasbeeh = onNavigateToTasbeeh,
-                    onNavigateToCompass = onNavigateToCompass,
-                    onNavigateHalalScanner = onNavigateHalalScanner,
-                    onHandleEvent = onHandleEvent
                 )
 
                 is PrayerTimeUiState.Error -> errorContent(

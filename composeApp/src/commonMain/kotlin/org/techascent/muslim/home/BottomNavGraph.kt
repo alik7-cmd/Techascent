@@ -14,13 +14,10 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import apphub.composeapp.generated.resources.ic_barcode
-import apphub.composeapp.generated.resources.ic_calendar
 import apphub.composeapp.generated.resources.ic_prayer
-import apphub.composeapp.generated.resources.title_calendar
+import apphub.composeapp.generated.resources.ic_scan
 import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_home
 import org.jetbrains.compose.resources.StringResource
@@ -46,8 +43,8 @@ val navigationItemsLists = listOf(
         route = Screen.PrayerView.route,
     ),
     NavigationItem(
-        unSelectedIcon = Res.drawable.ic_barcode,
-        selectedIcon = Res.drawable.ic_barcode,
+        unSelectedIcon = Res.drawable.ic_scan,
+        selectedIcon = Res.drawable.ic_scan,
         title = Res.string.title_halal_scanner,
         route = Screen.UtilityView.route,
     ),
