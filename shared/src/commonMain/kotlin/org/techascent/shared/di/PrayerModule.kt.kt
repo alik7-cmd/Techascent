@@ -1,5 +1,7 @@
 package org.techascent.shared.di
 
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 import org.koin.dsl.module
 import org.techascent.shared.data.api.PrayerApi
 import org.techascent.shared.data.api.PrayerApiImpl
@@ -11,6 +13,7 @@ import org.techascent.shared.data.datasource.PrayerTimeDataSource
 import org.techascent.shared.data.datasource.PrayerTimeDataSourceImpl
 import org.techascent.shared.data.datasource.halalscanner.HalalScannerDataSource
 import org.techascent.shared.data.datasource.halalscanner.HalalScannerDataSourceImpl
+import org.techascent.shared.data.realm.PrayerTimeMonthlyRealm
 import org.techascent.shared.data.repository.PrayerTimesRepository
 import org.techascent.shared.data.repository.PrayerTimesRepositoryImpl
 import org.techascent.shared.data.repository.halalscanner.HalalScannerRepository
@@ -34,4 +37,16 @@ val prayerModule = module {
     }*/
 
     /*single { get<AppDatabase>().prayerTimesDao() }*/
+
+    val realmModule = module {
+        single<RealmConfiguration> {
+            RealmConfiguration.create(
+                schema = setOf(PrayerTimeMonthlyRealm::class /*, OtherModels::class */)
+            )
+        }
+
+        single<Realm> {
+            Realm.open(get<RealmConfiguration>())
+        }
+    }
 }

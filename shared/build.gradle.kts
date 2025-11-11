@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization) // kotlinx.serialization plugin
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    id("io.realm.kotlin") version "2.3.0"
 }
 
 kotlin {
@@ -44,6 +45,8 @@ kotlin {
 
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.sqlite.bundled)
+
+                implementation("io.realm.kotlin:library-base:2.3.0")
             }
         }
 
