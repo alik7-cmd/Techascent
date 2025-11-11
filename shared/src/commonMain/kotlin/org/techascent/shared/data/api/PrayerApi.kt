@@ -8,6 +8,6 @@ interface PrayerApi {
         date: String,
         latitude: Double,
         longitude: Double,
-        method: Int
+        school: Int
     ): PrayerTimesResponse
 }

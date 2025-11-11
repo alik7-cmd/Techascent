@@ -14,6 +14,7 @@ import org.techascent.muslim.location.LocationPickerView
 import org.techascent.muslim.prayer.PrayerView
 import org.techascent.muslim.settings.SettingsView
 import org.techascent.muslim.tasbeeh.TasbeehView
+import org.techascent.muslim.utility.UtilityView
 
 private const val LOCATION_PICKER_VIEW = "LOCATION_PICKER_VIEW"
 private const val HOME_GRAPH = "HOME_GRAPH"
@@ -23,6 +24,7 @@ private const val SETTINGS_VIEW = "SETTINGS_VIEW"
 private const val TASBEEH_VIEW = "TASBEEH_VIEW"
 private const val COMPASS_VIEW = "COMPASS_VIEW"
 private const val HALAL_SCANNER_VIEW = "HALAL_SCANNER_VIEW"
+private const val UTILITY_VIEW = "UTILITY_VIEW"
 
 sealed class Screen(val route: String) {
     data object LocationPickerView : Screen(route = LOCATION_PICKER_VIEW)
@@ -33,6 +35,7 @@ sealed class Screen(val route: String) {
     data object TasbeehView : Screen(route = TASBEEH_VIEW)
     data object CompassView : Screen(route = COMPASS_VIEW)
     data object HalalScannerView : Screen(route = HALAL_SCANNER_VIEW)
+    data object UtilityView : Screen(route = UTILITY_VIEW)
 }
 
 @Composable
@@ -92,9 +95,13 @@ fun NavGraphBuilder.mainNavGraph(
                 innerPadding = innerPadding
             )
         }
-        /*composable(route = Screen.CalendarView.route) {
-            CalendarView()
-        }*/
+        composable(route = Screen.UtilityView.route) {
+            UtilityView(
+                onNavigateToCompass = { rootNavController.navigate(Screen.CompassView.route) },
+                onNavigateToTasbeeh = { rootNavController.navigate(Screen.TasbeehView.route) },
+                onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) }
+            )
+        }
         /*composable(route = Screen.SettingsView.route) {
             SettingsView(
                 innerPadding = innerPadding

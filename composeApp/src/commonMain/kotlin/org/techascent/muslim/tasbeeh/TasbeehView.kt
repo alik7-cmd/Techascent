@@ -33,14 +33,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.ic_back
 import apphub.composeapp.generated.resources.ic_finger
-import apphub.composeapp.generated.resources.ic_reset
 import apphub.composeapp.generated.resources.text_reset_counter
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.appbar.TopAppBar
 import org.techascent.composa.button.primary.ComposaButton
-import org.techascent.composa.button.text.ComposaButtonText
 import org.techascent.muslim.performHapticFeedback
 import org.techascent.muslim.showNativeResetDialog
 import org.techascent.muslim.tasbeeh.state.DialogProperty

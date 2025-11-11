@@ -67,11 +67,11 @@ fun LazyListScope.successContent(
     onHandleEvent: (PrayerTimeEvent) -> Unit
 ) {
     currentSalatContent(uiModel = uiModel)
-    actionButtonRow(
+    /*actionButtonRow(
         onNavigateToTasbeeh = onNavigateToTasbeeh,
         onNavigateToCompass = onNavigateToCompass,
         onNavigateHalalScanner = onNavigateHalalScanner
-    )
+    )*/
     /*infoBox(
         message = uiModel.warningMessage,
         url = uiModel.apiUrl,

@@ -58,6 +58,8 @@
     <string name="text_not_halal">Not Halal</string>
     <string name="text_unknown_status">Unknown</string>
 
+    <string name="text_halal_scanner_more">Halal Scanner and More</string>
+
     <string name="text_halal_certified_reason">
 This product has been officially certified or clearly labeled as halal by a recognized authority or organization. Its ingredients and production process comply with halal standards.
 </string>

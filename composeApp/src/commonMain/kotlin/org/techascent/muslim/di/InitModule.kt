@@ -16,6 +16,7 @@ import org.techascent.muslim.prayer.PrayerTimeViewModel
 import org.techascent.muslim.provideDataStore
 import org.techascent.muslim.settings.SettingsViewModel
 import org.techascent.muslim.tasbeeh.TasbeehViewModel
+import org.techascent.muslim.utility.UtilityViewModel
 import org.techascent.shared.di.prayerModule
 
 val appModule = module {
@@ -30,6 +31,7 @@ val appModule = module {
     viewModel { CompassViewModel() }
     viewModel { CityPickerViewModel() }
     viewModel { HalalScannerViewModel(repository = get()) }
+    viewModel { UtilityViewModel() }
 }
 
 fun initializeKoin() {

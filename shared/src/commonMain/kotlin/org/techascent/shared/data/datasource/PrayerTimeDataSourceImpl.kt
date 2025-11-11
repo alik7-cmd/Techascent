@@ -7,7 +7,7 @@ import org.techascent.shared.data.PrayerTimesResponse
 import org.techascent.shared.data.api.PrayerApi
 import org.techascent.shared.data.cache.CacheService
 import org.techascent.shared.data.dto.PrayerTimeDto
-import org.techascent.shared.data.enum.PrayerCalculationMethod
+import org.techascent.shared.data.enum.School
 import org.techascent.shared.data.enum.toCode
 import org.techascent.shared.network.ResultState
 import org.techascent.shared.network.baseRemoteCall
@@ -20,10 +20,10 @@ class PrayerTimeDataSourceImpl(
         latitude: Double,
         longitude: Double,
         date: String,
-        method: PrayerCalculationMethod,
+        school: School,
         onMapData: (PrayerTimesResponse) -> PrayerTimeDto
     ): Flow<ResultState<PrayerTimeDto>> = flow {
-        val cacheKey = "$latitude-$longitude-$date-${method.toCode()}"
+        val cacheKey = "$latitude-$longitude-$date-${school.toCode()}"
         val cached = cacheService.get(cacheKey)
         if (cached != null) {
             emit(ResultState.Success(onMapData(cached)))
@@ -35,7 +35,7 @@ class PrayerTimeDataSourceImpl(
                             date = date,
                             latitude = latitude,
                             longitude = longitude,
-                            method = method.toCode()
+                            school = school.toCode()
                         )
                     },
                     onMapData = { response ->
