@@ -27,7 +27,6 @@ import org.ncgroup.kscan.BarcodeFormats
 import org.ncgroup.kscan.BarcodeResult
 import org.ncgroup.kscan.ScannerView
 import org.techascent.composa.theming.ComposaTheme
-import org.techascent.muslim.halalscanner.composable.ErrorContent
 import org.techascent.muslim.halalscanner.composable.InformationContent
 import org.techascent.muslim.halalscanner.composable.LoadingContent
 import org.techascent.muslim.halalscanner.state.HalalScannerUiState

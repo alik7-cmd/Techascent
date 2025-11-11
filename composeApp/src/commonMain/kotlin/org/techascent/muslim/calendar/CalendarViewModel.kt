@@ -12,6 +12,7 @@ import org.techascent.muslim.common.getCurrentDateFormatted
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.enum.PrayerCalculationMethod
+import org.techascent.shared.data.enum.School
 import org.techascent.shared.data.repository.PrayerTimesRepository
 import org.techascent.shared.network.ResultState
 
@@ -38,7 +39,7 @@ class CalendarViewModel(
                 latitude = location.latitude,
                 longitude = location.longitude,
                 date = date,
-                method = PrayerCalculationMethod.MWL
+                school = School.HANAFI
             ).collect {
                 when (it) {
                     is ResultState.Success -> _uiState.emit(

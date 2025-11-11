@@ -27,3 +27,10 @@ enum class PrayerCalculationMethod(val code: Int) {
     CUSTOM(99);
 }
 internal fun PrayerCalculationMethod.toCode(): Int = this.code
+
+enum class School(val code: Int){
+    SHAFI(0),
+    HANAFI(1)
+}
+
+internal fun School.toCode(): Int = this.code

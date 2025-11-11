@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import apphub.composeapp.generated.resources.ic_barcode
 import apphub.composeapp.generated.resources.ic_calendar
 import apphub.composeapp.generated.resources.ic_prayer
 import apphub.composeapp.generated.resources.title_calendar
+import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_home
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -43,12 +45,12 @@ val navigationItemsLists = listOf(
         title = Res.string.title_home,
         route = Screen.PrayerView.route,
     ),
-    /*NavigationItem(
-        unSelectedIcon = Res.drawable.ic_calendar,
-        selectedIcon = Res.drawable.ic_calendar,
-        title = Res.string.title_calendar,
-        route = Screen.CalendarView.route,
-    ),*/
+    NavigationItem(
+        unSelectedIcon = Res.drawable.ic_barcode,
+        selectedIcon = Res.drawable.ic_barcode,
+        title = Res.string.title_halal_scanner,
+        route = Screen.UtilityView.route,
+    ),
     /*NavigationItem(
         unSelectedIcon = Res.drawable.ic_settings_2,
         selectedIcon = Res.drawable.ic_settings_2,
