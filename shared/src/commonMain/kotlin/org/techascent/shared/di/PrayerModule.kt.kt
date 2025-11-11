@@ -15,8 +15,6 @@ import org.techascent.shared.data.repository.PrayerTimesRepository
 import org.techascent.shared.data.repository.PrayerTimesRepositoryImpl
 import org.techascent.shared.data.repository.halalscanner.HalalScannerRepository
 import org.techascent.shared.data.repository.halalscanner.HalalScannerRepositoryImpl
-import org.techascent.shared.data.room.AppDatabase
-import org.techascent.shared.getDatabaseBuilder
 import org.techascent.shared.network.provideHttpClient
 
 val prayerModule = module {
@@ -24,16 +22,16 @@ val prayerModule = module {
     single<PrayerApi> { PrayerApiImpl(get()) }
     single<CacheService<String, Any>> { DefaultCacheService(maxSize = 100) }
     single<PrayerTimesRepository> { PrayerTimesRepositoryImpl(get()) }
-    single<PrayerTimeDataSource> { PrayerTimeDataSourceImpl(api = get(), cacheService = get(), dao = get()) }
+    single<PrayerTimeDataSource> { PrayerTimeDataSourceImpl(api = get(), cacheService = get()) }
 
     single<HalalScannerApi> { HalalScannerApiImpl(get()) }
     single<HalalScannerRepository> { HalalScannerRepositoryImpl(dataSource = get()) }
     single<HalalScannerDataSource> { HalalScannerDataSourceImpl(api = get()) }
 
-    single<AppDatabase> {
+    /*single<AppDatabase> {
         getDatabaseBuilder()
             .build()
-    }
+    }*/
 
-    single { get<AppDatabase>().prayerTimesDao() }
+    /*single { get<AppDatabase>().prayerTimesDao() }*/
 }

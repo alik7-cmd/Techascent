@@ -13,9 +13,10 @@ class IOSPlatform : Platform {
 
 actual fun getPlatform(): Platform = IOSPlatform()
 
+/*
 actual fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
     val dbPath = NSHomeDirectory() + "/Documents/prayer_app.db"
     return Room.databaseBuilder<AppDatabase>(
         name = dbPath
     )
-}
+}*/
