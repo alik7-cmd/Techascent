@@ -40,7 +40,7 @@ fun LazyListScope.parabolicTasbeeh(
         val animProgress = remember { Animatable(0f) }
         var isAnimating by remember { mutableStateOf(false) }
 
-        val totalWidth = 400f
+        val totalWidth = 500f
         val spacing = 90f
         val baseHeight = 250f
         val arcHeight = 120f
@@ -88,98 +88,96 @@ fun LazyListScope.parabolicTasbeeh(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ComposaTheme.color.backgroundAppBackground),
+                .height(400.dp)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        if (isAnimating) return@detectHorizontalDragGestures
+                        change.consume()
+                        if (dragAmount > 0) isAnimating = true
+                    }
+                },
             contentAlignment = Alignment.Center
         ) {
-            Box(
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val centerX = size.width / 2
+
+                // Left beads with spring shift
+                val leftBeads = (0 until leftCount).map { i ->
+                    val shift =
+                        leftShift.value + if (isAnimating) animProgress.value * spacing / leftCount else 0f
+                    val x = centerX - spacing * (leftCount - i) + shift
+                    val y = baseHeight - arcHeight * ((x - centerX).pow(2) / totalWidth.pow(2))
+                    Offset(x, y)
+                }
+
+                // Right beads with spring shift
+                val rightBeads = (0 until rightCount).map { i ->
+                    val shift =
+                        rightShift.value - if (isAnimating) animProgress.value * spacing / rightCount else 0f
+                    val x = centerX + spacing * (i + 1) + shift
+                    val y = baseHeight - arcHeight * ((x - centerX).pow(2) / totalWidth.pow(2))
+                    Offset(x, y)
+                }
+
+                // Moving bead
+                val movingBead = if (isAnimating) {
+                    val t = animProgress.value
+                    val startX = centerX - spacing * leftCount
+                    val endX = centerX + spacing
+                    val x = lerp(startX, endX, t)
+                    val y = baseHeight - arcHeight * ((x - centerX).pow(2) / totalWidth.pow(2))
+                    Offset(x, y)
+                } else null
+
+                // All beads for string
+                val allBeads =
+                    leftBeads + (movingBead?.let { listOf(it) } ?: emptyList()) + rightBeads
+
+                // Draw string (1px)
+                if (allBeads.size > 1) {
+                    val path = Path().apply {
+                        moveTo(allBeads.first().x, allBeads.first().y)
+                        for (p in allBeads.drop(1)) lineTo(p.x, p.y)
+                    }
+                    drawPath(path, Color.Gray, style = Stroke(width = 1f))
+                }
+
+                // Draw beads
+                leftBeads.forEach { drawCircle(Color(0xFF4CAF50), beadRadius, it) }
+                rightBeads.forEach { drawCircle(Color(0xFFAAAAAA), beadRadius, it) }
+                movingBead?.let { drawCircle(Color.Yellow, beadRadius + 6f, it) }
+            }
+
+            // Counter text
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp)
-                    .pointerInput(Unit) {
-                        detectHorizontalDragGestures { change, dragAmount ->
-                            if (isAnimating) return@detectHorizontalDragGestures
-                            change.consume()
-                            if (dragAmount > 0) isAnimating = true
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    val centerX = size.width / 2
+                    .align(Alignment.BottomCenter) // <-- THIS IS THE KEY MODIFIER
+                    .padding(bottom = ComposaSpacing.Large),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = count.toString(),
+                    style = ComposaTheme.typography.titleLargeDemi
+                )
 
-                    // Left beads with spring shift
-                    val leftBeads = (0 until leftCount).map { i ->
-                        val shift =
-                            leftShift.value + if (isAnimating) animProgress.value * spacing / leftCount else 0f
-                        val x = centerX - spacing * (leftCount - i) + shift
-                        val y = baseHeight - arcHeight * ((x - centerX).pow(2) / totalWidth.pow(2))
-                        Offset(x, y)
-                    }
+                Spacer(modifier = Modifier.height(ComposaSpacing.Large))
 
-                    // Right beads with spring shift
-                    val rightBeads = (0 until rightCount).map { i ->
-                        val shift =
-                            rightShift.value - if (isAnimating) animProgress.value * spacing / rightCount else 0f
-                        val x = centerX + spacing * (i + 1) + shift
-                        val y = baseHeight - arcHeight * ((x - centerX).pow(2) / totalWidth.pow(2))
-                        Offset(x, y)
-                    }
+                MessageBox(
+                    modifier = Modifier.padding(horizontal = ComposaSpacing.Medium)
+                        .testTag(PrayerTags.PRAYER_TIME_INFO_CONTENT),
+                    messageType = MessageType.Info,
+                    message = stringResource(Res.string.title_tasbeeh_instruction)
+                )
 
-                    // Moving bead
-                    val movingBead = if (isAnimating) {
-                        val t = animProgress.value
-                        val startX = centerX - spacing * leftCount
-                        val endX = centerX + spacing
-                        val x = lerp(startX, endX, t)
-                        val y = baseHeight - arcHeight * ((x - centerX).pow(2) / totalWidth.pow(2))
-                        Offset(x, y)
-                    } else null
+                Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
-                    // All beads for string
-                    val allBeads =
-                        leftBeads + (movingBead?.let { listOf(it) } ?: emptyList()) + rightBeads
-
-                    // Draw string (1px)
-                    if (allBeads.size > 1) {
-                        val path = Path().apply {
-                            moveTo(allBeads.first().x, allBeads.first().y)
-                            for (p in allBeads.drop(1)) lineTo(p.x, p.y)
-                        }
-                        drawPath(path, Color.Gray, style = Stroke(width = 1f))
-                    }
-
-                    // Draw beads
-                    leftBeads.forEach { drawCircle(Color(0xFF4CAF50), beadRadius, it) }
-                    rightBeads.forEach { drawCircle(Color(0xFFAAAAAA), beadRadius, it) }
-                    movingBead?.let { drawCircle(Color.Yellow, beadRadius + 6f, it) }
-                }
-
-                // Counter text
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = count.toString(),
-                        style = ComposaTheme.typography.titleLargeDemi
-                    )
-
-                    Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
-
-                    MessageBox(
-                        modifier = Modifier.padding(horizontal = ComposaSpacing.Medium)
-                            .testTag(PrayerTags.PRAYER_TIME_INFO_CONTENT),
-                        messageType = MessageType.Info,
-                        message = stringResource(Res.string.title_tasbeeh_instruction)
-                    )
-                    /*Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
-
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = ComposaSpacing.Medium),
-                        text = stringResource(resource = uiState.infoMessage),
-                        style = ComposaTheme.typography.footnote,
-                        color = ComposaTheme.color.textNeutral
-                    )*/
-                }
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = ComposaSpacing.Medium),
+                    text = stringResource(resource = uiState.infoMessage),
+                    style = ComposaTheme.typography.footnote,
+                    color = ComposaTheme.color.textNeutral
+                )
             }
         }
     }
