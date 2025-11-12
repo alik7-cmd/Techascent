@@ -2,8 +2,8 @@ package org.techascent.muslim.utility.state
 
 import androidx.compose.runtime.Stable
 import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.ic_halal
 import apphub.composeapp.generated.resources.ic_quibla
-import apphub.composeapp.generated.resources.ic_scan
 import apphub.composeapp.generated.resources.ic_tasbeeh
 import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_quibla
@@ -33,7 +33,7 @@ private val featureList = listOf(
 
     FeatureItem(
         titleRes = Res.string.title_halal_scanner,
-        imageRes = Res.drawable.ic_scan
+        imageRes = Res.drawable.ic_halal
     )
 
 )

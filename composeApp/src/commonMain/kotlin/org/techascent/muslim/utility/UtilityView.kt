@@ -169,7 +169,7 @@ fun CenteredCardWithImageAndTitle(
                         modifier = Modifier.size(60.dp),
                         icon = DrawableData(
                             imageRes = item.imageRes,
-                            tint = Color.Unspecified,
+                            tint = if(item.titleRes == Res.string.title_halal_scanner) Color.Green else Color.Unspecified,
                         )
                     )
 
