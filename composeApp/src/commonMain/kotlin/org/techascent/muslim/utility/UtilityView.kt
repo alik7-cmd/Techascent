@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -92,21 +93,26 @@ private fun UtilityScreen(
             )
         },
     ) { innerPadding ->
-        LazyVerticalGrid(
+
+        BoxWithConstraints(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = innerPadding,
-            columns = GridCells.Adaptive(minSize = 200.dp)
         ) {
-            items(uiState.listOfFeatures) { item ->
-                CenteredCardWithImageAndTitle(
-                    item = item,
-                    onNavigateToCompass = onNavigateToCompass,
-                    onNavigateToTasbeeh = onNavigateToTasbeeh,
-                    onNavigateHalalScanner = onNavigateHalalScanner
-                )
+            val minCellSize = (maxWidth / 2).coerceAtLeast(150.dp)
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = innerPadding,
+                columns = GridCells.Adaptive(minSize = minCellSize)
+            ) {
+                items(uiState.listOfFeatures) { item ->
+                    CenteredCardWithImageAndTitle(
+                        item = item,
+                        onNavigateToCompass = onNavigateToCompass,
+                        onNavigateToTasbeeh = onNavigateToTasbeeh,
+                        onNavigateHalalScanner = onNavigateHalalScanner
+                    )
+                }
             }
         }
-
     }
 }
 
@@ -125,12 +131,9 @@ fun CenteredCardWithImageAndTitle(
         val coroutineScope = rememberCoroutineScope()
         var showSettingsDialog by remember { mutableStateOf(false) }
         val factory = rememberPermissionsControllerFactory()
-        // 2. Create the controller instance. `remember` ensures it survives recompositions.
         val controller = remember(factory) {
             factory.createPermissionsController()
         }
-        // 3. Bind the controller's lifecycle to this composable.
-        // This is crucial for handling permission results correctly.
         BindEffect(controller)
         ComposaCardFrame(
             borderColor = ComposaTheme.color.strokeNeutralSubtle,
@@ -144,11 +147,10 @@ fun CenteredCardWithImageAndTitle(
                                 controller.providePermission(Permission.CAMERA)
                                 onNavigateHalalScanner()
                             } catch (e: DeniedException) {
-                                println("Camera permission denied ${e.message}")
+                                e.printStackTrace()
                                 showSettingsDialog = true
                             } catch (e: DeniedAlwaysException) {
-                                // 8. Handle the case where the permission is permanently denied.
-                                // We'll trigger a dialog to guide the user to settings.
+                                e.printStackTrace()
                                 showSettingsDialog = true
                             }
                         }
