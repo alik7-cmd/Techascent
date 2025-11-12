@@ -97,11 +97,14 @@ private fun TasbeehContent(
             contentPadding = innerPadding,
             verticalArrangement = spacedBy(ComposaSpacing.Medium)
         ) {
-            content(
+            parabolicTasbeeh(
+                uiState = uiState
+            )
+            /*content(
                 uiState = uiState,
                 onToggleDialogVisibility = onToggleDialogVisibility,
                 onProceedClick = onProceedClick
-            )
+            )*/
         }
     }
 }
