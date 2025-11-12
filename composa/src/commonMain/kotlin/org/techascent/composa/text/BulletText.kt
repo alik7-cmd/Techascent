@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 
 @Composable
@@ -44,7 +45,7 @@ fun BulletText(
     style: TextStyle = LocalTextStyle.current,
     bulletColor: Color = ComposaTheme.color.textNeutral
 ) {
-    Row(modifier = modifier, horizontalArrangement = spacedBy(4.dp)) {
+    Row(modifier = modifier, horizontalArrangement = spacedBy(ComposaSpacing.ExtraSmall)) {
 
         val tempFontSize = resolveFontSize(fontSize, style)
         val tempLineHeight = resolveLineHeight(lineHeight, style)
