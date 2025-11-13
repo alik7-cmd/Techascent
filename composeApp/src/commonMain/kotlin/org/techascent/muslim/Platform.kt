@@ -28,3 +28,5 @@ expect suspend fun readCsvFile(filename: String): List<String>
 expect fun getPlatformLocationService(): LocationService
 
 expect suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInfo
+
+expect fun openNearbyMosques()

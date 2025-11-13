@@ -29,7 +29,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.button_open_settings
@@ -38,6 +37,7 @@ import apphub.composeapp.generated.resources.text_halal_scanner_more
 import apphub.composeapp.generated.resources.text_permission_description
 import apphub.composeapp.generated.resources.text_permission_title
 import apphub.composeapp.generated.resources.title_halal_scanner
+import apphub.composeapp.generated.resources.title_nearby_mosque
 import apphub.composeapp.generated.resources.title_quibla
 import apphub.composeapp.generated.resources.title_tasbeeh
 import dev.icerock.moko.permissions.DeniedAlwaysException
@@ -55,6 +55,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
 import org.techascent.composa.icon.ComposaIcon
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.openNearbyMosques
 import org.techascent.muslim.utility.state.FeatureItem
 
 
@@ -155,6 +156,8 @@ fun CenteredCardWithImageAndTitle(
                             }
                         }
                     }
+
+                    Res.string.title_nearby_mosque -> openNearbyMosques()
                 }
             },
             content = {
@@ -169,7 +172,7 @@ fun CenteredCardWithImageAndTitle(
                         modifier = Modifier.size(60.dp),
                         icon = DrawableData(
                             imageRes = item.imageRes,
-                            tint = if(item.titleRes == Res.string.title_halal_scanner) Color.Green else Color.Unspecified,
+                            tint = item.tint,
                         )
                     )
 

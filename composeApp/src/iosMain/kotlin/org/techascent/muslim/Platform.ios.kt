@@ -21,7 +21,6 @@ import platform.UIKit.UIAlertActionStyleCancel
 import platform.UIKit.UIAlertActionStyleDefault
 import platform.UIKit.UIAlertController
 import platform.UIKit.UIAlertControllerStyleAlert
-import platform.UIKit.UIApplication
 import platform.UIKit.UIImpactFeedbackGenerator
 import platform.UIKit.UIImpactFeedbackStyle
 import platform.darwin.NSObject
@@ -37,6 +36,8 @@ import org.techascent.muslim.prayer.uimodel.AddressInfo
 import platform.CoreLocation.CLPlacemark
 import platform.Foundation.dictionaryWithValuesForKeys
 import kotlin.coroutines.resume
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
 
 /*class IOSPlatform: Platform {
     override val name: String = UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
@@ -201,5 +202,16 @@ actual suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInf
                 )
             )
         }
+    }
+}
+
+actual fun openNearbyMosques() {
+    val googleMapsUrl = NSURL(string = "comgooglemaps://?q=mosque")
+    val appleMapsUrl = NSURL(string = "http://maps.apple.com/?q=mosque")
+
+    val app = UIApplication.sharedApplication
+    when {
+        app.canOpenURL(googleMapsUrl) -> app.openURL(googleMapsUrl)
+        true -> app.openURL(appleMapsUrl)
     }
 }
