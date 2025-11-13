@@ -23,6 +23,8 @@ import org.techascent.muslim.prayer.uimodel.AddressInfo
 import java.io.File
 import java.util.Locale
 import kotlin.math.*
+import android.content.Intent
+import androidx.core.net.toUri
 
 
 actual fun playBeep() {
@@ -161,3 +163,22 @@ actual suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInf
         } ?: defaultAddress
     }
 }
+
+actual fun openNearbyMosques() {
+    val context = appContext ?: return
+    val mapUri = "geo:0,0?q=mosque".toUri()
+
+    val googleMapsIntent = Intent(Intent.ACTION_VIEW, mapUri).apply {
+        setPackage("com.google.android.apps.maps")
+    }
+
+    if (googleMapsIntent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(googleMapsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    } else {
+        val genericMapIntent = Intent(Intent.ACTION_VIEW, mapUri)
+        if (genericMapIntent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(genericMapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+    }
+}
+
