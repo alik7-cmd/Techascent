@@ -17,9 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.Res
-import apphub.composeapp.generated.resources.ic_looking
-import apphub.composeapp.generated.resources.text_try_again
-import org.jetbrains.compose.resources.stringResource
+import apphub.composeapp.generated.resources.ic_box
 import org.techascent.composa.button.primary.ComposaButton
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
@@ -74,8 +72,8 @@ fun ErrorPoster(
                 .size(200.dp)
                 .align(CenterHorizontally),
             icon = DrawableData(
-                imageRes = Res.drawable.ic_looking,
-                tint = ComposaTheme.color.textNeutral
+                imageRes = Res.drawable.ic_box,
+                tint = Color.Unspecified
             ),
         )
 
