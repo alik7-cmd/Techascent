@@ -21,6 +21,10 @@ import org.techascent.shared.data.dto.PrayerTimeDto
 import org.techascent.shared.data.dto.PrayerTimeInterval
 import kotlin.collections.map
 
+
+private const val BASE =
+    "https://raw.githubusercontent.com/fbehsaan/Images/main/"
+
 data class PrayerTimeUiModel(
     val intervals: List<PrayerTimeIntervalModel>,
     val currentPrayer: PrayerTimeIntervalModel?,
@@ -31,7 +35,8 @@ data class PrayerTimeUiModel(
     val sunset: String,
     val currentDateTime: String,
     val apiUrl: String = "https://aladhan.com/about",
-    val addressInfo: AddressInfo
+    val addressInfo: AddressInfo,
+    val prayerImage: String
 )
 
 data class PrayerTimeIntervalModel(
@@ -51,7 +56,7 @@ data class AddressInfo(
     val district: String?,
     val city: String?,
     val country: String?,
-    val address : String
+    val address: String
 )
 
 internal suspend fun PrayerTimeDto.toUiModel(): PrayerTimeUiModel {
@@ -67,7 +72,8 @@ internal suspend fun PrayerTimeDto.toUiModel(): PrayerTimeUiModel {
             iftarStartTime = iftarTime?.startTime?.toHourMinuteString(false),
             lastTimeOfSahri = iftarTime?.endTime?.toHourMinuteString(false),
         ),
-        addressInfo = getPlaceName(location.latitude, location.longitude)
+        addressInfo = getPlaceName(location.latitude, location.longitude),
+        prayerImage = getImageByPrayer(currentPrayer?.name)
         //currentWaqtEnd = currentPrayer?.endTime?.toInstant(TimeZone.currentSystemDefault())
     )
 
@@ -92,4 +98,13 @@ fun PrayerName.toDisplayString(): StringResource {
         PrayerName.MAGHRIB -> Res.string.text_maghrib
         PrayerName.ISHA -> Res.string.text_isha
     }
+}
+
+fun getImageByPrayer(name: PrayerName?) = when (name) {
+    PrayerName.FAJR, PrayerName.SALAT_UD_DUHA -> "${BASE}img_fajr.webp"
+    PrayerName.DUHR -> "${BASE}img_dhuhr.webp"
+    PrayerName.ASR -> "${BASE}img_asr.webp"
+    PrayerName.MAGHRIB -> "${BASE}img_maghrib.webp"
+    PrayerName.ISHA -> "${BASE}img_isha.webp"
+    null -> "${BASE}img_fajr.webp"
 }

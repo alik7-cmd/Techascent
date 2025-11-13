@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 
@@ -21,6 +22,8 @@ fun ComposeAsyncImage(
     colorFilter: ColorFilter? = null,
     filterQuality: FilterQuality = DefaultFilterQuality,
     clipToBounds: Boolean = true,
+    placeholder: Painter? = null,
+    error: Painter? = null,
 ){
     AsyncImage(
         modifier = modifier,
@@ -31,6 +34,8 @@ fun ComposeAsyncImage(
         alpha = alpha,
         colorFilter = colorFilter,
         filterQuality = filterQuality,
-        clipToBounds = clipToBounds
+        clipToBounds = clipToBounds,
+        placeholder = placeholder,
+        error = error
     )
 }

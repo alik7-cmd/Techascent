@@ -1,6 +1,5 @@
 package org.techascent.muslim.prayer.composable
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,20 +17,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.img_asr
-import apphub.composeapp.generated.resources.img_dhuhr
-import apphub.composeapp.generated.resources.img_isha
-import apphub.composeapp.generated.resources.img_maghrib
-import apphub.composeapp.generated.resources.text_asr
-import apphub.composeapp.generated.resources.text_dhuhr
-import apphub.composeapp.generated.resources.text_fajr
-import apphub.composeapp.generated.resources.text_isha
-import apphub.composeapp.generated.resources.text_maghrib
 import apphub.composeapp.generated.resources.text_sunrise
 import apphub.composeapp.generated.resources.text_sunset
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.techascent.composa.asyncimage.ComposeAsyncImage
 import org.techascent.composa.card.ComposaCardFrame
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
@@ -55,19 +45,19 @@ internal fun LazyListScope.currentSalatContent(
                 .testTag(PrayerTags.PRAYER_TIME_CURRENT_SALAT_CONTENT),
             content = {
                 Box {
-                    Image(
-                        painter = painterResource(
-                            getSalatImage(currentPrayer?.name)
-                        ),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds,
+                    ComposeAsyncImage(
+                        model = uiModel.prayerImage,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(
                                 getImageAspectRatioForWindowSize(
                                     widthSizeClass = widthSizeClass
                                 )
-                            )
+                            ),
+                        contentDescription = "",
+                        placeholder = painterResource(Res.drawable.img_asr),
+                        error =  painterResource(Res.drawable.img_asr),
                     )
 
                     Row(modifier = Modifier.align(Alignment.BottomCenter)) {
@@ -124,16 +114,5 @@ internal fun LazyListScope.currentSalatContent(
                 }
             }
         )
-    }
-}
-
-private fun getSalatImage(salatName: StringResource?): DrawableResource {
-    return when (salatName) {
-        Res.string.text_fajr -> Res.drawable.img_asr
-        Res.string.text_dhuhr -> Res.drawable.img_dhuhr
-        Res.string.text_asr -> Res.drawable.img_asr
-        Res.string.text_maghrib -> Res.drawable.img_maghrib
-        Res.string.text_isha -> Res.drawable.img_isha
-        else -> Res.drawable.img_asr
     }
 }
