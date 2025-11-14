@@ -215,3 +215,6 @@ actual fun openNearbyMosques() {
         true -> app.openURL(appleMapsUrl)
     }
 }
+
+actual fun getScreenWidthPx(): Int = UIScreen.mainScreen.bounds.width.toInt()
+actual fun getScreenHeightPx(): Int = UIScreen.mainScreen.bounds.height.toInt()

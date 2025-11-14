@@ -28,7 +28,7 @@
     <string name="message_location_picker">Prayer times are based on the position of the sun, which varies depending on where you are in the world. By accessing your location, the app can determine the precise time for each prayer — including Fajr, Dhuhr, Asr, Maghrib, and Isha — based on your local timezone, latitude, and longitude.</string>
     <string name="button_text_location_picker">Allow location</string>
     <string name="button_open_settings">Open Settings</string>"
-    <string name="text_compass_suggestion">To find the correct Qibla direction, make sure your location services are enabled so the app can detect your current position. Hold your phone flat and follow the on-screen arrow, which points directly toward the Kaaba in Mecca. For best accuracy, avoid metal objects nearby and calibrate your compass if needed by moving your device in a figure-eight motion. With these simple steps, you’ll always be able to face the right direction for prayer.</string>
+    <string name="text_compass_suggestion">To find the correct Qibla direction, make sure your location services are enabled so the app can detect your current position. Hold your phone flat and follow the on-screen arrow, which points directly toward the Kaaba in Mecca. \n\nFor best accuracy, avoid metal objects nearby and calibrate your compass if needed by moving your device in a figure-eight motion. With these simple steps, you’ll always be able to face the right direction for prayer.</string>
 
 
     <string name="title_tasbeeh">Tasbeeh</string>

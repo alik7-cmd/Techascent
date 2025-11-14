@@ -30,3 +30,6 @@ expect fun getPlatformLocationService(): LocationService
 expect suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInfo
 
 expect fun openNearbyMosques()
+
+expect fun getScreenWidthPx(): Int
+expect fun getScreenHeightPx(): Int
