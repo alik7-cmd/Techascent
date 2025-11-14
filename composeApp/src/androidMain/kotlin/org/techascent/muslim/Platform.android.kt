@@ -25,6 +25,7 @@ import java.util.Locale
 import kotlin.math.*
 import android.content.Intent
 import androidx.core.net.toUri
+import android.content.res.Resources
 
 
 actual fun playBeep() {
@@ -181,4 +182,8 @@ actual fun openNearbyMosques() {
         }
     }
 }
+
+actual fun getScreenWidthPx(): Int = Resources.getSystem().displayMetrics.widthPixels
+actual fun getScreenHeightPx(): Int = Resources.getSystem().displayMetrics.heightPixels
+
 
