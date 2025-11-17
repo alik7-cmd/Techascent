@@ -31,12 +31,15 @@ import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.tasbeeh.state.TasbeehUiState
+import kotlin.compareTo
+import kotlin.toString
 
 fun LazyListScope.parabolicTasbeeh(
-    uiState: TasbeehUiState
+    uiState: TasbeehUiState,
+    onCounterIncrement: () -> Unit
 ) {
     item {
-        var count by remember { mutableStateOf(0) }
+        //var count by remember { mutableStateOf(0) }
         val animProgress = remember { Animatable(0f) }
         var isAnimating by remember { mutableStateOf(false) }
 
@@ -60,7 +63,8 @@ fun LazyListScope.parabolicTasbeeh(
             if (isAnimating) {
                 animProgress.snapTo(0f)
                 animProgress.animateTo(1f, tween(600))
-                count++
+                onCounterIncrement()
+                //count++
 
                 // Spring-like bounce for left/right beads
                 scope.launch {
@@ -155,7 +159,7 @@ fun LazyListScope.parabolicTasbeeh(
                     .padding(bottom = ComposaSpacing.Large),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = count.toString(),
+                    text = uiState.count.toString(),
                     style = ComposaTheme.typography.titleLargeDemi
                 )
 
@@ -185,3 +189,86 @@ fun LazyListScope.parabolicTasbeeh(
 }
 
 private fun lerp(start: Float, end: Float, t: Float): Float = start + (end - start) * t
+
+
+/*fun LazyListScope.parabolicTasbeeh(
+    uiState: TasbeehUiState,
+    onCounterIncrement: () -> Unit
+) {
+    item {
+        val animProgress = remember { Animatable(0f) }
+        var isAnimating by remember { mutableStateOf(false) }
+
+        val totalWidth = 500f
+        val spacing = 90f
+        val baseHeight = 250f
+        val arcHeight = 120f
+        val beadRadius = 40f
+
+        val leftCount = 4
+        val rightCount = 4
+
+        val leftShift = remember { Animatable(0f) }
+        val rightShift = remember { Animatable(0f) }
+        val scope = rememberCoroutineScope()
+
+        LaunchedEffect(isAnimating) {
+            if (isAnimating) {
+                animProgress.snapTo(0f)
+                animProgress.animateTo(1f, tween(600))
+                onCounterIncrement() // Call ViewModel method
+
+                scope.launch {
+                    leftShift.animateTo(
+                        targetValue = spacing / leftCount,
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                    )
+                }
+                scope.launch {
+                    rightShift.animateTo(
+                        targetValue = -spacing / rightCount,
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                    )
+                }
+
+                leftShift.snapTo(0f)
+                rightShift.snapTo(0f)
+                animProgress.snapTo(0f)
+                isAnimating = false
+            }
+        }
+
+        // Rest of the composable remains the same, but use uiState.count instead of local count variable
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .height(400.dp)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        if (isAnimating) return@detectHorizontalDragGestures
+                        change.consume()
+                        if (dragAmount > 0) isAnimating = true
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                // Canvas drawing code remains the same
+            }
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = ComposaSpacing.Large),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = uiState.count.toString(), // Use uiState.count
+                    style = ComposaTheme.typography.titleLargeDemi
+                )
+                // Rest of Column content remains the same
+            }
+        }
+    }
+}*/
+

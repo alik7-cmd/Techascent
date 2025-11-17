@@ -33,3 +33,5 @@ expect fun openNearbyMosques()
 
 expect fun getScreenWidthPx(): Int
 expect fun getScreenHeightPx(): Int
+
+expect fun createDataStore(producePath: () -> String): DataStore<Preferences>

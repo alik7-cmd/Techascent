@@ -1,6 +1,7 @@
 package org.techascent.muslim
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.channels.awaitClose
@@ -32,6 +33,7 @@ import platform.Foundation.NSUTF8StringEncoding
 import platform.CoreLocation.CLGeocoder
 import platform.CoreLocation.CLLocation
 import kotlinx.coroutines.suspendCancellableCoroutine
+import okio.Path.Companion.toPath
 import org.techascent.muslim.prayer.uimodel.AddressInfo
 import platform.CoreLocation.CLPlacemark
 import platform.Foundation.dictionaryWithValuesForKeys
@@ -218,3 +220,8 @@ actual fun openNearbyMosques() {
 
 actual fun getScreenWidthPx(): Int = UIScreen.mainScreen.bounds.width.toInt()
 actual fun getScreenHeightPx(): Int = UIScreen.mainScreen.bounds.height.toInt()
+
+actual fun createDataStore(producePath: () -> String): DataStore<Preferences> =
+    PreferenceDataStoreFactory.createWithPath(
+        produceFile = { producePath().toPath() }
+    )
