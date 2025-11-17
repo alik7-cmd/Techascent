@@ -22,7 +22,7 @@ import org.techascent.shared.di.prayerModule
 val appModule = module {
     single<DataStore<Preferences>> { provideDataStore() }
     single<LocationService> { getPlatformLocationService() }
-    viewModel { PrayerTimeViewModel(repository = get(), locationService = get()) }
+    viewModel { PrayerTimeViewModel(repository = get(), locationService = get(), dataStore = get()) }
     viewModel { CalendarViewModel(repository = get(), locationService = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }

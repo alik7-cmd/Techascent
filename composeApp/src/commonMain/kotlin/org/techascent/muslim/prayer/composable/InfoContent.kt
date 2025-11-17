@@ -29,6 +29,7 @@ import org.techascent.muslim.common.IconWithText
 import org.techascent.muslim.common.getImageAspectRatioForWindowSize
 import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
+import org.techascent.muslim.prayer.uimodel.toDisplayString
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 internal fun LazyListScope.currentSalatContent(
@@ -70,7 +71,7 @@ internal fun LazyListScope.currentSalatContent(
 
                             currentPrayer?.name?.let {
                                 Text(
-                                    text = stringResource(resource = it),
+                                    text = stringResource(resource = it.toDisplayString()),
                                     style = ComposaTheme.typography.titleLarge,
                                     color = ComposaTheme.color.textNeutralOnDark //ComposaTheme.color.strokeNeutralSubtle
                                 )

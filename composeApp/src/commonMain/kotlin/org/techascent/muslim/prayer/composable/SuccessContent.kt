@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.text_salat_ud_duha
+import apphub.composeapp.generated.resources.warning_prayer_time
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.card.ComposaCardFrame
@@ -30,6 +31,7 @@ import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
+import org.techascent.muslim.prayer.uimodel.toDisplayString
 import kotlin.ranges.coerceAtLeast
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -38,9 +40,7 @@ fun LazyListScope.successContent(
     uiModel: PrayerTimeUiModel,
 ) {
     currentSalatContent(uiModel = uiModel)
-    infoBox(
-        message = uiModel.warningMessage,
-    )
+    infoBox()
     salatTimeContent(uiModel = uiModel)
     spacer()
 }
@@ -75,7 +75,7 @@ private fun LazyListScope.salatTimeContent(
                         targetTime = uiModel.currentPrayer.endTimeInstant,
                         totalDuration = (uiModel.currentPrayer.endTimeInstant - uiModel.currentPrayer.startTimeInstant)
                             .coerceAtLeast(Duration.ZERO),
-                        currentPrayer = uiModel.currentPrayer.name
+                        currentPrayer = uiModel.currentPrayer.name.toDisplayString()
                     )
                 }
             }
@@ -88,7 +88,7 @@ private fun LazyListScope.salatTimeContent(
                 borderColor = ComposaTheme.color.strokeNeutralSubtle,
                 content = {
                     uiModel.intervals.forEach {
-                        if (it.name != Res.string.text_salat_ud_duha) {
+                        if (it.name.toDisplayString() != Res.string.text_salat_ud_duha) {
                             val backgroundColor =
                                 if (it.displayableStartTime == uiModel.currentPrayer?.displayableStartTime) {
                                     ComposaTheme.color.backgroundInfoSubtle
@@ -96,7 +96,7 @@ private fun LazyListScope.salatTimeContent(
                                     ComposaTheme.color.backgroundNeutral
                                 }
                             SalatTimeCell(
-                                salatName = stringResource(resource = it.name),
+                                salatName = stringResource(resource = it.name.toDisplayString()),
                                 salatTime = "${it.displayableStartTime} - ${it.displayableEndTime}",
                                 backgroundColor = backgroundColor
                             )
@@ -109,15 +109,13 @@ private fun LazyListScope.salatTimeContent(
 
 }
 
-private fun LazyListScope.infoBox(
-    message: StringResource,
-) {
+private fun LazyListScope.infoBox() {
     item {
         MessageBox(
             modifier = Modifier.padding(horizontal = ComposaSpacing.Medium)
                 .testTag(PrayerTags.PRAYER_TIME_INFO_CONTENT),
             messageType = MessageType.Info,
-            message = stringResource(resource = message)
+            message = stringResource(resource = Res.string.warning_prayer_time)
         )
     }
 }

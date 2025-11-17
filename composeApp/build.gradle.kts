@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinSerialization)
 
 }
 
@@ -81,6 +82,8 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.screen.size)
             implementation(libs.kscan)
+            implementation(libs.kotlinx.serialization.json)
+
 
             /*implementation(libs.lifecycle.viewmodel)
             implementation(libs.lifecycle.viewmodel.compose)*/
