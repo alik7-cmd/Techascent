@@ -26,6 +26,8 @@ import kotlin.math.*
 import android.content.Intent
 import androidx.core.net.toUri
 import android.content.res.Resources
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import okio.Path.Companion.toPath
 
 
 actual fun playBeep() {
@@ -185,5 +187,10 @@ actual fun openNearbyMosques() {
 
 actual fun getScreenWidthPx(): Int = Resources.getSystem().displayMetrics.widthPixels
 actual fun getScreenHeightPx(): Int = Resources.getSystem().displayMetrics.heightPixels
+
+actual fun createDataStore(producePath: () -> String): DataStore<Preferences> =
+    PreferenceDataStoreFactory.createWithPath(
+        produceFile = { producePath().toPath() }
+    )
 
 

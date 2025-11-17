@@ -24,7 +24,7 @@ val appModule = module {
     single<LocationService> { getPlatformLocationService() }
     viewModel { PrayerTimeViewModel(repository = get(), locationService = get()) }
     viewModel { CalendarViewModel(repository = get(), locationService = get()) }
-    viewModel { TasbeehViewModel() }
+    viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }
     viewModel { SettingsViewModel() }
     /*viewModel { LocationPickerViewModel(controller = get ()) }*/
