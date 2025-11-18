@@ -25,6 +25,7 @@ private const val TASBEEH_VIEW = "TASBEEH_VIEW"
 private const val COMPASS_VIEW = "COMPASS_VIEW"
 private const val HALAL_SCANNER_VIEW = "HALAL_SCANNER_VIEW"
 private const val UTILITY_VIEW = "UTILITY_VIEW"
+private const val METHOD_SELECTION_VIEW = "METHOD_SELECTION_VIEW"
 
 sealed class Screen(val route: String) {
     data object LocationPickerView : Screen(route = LOCATION_PICKER_VIEW)
@@ -36,6 +37,7 @@ sealed class Screen(val route: String) {
     data object CompassView : Screen(route = COMPASS_VIEW)
     data object HalalScannerView : Screen(route = HALAL_SCANNER_VIEW)
     data object UtilityView : Screen(route = UTILITY_VIEW)
+    data object MethodSelectionView : Screen(route = METHOD_SELECTION_VIEW)
 }
 
 @Composable
@@ -89,7 +91,8 @@ fun NavGraphBuilder.mainNavGraph(
     ) {
         composable(route = Screen.PrayerView.route) {
             PrayerView(
-                innerPadding = innerPadding
+                innerPadding = innerPadding,
+                onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) }
             )
         }
         composable(route = Screen.UtilityView.route) {

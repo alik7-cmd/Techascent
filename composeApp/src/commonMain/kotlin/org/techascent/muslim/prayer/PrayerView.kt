@@ -16,9 +16,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.ic_scan
+import apphub.composeapp.generated.resources.text_scan_again
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import org.techascent.composa.appbar.TopAppBar
+import org.techascent.composa.appbar.TrailingAction
 import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.common.DrawableData
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.composable.errorContent
 import org.techascent.muslim.prayer.composable.loadingContent
@@ -29,6 +36,7 @@ import org.techascent.muslim.prayer.state.PrayerTimeUiState
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 internal fun PrayerView(
+    onNavigateHalalScanner: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val viewModel = koinViewModel<PrayerTimeViewModel>()
@@ -42,7 +50,8 @@ internal fun PrayerView(
 
         PrayerScreen(
             onFetchPrayers = viewModel::getMonthlyPrayerTimes,
-            innerPadding = innerPadding
+            innerPadding = innerPadding,
+            onNavigateHalalScanner = onNavigateHalalScanner
         )
     }
 }
@@ -52,12 +61,14 @@ internal fun PrayerView(
 private fun PrayerScreen(
     viewModel: PrayerTimeViewModel = koinViewModel<PrayerTimeViewModel>(),
     onFetchPrayers: () -> Unit,
+    onNavigateHalalScanner: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
     PrayerContent(
         uiState = uiState,
         onFetchPrayers = onFetchPrayers,
+        onNavigateHalalScanner = onNavigateHalalScanner,
         innerPadding = innerPadding
     )
 }
@@ -67,6 +78,7 @@ private fun PrayerScreen(
 private fun PrayerContent(
     uiState: PrayerTimeUiState,
     onFetchPrayers: () -> Unit,
+    onNavigateHalalScanner: () -> Unit,
     innerPadding: PaddingValues
 ) {
     Scaffold(
@@ -74,6 +86,19 @@ private fun PrayerContent(
         modifier = Modifier
             .fillMaxSize()
             .background(color = ComposaTheme.color.backgroundAppBackground),
+        topBar = {
+            /*TopAppBar(
+                title = "",
+                action = TrailingAction.IconButton(
+                    icon = DrawableData(
+                        imageRes = Res.drawable.ic_scan,
+                        tint = ComposaTheme.color.iconAction,
+                        contentDescription = stringResource(Res.string.text_scan_again)
+                    ),
+                    onClick = onNavigateHalalScanner
+                )
+            )*/
+        }
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),

@@ -16,6 +16,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import androidx.compose.runtime.getValue
 import apphub.composeapp.generated.resources.ic_back
+import apphub.composeapp.generated.resources.text_reset
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -73,7 +74,7 @@ private fun TasbeehContent(
                 navigationIcon = Res.drawable.ic_back,
                 onNavigationIconClicked = onNavigateBack,
                 action = TrailingAction.TextButton(
-                    text = "Reset",
+                    text = stringResource(Res.string.text_reset),
                     onClick = {
                         ResetWarningDialog(
                             title = title,

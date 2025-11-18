@@ -30,10 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import org.techascent.shared.data.enum.PrayerCalculationMethod
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.techascent.muslim.method.state.toStringRes
+import org.techascent.shared.data.enum.School
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
+@Preview
 fun MethodSelectionView() {
     val viewModel = koinViewModel<MethodViewModel>()
 
@@ -82,7 +86,7 @@ private fun MethodSelectionContent(
 
 @Composable
 fun MyRadioGroup(
-    listOfMethods: List<PrayerCalculationMethod>
+    listOfMethods: List<School>
 ) {
 
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(listOfMethods[0]) }
@@ -103,11 +107,11 @@ fun MyRadioGroup(
             ) {
                 RadioButton(
                     selected = (text == selectedOption),
-                    onClick = null // null recommended for accessibility with selectable
+                    onClick = null
                 )
                 Text(
-                    text = text.toString(),
-                    modifier = Modifier.padding(start = 16.dp)
+                    text = stringResource(text.toStringRes()),
+                    modifier = Modifier.padding(start = ComposaSpacing.Medium)
                 )
             }
         }

@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">AppHub</string>
 
+
+    <string name="text_hanafi">Hanafi</string>
+    <string name="text_shafi">Shafi</string>
+
     <string name="title_home">Prayer Time</string>
     <string name="title_calendar">Calendar</string>
     <string name="title_settings">Settings</string>
@@ -40,6 +44,7 @@
     <string name="reset_warning_cancel_text">Cancel</string>
     <string name="text_okay">Okay</string>
     <string name="text_reset_counter">Reset Counter</string>
+    <string name="text_reset">Reset</string>
 
     <string name="title_quibla">Quibla</string>
     <string name="title_halal_scanner">Halal Scanner</string>

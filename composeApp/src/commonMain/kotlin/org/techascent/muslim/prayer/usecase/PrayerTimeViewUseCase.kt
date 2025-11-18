@@ -12,7 +12,6 @@ import kotlinx.serialization.json.Json
 import org.techascent.muslim.common.getCurrentYearAndMonth
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.getPlaceName
-import org.techascent.muslim.prayer.uimodel.AddressInfo
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.enum.School
@@ -25,19 +24,24 @@ class PrayerTimeViewUseCase(
     private val dataStore: DataStore<Preferences>
 ) {
     companion object {
-        private fun getCacheKeyForMonthly(city: String, school: School): String =
-            "monthly_prayer_times_${city}_${school.name}"
+        private fun getCacheKeyForMonthly(city: String, school: School, month: Int): String =
+            "$DEFAULT${city}_${school.name}_${month}"
 
-        private const val DEFAULT = "DEFAULT"
+        private const val DEFAULT = "monthly_prayer_times_"
     }
 
     suspend fun getMonthlyPrayerTimes(
     ): Flow<ResultState<List<PrayerTimeUiModel>>> {
         val location = locationService.getCurrentLocation()
+        val date = getCurrentYearAndMonth()
 
         location?.let {
             val addressInfo = getPlaceName(it.latitude, it.longitude)
-            val cacheKey = getCacheKeyForMonthly(addressInfo.district ?: DEFAULT, School.HANAFI)
+            val cacheKey = getCacheKeyForMonthly(
+                city = addressInfo.district ?: DEFAULT,
+                school = School.HANAFI,
+                month = date.month
+            )
             val cachedData = getCachedMonthlyPrayerTimes(cacheKey)
             if (cachedData != null) {
                 return flowOf(
@@ -45,7 +49,7 @@ class PrayerTimeViewUseCase(
                 )
             }
 
-            val date = getCurrentYearAndMonth()
+
             return repository.getMonthlyPrayerTimes(
                 year = date.year,
                 month = date.month,
@@ -89,20 +93,16 @@ class PrayerTimeViewUseCase(
         try {
             val jsonString = Json.encodeToString(uiModels)
             dataStore.edit { preferences ->
+                val keysToRemove = preferences.asMap().keys
+                    .filter { it.name.startsWith(DEFAULT) }
+
+                keysToRemove.forEach { key ->
+                    preferences.remove(key)
+                }
                 preferences[stringPreferencesKey(cacheKey)] = jsonString
             }
         } catch (e: Exception) {
             e.printStackTrace()
-        }
-    }
-
-    private suspend fun getAddress(): AddressInfo? {
-        val location = locationService.getCurrentLocation()
-        return location?.let {
-            getPlaceName(
-                latitude = location.latitude,
-                longitude = location.longitude
-            )
         }
     }
 }
