@@ -24,8 +24,7 @@ val appModule = module {
     single<DataStore<Preferences>> { provideDataStore() }
     single { PrayerTimeViewUseCase(repository = get(), dataStore = get(), locationService = get()) }
     single<LocationService> { getPlatformLocationService() }
-    viewModel { PrayerTimeViewModel(
-        locationService = get(), prayerTimeUseCase = get()) }
+    viewModel { PrayerTimeViewModel(prayerTimeUseCase = get()) }
     viewModel { CalendarViewModel(repository = get(), locationService = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }

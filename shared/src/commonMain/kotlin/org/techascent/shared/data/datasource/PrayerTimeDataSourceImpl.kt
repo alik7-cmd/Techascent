@@ -36,8 +36,8 @@ class PrayerTimeDataSourceImpl(
     override fun getMonthlyPrayerTimes(
         year: Int,
         month: Int,
-        city: String,
-        country: String,
+        latitude: Double,
+        longitude: Double,
         school: Int,
         onMapData: (PrayerTimesMonthlyResponse) -> List<PrayerTimeDto>
     ): Flow<ResultState<List<PrayerTimeDto>>> {
@@ -46,8 +46,8 @@ class PrayerTimeDataSourceImpl(
                 api.getMonthlyPrayerTimes(
                     year = year,
                     month = month,
-                    city = city,
-                    country = country,
+                    latitude = latitude,
+                    longitude = longitude,
                     school = school
                 )
             },

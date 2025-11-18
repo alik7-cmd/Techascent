@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import org.techascent.muslim.common.getCurrentYearAndMonth
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.getPlaceName
 import org.techascent.muslim.prayer.uimodel.AddressInfo
@@ -26,41 +27,47 @@ class PrayerTimeViewUseCase(
     companion object {
         private fun getCacheKeyForMonthly(city: String, school: School): String =
             "monthly_prayer_times_${city}_${school.name}"
+
+        private const val DEFAULT = "DEFAULT"
     }
 
     suspend fun getMonthlyPrayerTimes(
-        year: Int,
-        month: Int,
-        city: String,
-        country: String,
-        school: School,
     ): Flow<ResultState<List<PrayerTimeUiModel>>> {
-        val cacheKey = getCacheKeyForMonthly(city, school)
-        val cachedData = getCachedMonthlyPrayerTimes(cacheKey)
-        if (cachedData != null) {
-            return flowOf(
-                ResultState.Success(cachedData)
-            )
+        val location = locationService.getCurrentLocation()
 
-        }
-        return repository.getMonthlyPrayerTimes(
-            year = year,
-            month = month,
-            city = city,
-            country = country,
-            school = school.ordinal
-        ).map { resultState ->
-            when (resultState) {
-                is ResultState.Success -> {
-                    val uiModels = resultState.data.map { it.toUiModel() }
-                    saveMonthlyPrayerTimesToCache(cacheKey, uiModels)
-                    ResultState.Success(uiModels)
+        location?.let {
+            val addressInfo = getPlaceName(it.latitude, it.longitude)
+            val cacheKey = getCacheKeyForMonthly(addressInfo.district ?: DEFAULT, School.HANAFI)
+            val cachedData = getCachedMonthlyPrayerTimes(cacheKey)
+            if (cachedData != null) {
+                return flowOf(
+                    ResultState.Success(cachedData)
+                )
+            }
+
+            val date = getCurrentYearAndMonth()
+            return repository.getMonthlyPrayerTimes(
+                year = date.year,
+                month = date.month,
+                latitude = it.latitude,
+                longitude = it.longitude,
+                school = School.HANAFI.code
+            ).map { resultState ->
+                when (resultState) {
+                    is ResultState.Success -> {
+                        val uiModels = resultState.data.map { it.toUiModel() }
+                        saveMonthlyPrayerTimesToCache(cacheKey, uiModels)
+                        ResultState.Success(uiModels)
+                    }
+
+                    is ResultState.Error -> resultState
+                    is ResultState.Loading -> resultState
                 }
-
-                is ResultState.Error -> resultState
-                is ResultState.Loading -> resultState
             }
         }
+
+        return flowOf(ResultState.Error("Location not found"))
+
     }
 
     suspend fun getCachedMonthlyPrayerTimes(cacheKey: String): List<PrayerTimeUiModel>? {

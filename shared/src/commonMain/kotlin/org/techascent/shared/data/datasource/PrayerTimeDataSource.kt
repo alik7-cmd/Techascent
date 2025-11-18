@@ -20,8 +20,8 @@ interface PrayerTimeDataSource {
     fun getMonthlyPrayerTimes(
         year: Int,
         month: Int,
-        city: String,
-        country: String,
+        latitude: Double,
+        longitude: Double,
         school: Int,
         onMapData: (PrayerTimesMonthlyResponse) -> List<PrayerTimeDto>
     ): Flow<ResultState<List<PrayerTimeDto>>>

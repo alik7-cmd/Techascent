@@ -30,13 +30,13 @@ class PrayerApiImpl(private val client: HttpClient) : PrayerApi {
     override suspend fun getMonthlyPrayerTimes(
         year: Int,
         month: Int,
-        city: String,
-        country: String,
+        latitude: Double,
+        longitude: Double,
         school: Int
     ): PrayerTimesMonthlyResponse {
-        return client.get("https://api.aladhan.com/v1/calendarByCity/$year/$month") {
-            parameter(key = CITY, value = city)
-            parameter(key = COUNTRY, value = country)
+        return client.get("https://api.aladhan.com/v1/calendar/$year/$month") {
+            parameter(key = LATITUDE, value = latitude)
+            parameter(key = LONGITUDE, value = longitude)
             parameter(key = SCHOOL, value = school)
         }.body()
     }

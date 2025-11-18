@@ -25,12 +25,12 @@ class PrayerTimesRepositoryImpl(
     override fun getMonthlyPrayerTimes(
         year: Int,
         month: Int,
-        city: String,
-        country: String,
+        latitude: Double,
+        longitude: Double,
         school: Int
     ): Flow<ResultState<List<PrayerTimeDto>>> {
         return dataSource.getMonthlyPrayerTimes(
-            year, month, city, country, school, onMapData = {
+            year, month, latitude, longitude, school, onMapData = {
                 it.toDto()
             }
         )

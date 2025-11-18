@@ -15,8 +15,8 @@ interface PrayerApi {
     suspend fun getMonthlyPrayerTimes(
         year: Int,
         month: Int,
-        city: String,
-        country: String,
+        latitude: Double,
+        longitude: Double,
         school: Int
     ): PrayerTimesMonthlyResponse
 }

@@ -11,30 +11,21 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock.System
-import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.common.toReadableDate
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
-import org.techascent.shared.data.enum.School
 import org.techascent.shared.network.ResultState
 import kotlin.time.ExperimentalTime
 
 class PrayerTimeViewModel(
-    val locationService: LocationService,
     private val prayerTimeUseCase: PrayerTimeViewUseCase
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PrayerTimeUiState> =
         MutableStateFlow(PrayerTimeUiState.Loading)
     val uiState = _uiState.onStart {
-        getMonthlyPrayerTimes(
-            year = 2025,
-            month = 11,
-            city = "Oslo",
-            country = "NOR",
-            school = School.HANAFI
-        )
+        getMonthlyPrayerTimes()
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -45,20 +36,8 @@ class PrayerTimeViewModel(
     val event: Flow<PrayerTimeEvent> = _event.receiveAsFlow()
 
     @OptIn(ExperimentalTime::class)
-    internal fun getMonthlyPrayerTimes(
-        year: Int,
-        month: Int,
-        city: String,
-        country: String,
-        school: School
-    ) = viewModelScope.launch {
-        prayerTimeUseCase.getMonthlyPrayerTimes(
-            year = year,
-            month = month,
-            city = city,
-            country = country,
-            school = school
-        ).collect {
+    internal fun getMonthlyPrayerTimes() = viewModelScope.launch {
+        prayerTimeUseCase.getMonthlyPrayerTimes().collect {
             when (it) {
                 is ResultState.Success -> {
                     val data = it.data.find { uiModel ->
@@ -66,7 +45,7 @@ class PrayerTimeViewModel(
                             .toReadableDate()
 
                     }
-                    data?.let { uiModel->
+                    data?.let { uiModel ->
                         _uiState.emit(
                             value = PrayerTimeUiState.Success(data = uiModel)
                         )

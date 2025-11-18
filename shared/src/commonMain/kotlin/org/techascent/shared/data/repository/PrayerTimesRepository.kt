@@ -18,8 +18,8 @@ interface PrayerTimesRepository {
     fun getMonthlyPrayerTimes(
         year: Int,
         month: Int,
-        city: String,
-        country: String,
+        latitude: Double,
+        longitude: Double,
         school: Int,
     ): Flow<ResultState<List<PrayerTimeDto>>>
 }
