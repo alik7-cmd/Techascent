@@ -91,7 +91,7 @@ private fun LazyListScope.salatTimeContent(
                         if (it.name.toDisplayString() != Res.string.text_salat_ud_duha) {
                             val backgroundColor =
                                 if (it.displayableStartTime == uiModel.currentPrayer?.displayableStartTime) {
-                                    ComposaTheme.color.backgroundInfoSubtle
+                                    ComposaTheme.color.backgroundWarningSubtle
                                 } else {
                                     ComposaTheme.color.backgroundNeutral
                                 }
