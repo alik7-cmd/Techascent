@@ -15,18 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -56,6 +52,7 @@ import org.techascent.composa.common.DrawableData
 import org.techascent.composa.icon.ComposaIcon
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.openNearbyMosques
+import org.techascent.muslim.showNativeResetDialog as showPermissionRationalDialog
 import org.techascent.muslim.utility.state.FeatureItem
 
 
@@ -130,11 +127,14 @@ fun CenteredCardWithImageAndTitle(
         contentAlignment = Alignment.Center
     ) {
         val coroutineScope = rememberCoroutineScope()
-        var showSettingsDialog by remember { mutableStateOf(false) }
         val factory = rememberPermissionsControllerFactory()
         val controller = remember(factory) {
             factory.createPermissionsController()
         }
+        val title = stringResource(Res.string.text_permission_title)
+        val message = stringResource(Res.string.text_permission_description)
+        val confirmText = stringResource(Res.string.button_open_settings)
+        val cancelText = stringResource(Res.string.text_cancel)
         BindEffect(controller)
         ComposaCardFrame(
             borderColor = ComposaTheme.color.strokeNeutralSubtle,
@@ -149,10 +149,26 @@ fun CenteredCardWithImageAndTitle(
                                 onNavigateHalalScanner()
                             } catch (e: DeniedException) {
                                 e.printStackTrace()
-                                showSettingsDialog = true
+                                showPermissionRationalDialog(
+                                    title = title,
+                                    message = message,
+                                    confirmText = confirmText,
+                                    cancelText = cancelText,
+                                    onConfirm = {
+                                        controller.openAppSettings()
+                                    },
+                                )
                             } catch (e: DeniedAlwaysException) {
                                 e.printStackTrace()
-                                showSettingsDialog = true
+                                showPermissionRationalDialog(
+                                    title = title,
+                                    message = message,
+                                    confirmText = confirmText,
+                                    cancelText = cancelText,
+                                    onConfirm = {
+                                        controller.openAppSettings()
+                                    },
+                                )
                             }
                         }
                     }
@@ -184,29 +200,7 @@ fun CenteredCardWithImageAndTitle(
                 }
             }
         )
-        if (showSettingsDialog) {
-            AlertDialog(
-                onDismissRequest = { showSettingsDialog = false },
-                title = { Text(stringResource(Res.string.text_permission_title)) },
-                text = { Text(stringResource(Res.string.text_permission_description)) },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            showSettingsDialog = false
-                            // 10. Open the app settings so the user can grant the permission.
-                            controller.openAppSettings()
-                        }
-                    ) {
-                        Text(stringResource(Res.string.button_open_settings))
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { showSettingsDialog = false }) {
-                        Text(stringResource(Res.string.text_cancel))
-                    }
-                }
-            )
-        }
+
     }
 }
 

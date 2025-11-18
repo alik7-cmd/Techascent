@@ -2,6 +2,7 @@ package org.techascent.muslim.tasbeeh
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.spacedBy
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
@@ -94,7 +95,9 @@ private fun TasbeehContent(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = innerPadding,
+            contentPadding = PaddingValues(
+                top = innerPadding.calculateTopPadding(),
+            ),
             verticalArrangement = spacedBy(ComposaSpacing.Medium)
         ) {
             parabolicTasbeeh(
