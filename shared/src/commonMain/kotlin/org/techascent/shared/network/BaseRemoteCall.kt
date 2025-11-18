@@ -19,5 +19,6 @@ inline fun <Response, Dto> baseRemoteCall(
     val dto = onMapData(response)
     emit(ResultState.Success(dto))
 }.catch { e ->
+    print("message ${e.message}")
     emit(ResultState.Error(e.message, e))
 }

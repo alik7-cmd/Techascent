@@ -1,5 +1,6 @@
 package org.techascent.muslim.prayer.composable
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,6 @@ import apphub.composeapp.generated.resources.text_sunrise
 import apphub.composeapp.generated.resources.text_sunset
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.techascent.composa.asyncimage.ComposeAsyncImage
 import org.techascent.composa.card.ComposaCardFrame
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
@@ -29,6 +29,8 @@ import org.techascent.muslim.common.IconWithText
 import org.techascent.muslim.common.getImageAspectRatioForWindowSize
 import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
+import org.techascent.muslim.prayer.uimodel.toDisplayImageRes
+import org.techascent.muslim.prayer.uimodel.toDisplayString
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 internal fun LazyListScope.currentSalatContent(
@@ -45,19 +47,19 @@ internal fun LazyListScope.currentSalatContent(
                 .testTag(PrayerTags.PRAYER_TIME_CURRENT_SALAT_CONTENT),
             content = {
                 Box {
-                    ComposeAsyncImage(
-                        model = uiModel.prayerImage,
-                        contentScale = ContentScale.Crop,
+                    Image(
+                        painter = painterResource(
+                            currentPrayer?.name?.toDisplayImageRes() ?: Res.drawable.img_asr
+                        ),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(
                                 getImageAspectRatioForWindowSize(
                                     widthSizeClass = widthSizeClass
                                 )
-                            ),
-                        contentDescription = "",
-                        placeholder = painterResource(Res.drawable.img_asr),
-                        error =  painterResource(Res.drawable.img_asr),
+                            )
                     )
 
                     Row(modifier = Modifier.align(Alignment.BottomCenter)) {
@@ -70,7 +72,7 @@ internal fun LazyListScope.currentSalatContent(
 
                             currentPrayer?.name?.let {
                                 Text(
-                                    text = stringResource(resource = it),
+                                    text = stringResource(resource = it.toDisplayString()),
                                     style = ComposaTheme.typography.titleLarge,
                                     color = ComposaTheme.color.textNeutralOnDark //ComposaTheme.color.strokeNeutralSubtle
                                 )

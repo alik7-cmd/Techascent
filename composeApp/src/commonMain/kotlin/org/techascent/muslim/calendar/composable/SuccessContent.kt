@@ -19,6 +19,7 @@ import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.composable.IftarTimeContent
 import org.techascent.muslim.prayer.composable.SalatTimeCell
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
+import org.techascent.muslim.prayer.uimodel.toDisplayString
 
 fun LazyListScope.successContent(
     uiModel: PrayerTimeUiModel,
@@ -52,9 +53,9 @@ private fun SalatContent(
             borderColor = ComposaTheme.color.strokeNeutralSubtle,
             content = {
                 uiModel.intervals.forEach {
-                    if (it.name != Res.string.text_salat_ud_duha) {
+                    if (it.name.toDisplayString() != Res.string.text_salat_ud_duha) {
                         SalatTimeCell(
-                            salatName = stringResource(resource = it.name),
+                            salatName = stringResource(resource = it.name.toDisplayString()),
                             salatTime = "${it.displayableStartTime} - ${it.displayableEndTime}",
                             backgroundColor = Color.Unspecified
                         )

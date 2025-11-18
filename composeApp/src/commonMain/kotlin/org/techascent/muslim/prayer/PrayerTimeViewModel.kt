@@ -10,25 +10,22 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.techascent.muslim.common.getCurrentDateFormatted
-import org.techascent.muslim.common.location.LocationService
+import kotlinx.datetime.Clock.System
+import org.techascent.muslim.common.toReadableDate
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
-import org.techascent.muslim.prayer.uimodel.toUiModel
-import org.techascent.shared.data.enum.PrayerCalculationMethod
-import org.techascent.shared.data.enum.School
-import org.techascent.shared.data.repository.PrayerTimesRepository
+import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
 import org.techascent.shared.network.ResultState
+import kotlin.time.ExperimentalTime
 
 class PrayerTimeViewModel(
-    val repository: PrayerTimesRepository,
-    val locationService: LocationService,
+    private val prayerTimeUseCase: PrayerTimeViewUseCase
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PrayerTimeUiState> =
         MutableStateFlow(PrayerTimeUiState.Loading)
     val uiState = _uiState.onStart {
-        getPrayerTimes()
+        getMonthlyPrayerTimes()
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -38,35 +35,34 @@ class PrayerTimeViewModel(
     private val _event: Channel<PrayerTimeEvent> = Channel()
     val event: Flow<PrayerTimeEvent> = _event.receiveAsFlow()
 
-    internal fun getPrayerTimes() = viewModelScope.launch {
-        val location = locationService.getCurrentLocation()
-        location?.let { location ->
-            repository.getPrayerTimes(
-                latitude = location.latitude,
-                longitude = location.longitude,
-                date = getCurrentDateFormatted(),
-                school = School.HANAFI
-            ).collect {
-                when (it) {
-                    is ResultState.Success -> _uiState.emit(
-                        value =
-                            PrayerTimeUiState.Success(
-                                data = it.data.toUiModel()
-                            )
-                    )
+    @OptIn(ExperimentalTime::class)
+    internal fun getMonthlyPrayerTimes() = viewModelScope.launch {
+        prayerTimeUseCase.getMonthlyPrayerTimes().collect {
+            when (it) {
+                is ResultState.Success -> {
+                    val data = it.data.find { uiModel ->
+                        uiModel.currentDateTime == System.now().toEpochMilliseconds()
+                            .toReadableDate()
 
-                    is ResultState.Error -> _uiState.emit(
-                        value = PrayerTimeUiState.Error(
-                            message = it.message ?: ""
+                    }
+                    data?.let { uiModel ->
+                        _uiState.emit(
+                            value = PrayerTimeUiState.Success(data = uiModel)
                         )
-                    )
-
-                    is ResultState.Loading -> _uiState.emit(value = PrayerTimeUiState.Loading)
+                    }
                 }
+
+                is ResultState.Error -> _uiState.emit(
+                    value = PrayerTimeUiState.Error(
+                        message = it.message ?: ""
+                    )
+                )
+
+                is ResultState.Loading -> _uiState.emit(value = PrayerTimeUiState.Loading)
             }
         }
-
     }
+
 
     fun onHandleEvent(event: PrayerTimeEvent) = viewModelScope.launch {
         when (event) {

@@ -28,6 +28,7 @@ import androidx.core.net.toUri
 import android.content.res.Resources
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import okio.Path.Companion.toPath
+import kotlin.text.get
 
 
 actual fun playBeep() {
@@ -154,18 +155,23 @@ actual suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInf
     )
     val context = appContext ?: return defaultAddress
     return withContext(Dispatchers.IO) {
-        val geocoder = Geocoder(context, Locale.getDefault())
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-        addresses?.firstOrNull()?.let {
-            AddressInfo(
-                district = it.subAdminArea,
-                city = it.locality,
-                country = it.countryName,
-                address = addresses[0].getAddressLine(0)
-            )
-        } ?: defaultAddress
+        try {
+            val geocoder = Geocoder(context, Locale.getDefault())
+            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+            addresses?.firstOrNull()?.let {
+                AddressInfo(
+                    district = it.subAdminArea,
+                    city = it.locality,
+                    country = it.countryName,
+                    address = addresses[0].getAddressLine(0)
+                )
+            } ?: defaultAddress
+        } catch (e: Exception) {
+            defaultAddress
+        }
     }
 }
+
 
 actual fun openNearbyMosques() {
     val context = appContext ?: return
