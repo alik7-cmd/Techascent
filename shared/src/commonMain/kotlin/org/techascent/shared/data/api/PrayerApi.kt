@@ -1,5 +1,6 @@
 package org.techascent.shared.data.api
 
+import org.techascent.shared.data.PrayerTimesMonthlyResponse
 import org.techascent.shared.data.PrayerTimesResponse
 
 
@@ -10,4 +11,12 @@ interface PrayerApi {
         longitude: Double,
         school: Int
     ): PrayerTimesResponse
+
+    suspend fun getMonthlyPrayerTimes(
+        year: Int,
+        month: Int,
+        city: String,
+        country: String,
+        school: Int
+    ): PrayerTimesMonthlyResponse
 }

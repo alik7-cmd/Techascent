@@ -1,9 +1,9 @@
 package org.techascent.shared.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import org.techascent.shared.data.PrayerTimesMonthlyResponse
 import org.techascent.shared.data.datasource.PrayerTimeDataSource
 import org.techascent.shared.data.dto.PrayerTimeDto
-import org.techascent.shared.data.enum.PrayerCalculationMethod
 import org.techascent.shared.data.enum.School
 import org.techascent.shared.network.ResultState
 import org.techascent.shared.data.mapper.toDto
@@ -18,8 +18,22 @@ class PrayerTimesRepositoryImpl(
         school: School,
     ): Flow<ResultState<PrayerTimeDto>> {
         return dataSource.getPrayerTimes(latitude, longitude, date, school, onMapData = {response ->
-            response.toDto()
+            response.data.toDto()
         })
+    }
+
+    override fun getMonthlyPrayerTimes(
+        year: Int,
+        month: Int,
+        city: String,
+        country: String,
+        school: Int
+    ): Flow<ResultState<List<PrayerTimeDto>>> {
+        return dataSource.getMonthlyPrayerTimes(
+            year, month, city, country, school, onMapData = {
+                it.toDto()
+            }
+        )
     }
 }
 

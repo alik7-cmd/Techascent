@@ -41,7 +41,7 @@ internal fun PrayerView(
         }
 
         PrayerScreen(
-            onFetchPrayers = viewModel::getPrayerTimes,
+            onFetchPrayers = {},
             innerPadding = innerPadding
         )
     }

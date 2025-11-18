@@ -38,7 +38,7 @@ data class PrayerTimeUiModel(
     val currentDateTime: String,
     val apiUrl: String = "https://aladhan.com/about",
     val addressInfo: AddressInfo,
-    val prayerImage: String
+    val prayerImage: String,
 )
 
 @Serializable

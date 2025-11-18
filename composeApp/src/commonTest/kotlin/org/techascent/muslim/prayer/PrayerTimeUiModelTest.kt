@@ -8,6 +8,7 @@ import org.techascent.muslim.common.toHourMinuteString
 import org.techascent.muslim.prayer.uimodel.toDisplayString
 import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.dto.IftarTimeDto
+import org.techascent.shared.data.dto.LocationDto
 import org.techascent.shared.data.dto.PrayerName
 import org.techascent.shared.data.dto.PrayerTimeDto
 import org.techascent.shared.data.dto.PrayerTimeInterval
@@ -45,7 +46,11 @@ class PrayerTimeUiModelTest {
             ),
             hijriDate = "1447-12-26",
             sunrise = LocalDateTime(2025, 7, 2, 5, 50),
-            sunset = LocalDateTime(2025, 7, 2, 19, 40)
+            sunset = LocalDateTime(2025, 7, 2, 19, 40),
+            location = LocationDto(
+                latitude = 23.8041,
+                longitude = 90.4152
+            )
         )
     }
 
