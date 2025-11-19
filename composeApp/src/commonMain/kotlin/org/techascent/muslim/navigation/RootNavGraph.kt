@@ -101,11 +101,11 @@ fun NavGraphBuilder.mainNavGraph(
                 onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) }
             )
         }
-        /*composable(route = Screen.SettingsView.route) {
+        composable(route = Screen.SettingsView.route) {
             SettingsView(
                 innerPadding = innerPadding
             )
-        }*/
+        }
 
         /*// From B, navigate to C
         navController.navigate("C") {

@@ -27,6 +27,7 @@ import org.techascent.muslim.getPlaceName
 import org.techascent.shared.data.dto.PrayerName
 import org.techascent.shared.data.dto.PrayerTimeDto
 import org.techascent.shared.data.dto.PrayerTimeInterval
+import org.techascent.shared.data.enum.School
 import kotlin.collections.map
 
 
@@ -45,6 +46,7 @@ data class PrayerTimeUiModel(
     val apiUrl: String = "https://aladhan.com/about",
     val addressInfo: AddressInfo,
     val prayerImage: String,
+    val school: School = School.HANAFI
 )
 
 @Serializable
@@ -80,7 +82,9 @@ enum class PrayerNameEnum {
     ISHA
 }
 
-internal suspend fun PrayerTimeDto.toUiModel(): PrayerTimeUiModel {
+internal suspend fun PrayerTimeDto.toUiModel(
+    school: School
+): PrayerTimeUiModel {
     return PrayerTimeUiModel(
         intervals = intervals.map { it.toUiModel() },
         currentPrayer = currentPrayer?.toUiModel(),
@@ -93,7 +97,8 @@ internal suspend fun PrayerTimeDto.toUiModel(): PrayerTimeUiModel {
             lastTimeOfSahri = iftarTime?.endTime?.toHourMinuteString(false),
         ),
         addressInfo = getPlaceName(location.latitude, location.longitude),
-        prayerImage = getImageByPrayer(currentPrayer?.name)
+        prayerImage = getImageByPrayer(currentPrayer?.name),
+        school = school
         //currentWaqtEnd = currentPrayer?.endTime?.toInstant(TimeZone.currentSystemDefault())
     )
 

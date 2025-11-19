@@ -45,7 +45,7 @@ class CalendarViewModel(
                     is ResultState.Success -> _uiState.emit(
                         value =
                             CalendarUiState.Success(
-                                data = it.data.toUiModel()
+                                data = it.data.toUiModel(School.HANAFI)
                             )
                     )
 
