@@ -1,5 +1,7 @@
 package org.techascent.muslim.settings
 
+import Header
+import SettingsCell
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
@@ -13,11 +15,13 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.unit.LayoutDirection
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.text_school_of
@@ -33,9 +37,12 @@ import org.techascent.composa.cell.center.CenterSlot
 import org.techascent.composa.cell.left.LeftSlot
 import org.techascent.composa.cell.right.RightSlot
 import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.messabebox.MessageBox
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.common.toTextRes
 import org.techascent.muslim.common.toVisibility
+import org.techascent.muslim.settings.event.SettingsEvent
+import org.techascent.muslim.settings.state.SettingsUiState
 import org.techascent.shared.data.enum.School
 
 @OptIn(KoinExperimentalAPI::class)
@@ -46,9 +53,20 @@ fun SettingsView(
     val viewModel = koinViewModel<SettingsViewModel>()
 
     ComposaTheme {
+        val uriHandler = LocalUriHandler.current
+        LaunchedEffect(key1 = Unit) {
+            viewModel.event.collect {
+                handleEvent(
+                    event = it,
+                    uriHandler = uriHandler
+                )
+            }
+        }
+
         SettingsScreen(
             viewModel = viewModel,
-            innerPadding = innerPadding
+            innerPadding = innerPadding,
+            onHandleEvent = viewModel::onHandleEvent
         )
     }
 }
@@ -56,14 +74,17 @@ fun SettingsView(
 @Composable
 private fun SettingsScreen(
     viewModel: SettingsViewModel,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    onHandleEvent: (SettingsEvent) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val schoolPreference by viewModel.schoolPreference.collectAsState()
     SettingsContent(
+        uiState = uiState,
         schoolPreference = schoolPreference,
         innerPadding = innerPadding,
-        onUpdateSchool = viewModel::updateSchoolPreference
+        onUpdateSchool = viewModel::updateSchoolPreference,
+        onHandleEvent = onHandleEvent
     )
 
 }
@@ -71,8 +92,10 @@ private fun SettingsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingsContent(
+    uiState: SettingsUiState,
     schoolPreference: Int,
     onUpdateSchool: (Int) -> Unit,
+    onHandleEvent: (SettingsEvent) -> Unit,
     innerPadding: PaddingValues
 ) {
     Scaffold(
@@ -109,8 +132,8 @@ private fun SettingsContent(
                             Cell(
                                 leftSlot = LeftSlot.None,
                                 centerSlot = CenterSlot.TitleWithLabel(
-                                    title = stringResource(Res.string.text_school_of),
-                                    label = stringResource(
+                                    label = stringResource(Res.string.text_school_of),
+                                    title = stringResource(
                                         School.fromCode(schoolPreference).toTextRes()
                                     ),
 
@@ -127,18 +150,35 @@ private fun SettingsContent(
 
                         }
                     )
-                    Text(
+                    MessageBox(
                         modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(resource = Res.string.text_school_suggestion),
-                        style = ComposaTheme.typography.footnote,
-                        color = ComposaTheme.color.textNeutral
+                        message = stringResource(resource = Res.string.text_school_suggestion),
                     )
                 }
-
             }
-            //appearanceContent(appearanceUiModel = uiState.appearanceUiModel)
-            //ratingContent(aboutUsUiModel = uiState.aboutUsUiModel)
+
+            item {
+                Header(text = stringResource(resource = uiState.links.title))
+                ComposaCardFrame(
+                    modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
+                    borderColor = ComposaTheme.color.strokeNeutralSubtle,
+                    content = {
+                        uiState.links.listOfElements.forEach { item ->
+                            SettingsCell(
+                                item = item,
+                                onClick = { onHandleEvent(SettingsEvent.OpenExternalLink(url = "https://aladhan.com")) }
+                            )
+                        }
+                    }
+                )
+            }
         }
     }
 
+}
+
+private fun handleEvent(event: SettingsEvent, uriHandler: UriHandler) {
+    when (event) {
+        is SettingsEvent.OpenExternalLink -> uriHandler.openUri(event.url)
+    }
 }

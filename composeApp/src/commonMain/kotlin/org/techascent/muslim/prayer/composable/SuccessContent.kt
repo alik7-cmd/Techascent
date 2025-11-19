@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.testTag
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.text_salat_ud_duha
 import apphub.composeapp.generated.resources.warning_prayer_time
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.card.ComposaCardFrame
 import org.techascent.composa.cell.Cell
@@ -40,10 +39,12 @@ import kotlin.time.ExperimentalTime
 
 fun LazyListScope.successContent(
     uiModel: PrayerTimeUiModel,
+    onNavigateHalalScanner: () -> Unit,
 ) {
     currentSalatContent(uiModel = uiModel)
     infoBox(school = uiModel.school)
     salatTimeContent(uiModel = uiModel)
+    featureCard(onClick = onNavigateHalalScanner)
     spacer()
 }
 

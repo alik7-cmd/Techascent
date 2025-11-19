@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,6 +28,7 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import org.ncgroup.kscan.BarcodeFormats
 import org.ncgroup.kscan.BarcodeResult
 import org.ncgroup.kscan.ScannerView
+import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.halalscanner.composable.InformationContent
 import org.techascent.muslim.halalscanner.composable.LoadingContent
@@ -55,7 +58,6 @@ private fun HalalScannerScreen(
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    // Pass down the entire uiState and the padding
     HalalScannerContent(
         uiState = uiState,
         onFetchProduct = onFetchProduct,
@@ -63,14 +65,14 @@ private fun HalalScannerScreen(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun HalalScannerContent(
     uiState: HalalScannerUiState,
     onFetchProduct: (String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
-    // The main Scaffold now applies the padding from the parent
+    var shouldShowScanner by remember { mutableStateOf(true) }
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         modifier = Modifier
@@ -80,10 +82,9 @@ private fun HalalScannerContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues), // Use the new padding
+                .background(color = ComposaTheme.color.backgroundAppBackground),
             contentAlignment = Alignment.Center
         ) {
-            var shouldShowScanner by remember { mutableStateOf(true) }
 
             AnimatedVisibility(
                 visible = shouldShowScanner,
@@ -99,20 +100,17 @@ private fun HalalScannerContent(
                 ) { result ->
                     when (result) {
                         is BarcodeResult.OnSuccess -> {
-                            println("Barcode: ${result.barcode.data}, format: ${result.barcode.format}")
                             shouldShowScanner = false
                             onFetchProduct(result.barcode.data)
                         }
 
                         is BarcodeResult.OnFailed -> {
                             shouldShowScanner = false
-                            println("Error: ${result.exception.message}")
                         }
 
                         is BarcodeResult.OnCanceled -> {
                             shouldShowScanner = false
                             onNavigateBack()
-                            println("OnCanceled: canceled by user")
                         }
                     }
                 }
@@ -122,16 +120,26 @@ private fun HalalScannerContent(
                 visible = !shouldShowScanner,
                 modifier = Modifier.fillMaxSize()
             ) {
+                val contentModifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues)
+                    .padding(vertical = ComposaSpacing.Medium)
+
                 when (uiState) {
                     is HalalScannerUiState.Error -> ErrorCard(
                         description = stringResource(Res.string.text_product_not_found),
                         buttonText = stringResource(Res.string.text_cancel),
-                        onRetry = onNavigateBack
+                        onRetry = onNavigateBack,
+                        modifier = contentModifier
                     )
 
-                    is HalalScannerUiState.Loading -> LoadingContent()
+                    is HalalScannerUiState.Loading -> LoadingContent(
+                        modifier = contentModifier
+                    )
+
                     is HalalScannerUiState.Success -> {
                         InformationContent(
+                            modifier = contentModifier,
                             productUiState = uiState.data,
                             onNavigateBack = onNavigateBack
                         )

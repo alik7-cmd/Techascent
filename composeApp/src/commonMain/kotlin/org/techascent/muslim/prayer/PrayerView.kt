@@ -29,7 +29,8 @@ import org.techascent.muslim.prayer.state.PrayerTimeUiState
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 internal fun PrayerView(
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    onNavigateHalalScanner: () -> Unit,
 ) {
     val viewModel = koinViewModel<PrayerTimeViewModel>()
     val uriHandler = LocalUriHandler.current
@@ -43,6 +44,7 @@ internal fun PrayerView(
         PrayerScreen(
             onFetchPrayers = viewModel::getMonthlyPrayerTimes,
             innerPadding = innerPadding,
+            onNavigateHalalScanner = onNavigateHalalScanner
         )
     }
 }
@@ -52,12 +54,14 @@ internal fun PrayerView(
 private fun PrayerScreen(
     viewModel: PrayerTimeViewModel = koinViewModel<PrayerTimeViewModel>(),
     onFetchPrayers: () -> Unit,
+    onNavigateHalalScanner: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
     PrayerContent(
         uiState = uiState,
         onFetchPrayers = onFetchPrayers,
+        onNavigateHalalScanner = onNavigateHalalScanner,
         innerPadding = innerPadding
     )
 }
@@ -67,6 +71,7 @@ private fun PrayerScreen(
 private fun PrayerContent(
     uiState: PrayerTimeUiState,
     onFetchPrayers: () -> Unit,
+    onNavigateHalalScanner: () -> Unit,
     innerPadding: PaddingValues
 ) {
     Scaffold(
@@ -84,6 +89,7 @@ private fun PrayerContent(
                 is PrayerTimeUiState.Loading -> loadingContent()
                 is PrayerTimeUiState.Success -> successContent(
                     uiModel = uiState.data,
+                    onNavigateHalalScanner = onNavigateHalalScanner
                 )
 
                 is PrayerTimeUiState.Error -> errorContent(

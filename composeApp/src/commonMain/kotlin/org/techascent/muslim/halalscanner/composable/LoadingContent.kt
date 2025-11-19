@@ -10,9 +10,11 @@ import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.tags.PrayerTags
 
 @Composable
-internal fun LoadingContent() {
+internal fun LoadingContent(
+    modifier: Modifier = Modifier
+) {
     ComposaCardFrame(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .testTag(PrayerTags.PRAYER_TIME_LOADING),
         borderColor = ComposaTheme.color.strokeNeutralSubtle,

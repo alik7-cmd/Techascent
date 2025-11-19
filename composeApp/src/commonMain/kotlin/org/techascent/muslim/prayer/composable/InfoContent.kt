@@ -79,13 +79,20 @@ internal fun LazyListScope.currentSalatContent(
                             }
 
                             IconWithText(
-                                text = uiModel.addressInfo.address,
+                                text = uiModel.addressInfo.district?.plus(", ${uiModel.addressInfo.country}")
+                                    ?: uiModel.addressInfo.address,
                                 drawableData = null,
                                 textStyle = ComposaTheme.typography.footnote,
                                 textColor = ComposaTheme.color.textNeutralOnDark
                             )
                             Text(
                                 text = uiModel.currentDateTime,
+                                style = ComposaTheme.typography.footnote,
+                                color = ComposaTheme.color.textNeutralOnDark
+                            )
+
+                            Text(
+                                text = uiModel.hijriDate,
                                 style = ComposaTheme.typography.footnote,
                                 color = ComposaTheme.color.textNeutralOnDark
                             )

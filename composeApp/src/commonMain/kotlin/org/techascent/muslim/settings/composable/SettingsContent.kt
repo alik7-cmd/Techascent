@@ -1,3 +1,24 @@
+import androidx.compose.foundation.content.MediaType.Companion.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
+import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.ic_ecternal_link
+import apphub.composeapp.generated.resources.icon_internal_navigation
+import org.jetbrains.compose.resources.stringResource
+import org.techascent.composa.cell.Cell
+import org.techascent.composa.cell.center.CenterSlot
+import org.techascent.composa.cell.left.LeftSlot
+import org.techascent.composa.cell.right.RightSlot
+import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.common.DrawableData
+import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.settings.state.NavigationType
+import org.techascent.muslim.settings.state.SettingsItem
+
+/*
 package org.techascent.muslim.settings.composable
 
 import androidx.compose.foundation.layout.Spacer
@@ -95,6 +116,53 @@ internal fun LazyListScope.spacer() {
 
 @Composable
 private fun Header(
+    modifier: Modifier = Modifier,
+    text: String
+) {
+    Text(
+        modifier = modifier.padding(horizontal = ComposaSpacing.Medium)
+            .padding(bottom = ComposaSpacing.Small),
+        text = text,
+        style = ComposaTheme.typography.titleEmphasized,
+        color = ComposaTheme.color.textNeutral,
+        fontSize = 15.sp
+    )
+
+
+}*/
+
+@Composable
+internal fun SettingsCell(
+    item: SettingsItem,
+    onClick: (() -> Unit)
+) {
+    Cell(
+        leftSlot = LeftSlot.None,
+        centerSlot = item.subtitle?.let { subTitleRes ->
+            CenterSlot.TitleWithLabel(
+                title = stringResource(item.title),
+                label = stringResource(subTitleRes)
+            )
+        } ?: run {
+            CenterSlot.Title(
+                title = stringResource(item.title)
+            )
+        },
+        rightSlot = RightSlot.Icon(
+            data = DrawableData(
+                imageRes = if (item.navigationType == NavigationType.INTERNAL)
+                    Res.drawable.icon_internal_navigation
+                else Res.drawable.ic_ecternal_link,
+                tint = ComposaTheme.color.textNeutral
+            )
+        ),
+        onClick = onClick
+    )
+
+}
+
+@Composable
+internal fun Header(
     modifier: Modifier = Modifier,
     text: String
 ) {

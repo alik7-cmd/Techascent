@@ -23,6 +23,8 @@
     <string name="text_remaining_time">Remaining time of</string>"
 
     <string name="warning_prayer_time">Your prayer times are based on the %1$s school of thought. You can change this from the settings anytime.</string>
+    <string name="text_halal_promotion">Shop with confidence.\nScan a product’s barcode to instantly see if it's halal—quick, clear, and worry-free.</string>
+
 
     <string name="title_location_picker">Why We Need Your Location Permission</string>
     <string name="message_location_picker">Prayer times are based on the position of the sun, which varies depending on where you are in the world. By accessing your location, the app can determine the precise time for each prayer — including Fajr, Dhuhr, Asr, Maghrib, and Isha — based on your local timezone, latitude, and longitude.</string>
@@ -89,9 +91,16 @@ There isn’t enough reliable information about this product’s ingredients or 
 
     <string name="text_cancel">Cancel</string>
     <string name="text_scan_again">Scan Again</string>
+    <string name="text_done">Done</string>
 
     <string name="text_product_not_found">We couldn’t find this product or retrieve its Halal status from OpenFoodFacts. Please check the product details or try again later.</string>
 
+
+    <string name="text_information">Information</string>
+    <string name="text_see_api_title">Where we get our prayer times</string>
+    <string name="text_see_api_sub_title">aladhan.com</string>
+
+    <string name="text_rate_us_title">Rate Us</string>
 
     <string name="text_school_of">School of thoughts</string>
     <string name="text_hanafi">Hanafi</string>

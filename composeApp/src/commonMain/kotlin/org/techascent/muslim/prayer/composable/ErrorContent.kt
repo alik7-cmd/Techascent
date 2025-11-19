@@ -39,10 +39,11 @@ internal fun ErrorCard(
     title: String? = null,
     description: String? = null,
     buttonText: String? = null,
-    onRetry: (() -> Unit)? = null
+    onRetry: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
 ) {
     ComposaCardFrame(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(ComposaSpacing.Medium).testTag(PrayerTags.PRAYER_TIME_LOADING_ERROR),
         borderColor = ComposaTheme.color.strokeNeutralSubtle,
