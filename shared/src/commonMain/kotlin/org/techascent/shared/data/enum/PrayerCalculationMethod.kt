@@ -30,7 +30,11 @@ internal fun PrayerCalculationMethod.toCode(): Int = this.code
 
 enum class School(val code: Int){
     SHAFI(0),
-    HANAFI(1)
+    HANAFI(1);
+
+    companion object {
+        fun fromCode(code: Int): School = School.entries.find { it.code == code } ?: School.SHAFI
+    }
 }
 
 internal fun School.toCode(): Int = this.code

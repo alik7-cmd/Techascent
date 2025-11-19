@@ -1,11 +1,15 @@
 package org.techascent.muslim.common
 
+import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.text_hanafi
+import apphub.composeapp.generated.resources.text_shafi
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.techascent.shared.data.enum.School
 import kotlin.time.Duration
 
 data class DateEntity(
@@ -107,3 +111,13 @@ fun MonthLength.lengthOfMonth(): Int = days
 
 fun isLeapYear(year: Int): Boolean =
     (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+
+fun School.toTextRes()= when(this){
+    School.SHAFI -> Res.string.text_shafi
+    School.HANAFI -> Res.string.text_hanafi
+}
+
+fun School.toVisibility()= when(this){
+    School.SHAFI -> false
+    School.HANAFI -> true
+}

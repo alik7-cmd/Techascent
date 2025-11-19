@@ -29,9 +29,11 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.messabebox.MessageBox
 import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.common.toTextRes
 import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toDisplayString
+import org.techascent.shared.data.enum.School
 import kotlin.ranges.coerceAtLeast
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -40,7 +42,7 @@ fun LazyListScope.successContent(
     uiModel: PrayerTimeUiModel,
 ) {
     currentSalatContent(uiModel = uiModel)
-    infoBox()
+    infoBox(school = uiModel.school)
     salatTimeContent(uiModel = uiModel)
     spacer()
 }
@@ -109,13 +111,17 @@ private fun LazyListScope.salatTimeContent(
 
 }
 
-private fun LazyListScope.infoBox() {
+private fun LazyListScope.infoBox(
+    school: School
+) {
+
     item {
+        val schoolText = stringResource(school.toTextRes())
         MessageBox(
             modifier = Modifier.padding(horizontal = ComposaSpacing.Medium)
                 .testTag(PrayerTags.PRAYER_TIME_INFO_CONTENT),
             messageType = MessageType.Info,
-            message = stringResource(resource = Res.string.warning_prayer_time)
+            message = stringResource(Res.string.warning_prayer_time, schoolText)
         )
     }
 }

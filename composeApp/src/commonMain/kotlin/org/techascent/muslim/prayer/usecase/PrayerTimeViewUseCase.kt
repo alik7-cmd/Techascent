@@ -2,7 +2,9 @@ package org.techascent.muslim.prayer.usecase
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -34,12 +36,13 @@ class PrayerTimeViewUseCase(
     ): Flow<ResultState<List<PrayerTimeUiModel>>> {
         val location = locationService.getCurrentLocation()
         val date = getCurrentYearAndMonth()
+        val code =  dataStore.data.first()[intPreferencesKey("school_preference")] ?: School.HANAFI.code
 
         location?.let {
             val addressInfo = getPlaceName(it.latitude, it.longitude)
             val cacheKey = getCacheKeyForMonthly(
                 city = addressInfo.district ?: DEFAULT,
-                school = School.HANAFI,
+                school = School.fromCode(code),
                 month = date.month
             )
             val cachedData = getCachedMonthlyPrayerTimes(cacheKey)
@@ -55,11 +58,13 @@ class PrayerTimeViewUseCase(
                 month = date.month,
                 latitude = it.latitude,
                 longitude = it.longitude,
-                school = School.HANAFI.code
+                school = School.fromCode(code).code
             ).map { resultState ->
                 when (resultState) {
                     is ResultState.Success -> {
-                        val uiModels = resultState.data.map { it.toUiModel() }
+                        val uiModels = resultState.data.map { it.toUiModel(
+                            school = School.fromCode(code)
+                        ) }
                         saveMonthlyPrayerTimesToCache(cacheKey, uiModels)
                         ResultState.Success(uiModels)
                     }

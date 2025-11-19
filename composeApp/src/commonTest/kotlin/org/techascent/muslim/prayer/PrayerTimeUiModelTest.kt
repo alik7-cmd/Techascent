@@ -12,6 +12,7 @@ import org.techascent.shared.data.dto.LocationDto
 import org.techascent.shared.data.dto.PrayerName
 import org.techascent.shared.data.dto.PrayerTimeDto
 import org.techascent.shared.data.dto.PrayerTimeInterval
+import org.techascent.shared.data.enum.School
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -77,7 +78,9 @@ class PrayerTimeUiModelTest {
 
     @Test
     fun `toUiModel should return correct mapping of prayer time`() {
-        val uiModel = samplePrayerTimeDto.toUiModel()
+        val uiModel = samplePrayerTimeDto.toUiModel(
+            School.HANAFI
+        )
         val fajrInterval = uiModel.intervals.first()
         assertEquals(expected = uiModel.intervals.size, actual = 2)
         assertEquals(expected = Res.string.text_fajr, actual = fajrInterval.name)

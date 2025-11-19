@@ -18,8 +18,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.ic_prayer
 import apphub.composeapp.generated.resources.ic_scan
+import apphub.composeapp.generated.resources.ic_settings_2
 import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_home
+import apphub.composeapp.generated.resources.title_settings
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.common.ComposaSpacing
@@ -48,12 +50,12 @@ val navigationItemsLists = listOf(
         title = Res.string.title_halal_scanner,
         route = Screen.UtilityView.route,
     ),
-    /*NavigationItem(
+    NavigationItem(
         unSelectedIcon = Res.drawable.ic_settings_2,
         selectedIcon = Res.drawable.ic_settings_2,
         title = Res.string.title_settings,
         route = Screen.SettingsView.route,
-    ),*/
+    ),
 )
 
 @Composable

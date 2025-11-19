@@ -28,7 +28,7 @@ val appModule = module {
     viewModel { CalendarViewModel(repository = get(), locationService = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }
-    viewModel { SettingsViewModel() }
+    viewModel { SettingsViewModel(dataStore = get()) }
     /*viewModel { LocationPickerViewModel(controller = get ()) }*/
     viewModel { CompassViewModel() }
     viewModel { CityPickerViewModel() }
