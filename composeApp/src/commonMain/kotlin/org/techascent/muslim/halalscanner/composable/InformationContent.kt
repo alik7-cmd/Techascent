@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -17,14 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_halal
-import apphub.composeapp.generated.resources.text_cancel
-import apphub.composeapp.generated.resources.text_scan_again
+import apphub.composeapp.generated.resources.text_done
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.asyncimage.ComposeAsyncImage
 import org.techascent.composa.button.primary.ComposaButton
@@ -34,11 +33,7 @@ import org.techascent.composa.icon.ComposaIcon
 import org.techascent.composa.messabebox.MessageBox
 import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.text.BulletText
-import org.techascent.composa.text.DecoratedText
-import org.techascent.composa.text.SpannableText
-import org.techascent.composa.text.StyledText
 import org.techascent.composa.theming.ComposaTheme
-import org.techascent.muslim.halalscanner.state.HalalUiState
 import org.techascent.muslim.halalscanner.state.ProductUiState
 import org.techascent.shared.data.mapper.HalalStatus
 
@@ -46,10 +41,11 @@ import org.techascent.shared.data.mapper.HalalStatus
 internal fun InformationContent(
     productUiState: ProductUiState,
     onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
             .background(ComposaTheme.color.backgroundAppBackground),
@@ -105,48 +101,16 @@ internal fun InformationContent(
                 )
             }
 
-            Row(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                horizontalArrangement = spacedBy(ComposaSpacing.Medium)
-
-            ) {
-                ComposaButton(
-                    text = stringResource(Res.string.text_cancel),
-                    onClick = onNavigateBack,
-                    iconTint = Color.Unspecified,
-                )
-                ComposaButton(
-                    text = stringResource(Res.string.text_scan_again),
-                    onClick = {},
-                    iconTint = Color.Unspecified,
-                )
-            }
+            ComposaButton(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(ComposaSpacing.Medium)
+                    .align(Alignment.CenterHorizontally),
+                text = stringResource(Res.string.text_done),
+                onClick = onNavigateBack,
+                iconTint = Color.Unspecified
+            )
         }
     )
-}
-
-@Composable
-private fun StatusText(
-    halalUiState: HalalUiState,
-    modifier: Modifier
-) {
-    val color = getColorByStatus(status = halalUiState.status)
-    val segments = listOf(
-        StyledText(
-            "Product Status: ", order = 0,
-            textStyle = ComposaTheme.typography.body
-        ),
-        DecoratedText(
-            text = stringResource(halalUiState.halalStatusRes),
-            order = 1,
-            spanStyle = SpanStyle(
-                color = color,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
-        ),
-    )
-    SpannableText(segments = segments, fontSize = 16.sp, modifier = modifier)
 }
 
 @Composable

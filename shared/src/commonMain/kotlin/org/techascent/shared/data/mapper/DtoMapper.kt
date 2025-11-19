@@ -70,7 +70,10 @@ fun PrayerData.toDto(): PrayerTimeDto {
     }
 
     // Hijri date string from API response
-    val hijriDate = this.date.hijri.date
+    val hijriDate = this.date.hijri.day
+        .plus(" ")
+        .plus(this.date.hijri.month.en)
+        .plus(" ").plus(this.date.hijri.year)
 
     return PrayerTimeDto(
         intervals = intervals,
@@ -139,7 +142,10 @@ fun Data.toDto(): PrayerTimeDto {
     }
 
     // Hijri date string from API response
-    val hijriDate = this.date.hijri.date
+    val hijriDate = this.date.hijri.day
+        .plus(" ")
+        .plus(this.date.hijri.month.en)
+        .plus(" ").plus(this.date.hijri.year)
 
     return PrayerTimeDto(
         intervals = intervals,

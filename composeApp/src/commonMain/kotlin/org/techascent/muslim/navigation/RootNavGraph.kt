@@ -92,6 +92,7 @@ fun NavGraphBuilder.mainNavGraph(
         composable(route = Screen.PrayerView.route) {
             PrayerView(
                 innerPadding = innerPadding,
+                onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) }
             )
         }
         composable(route = Screen.UtilityView.route) {
