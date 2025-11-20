@@ -1,6 +1,7 @@
 package org.techascent.composa.featurecard
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import org.techascent.composa.theming.ComposaTheme
 @Composable
 fun FeatureCard(
     icon: DrawableData,
+    title: String,
     text: String,
     buttonText: String,
     leftIcon: DrawableData? = null,
@@ -37,18 +39,28 @@ fun FeatureCard(
                     icon = icon,
                     modifier = Modifier.weight(0.2f)
                 )
-                Text(
-                    text = text,
-                    style = ComposaTheme.typography.buttonLarge,
-                    modifier = Modifier.weight(0.8f)
-                )
+                Column(
+                    modifier = Modifier.weight(0.8f),
+                    verticalArrangement = Arrangement.spacedBy(ComposaSpacing.Small)
+                ) {
+
+                    Text(
+                        text = title,
+                        style = ComposaTheme.typography.titleEmphasized,
+                    )
+                    Text(
+                        text = text,
+                        style = ComposaTheme.typography.buttonLarge,
+                    )
+                }
+
             }
             ComposaButtonText(
                 text = buttonText,
                 onClick = onClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = ComposaSpacing.Medium, vertical = ComposaSpacing.Small),
+                    .padding(horizontal = ComposaSpacing.Medium,),
                 leftIcon = leftIcon,
                 rightIcon = rightIcon,
             )

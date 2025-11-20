@@ -11,6 +11,7 @@ import apphub.composeapp.generated.resources.text_cancel
 import apphub.composeapp.generated.resources.text_halal_promotion
 import apphub.composeapp.generated.resources.text_permission_description
 import apphub.composeapp.generated.resources.text_permission_title
+import apphub.composeapp.generated.resources.text_scan_promotion_title
 import apphub.composeapp.generated.resources.title_halal_scanner
 import dev.icerock.moko.permissions.DeniedAlwaysException
 import dev.icerock.moko.permissions.DeniedException
@@ -43,6 +44,7 @@ internal fun LazyListScope.featureCard(
                 imageRes = Res.drawable.ic_halal,
                 tint = ComposaTheme.color.iconAction
             ),
+            title = stringResource(Res.string.text_scan_promotion_title),
             text = stringResource(Res.string.text_halal_promotion),
             buttonText = stringResource(Res.string.title_halal_scanner),
             leftIcon = DrawableData(
