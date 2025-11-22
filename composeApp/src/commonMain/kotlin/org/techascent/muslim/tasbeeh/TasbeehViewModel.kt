@@ -63,6 +63,17 @@ class TasbeehViewModel(
 
     }
 
+    fun onSetComplete(){
+        viewModelScope.launch {
+            uiState.update {currentState ->
+                currentState.copy(
+                    sets = currentState.sets.plus(1),
+                    count = 0
+                )
+            }
+        }
+    }
+
     fun onUpdateDialogVisibility() {
         uiState.update { currentState ->
             currentState.copy(shouldShowResetDialog = !currentState.shouldShowResetDialog)
