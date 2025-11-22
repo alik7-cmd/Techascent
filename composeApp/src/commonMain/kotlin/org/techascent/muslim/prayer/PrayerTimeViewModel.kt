@@ -49,7 +49,11 @@ class PrayerTimeViewModel(
                         _uiState.emit(
                             value = PrayerTimeUiState.Success(data = uiModel)
                         )
-                    }
+                    } ?: _uiState.emit(
+                        value = PrayerTimeUiState.Error(
+                            message = "Nothing found"
+                        )
+                    )
                 }
 
                 is ResultState.Error -> _uiState.emit(
