@@ -48,7 +48,8 @@ private fun TasbeehScreen(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
         onCounterIncrement = viewModel::onCounterIncrement,
-        onResetIncrement = viewModel::onResetIncrement
+        onResetIncrement = viewModel::onResetIncrement,
+        onSetComplete = viewModel::onSetComplete
     )
 }
 
@@ -58,7 +59,8 @@ private fun TasbeehContent(
     uiState: TasbeehUiState,
     onNavigateBack: () -> Unit,
     onCounterIncrement: () -> Unit,
-    onResetIncrement: () -> Unit
+    onResetIncrement: () -> Unit,
+    onSetComplete: () -> Unit,
 ) {
     val title = stringResource(resource = uiState.dialogProperty.title)
     val message = stringResource(resource = uiState.dialogProperty.message)
@@ -102,7 +104,8 @@ private fun TasbeehContent(
         ) {
             parabolicTasbeeh(
                 uiState = uiState,
-                onCounterIncrement = onCounterIncrement
+                onCounterIncrement = onCounterIncrement,
+                onSetComplete = onSetComplete
             )
         }
     }

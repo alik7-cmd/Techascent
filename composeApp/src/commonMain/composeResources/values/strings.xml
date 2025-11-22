@@ -35,7 +35,9 @@
 
 
     <string name="title_tasbeeh">Tasbeeh</string>
-    <string name="title_tasbeeh_instruction">Swipe left → right to increment</string>
+    <string name="title_tasbeeh_instruction">Swipe left to right anywhere on the screen to increment.</string>
+
+    <string name="text_tasbeeh_set_complete">Set %1$d Complete. Total count: %2$d</string>
     <string name="message_tasbeeh">The Prophet Muhammad ﷺ used to count tasbeeh on his right hand, encouraging us to do the same. He said, Count on your fingers, for they will be asked and will speak. (Abu Dawood) Let’s follow his Sunnah and remember Allah with our right hand daily. </string>
     <string name="reset_warning_title">Reset Warning</string>
     <string name="reset_warning_message">This will reset all data. Continue?</string>
