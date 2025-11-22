@@ -10,14 +10,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.tasbeeh.state.TasbeehUiState
+import kotlin.text.get
 
 class TasbeehViewModel(
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
     companion object {
-        private val COUNTER_KEY = intPreferencesKey("tasbeeh_counter")
+        private val COUNTER_KEY = intPreferencesKey(DataStoreKey.TASBBEH_COUNTER)
+        private val SET_KEY = intPreferencesKey(DataStoreKey.SET_COUNTER)
+
     }
 
     internal val uiState: MutableStateFlow<TasbeehUiState> =
@@ -29,15 +33,19 @@ class TasbeehViewModel(
 
     private fun loadCounterFromDataStore() {
         viewModelScope.launch {
-            dataStore.data
-                .map { preferences -> preferences[COUNTER_KEY] ?: 0 }
-                .collect { count ->
-                    uiState.update { currentState ->
-                        currentState.copy(count = count)
-                    }
+            kotlinx.coroutines.flow.combine(
+                dataStore.data.map { preferences -> preferences[COUNTER_KEY] ?: 0 },
+                dataStore.data.map { preferences -> preferences[SET_KEY] ?: 0 }
+            ) { count, sets ->
+                Pair(count, sets)
+            }.collect { (count, sets) ->
+                uiState.update { currentState ->
+                    currentState.copy(count = count, sets = sets)
                 }
+            }
         }
     }
+
 
     fun onCounterIncrement() {
         uiState.update { currentState ->
@@ -50,7 +58,8 @@ class TasbeehViewModel(
     fun onResetIncrement() {
         uiState.update { currentState ->
             saveCounterToDataStore(0)
-            currentState.copy(count = 0)
+            saveSetToDataStore(0)
+            currentState.copy(count = 0, sets = 0)
         }
     }
 
@@ -60,12 +69,21 @@ class TasbeehViewModel(
                 preferences[COUNTER_KEY] = count
             }
         }
-
     }
 
-    fun onSetComplete(){
+    private fun saveSetToDataStore(count: Int) {
         viewModelScope.launch {
-            uiState.update {currentState ->
+            dataStore.edit { preferences ->
+                preferences[SET_KEY] = count
+            }
+        }
+    }
+
+    fun onSetComplete() {
+        viewModelScope.launch {
+            uiState.update { currentState ->
+                saveSetToDataStore(currentState.sets.plus(1))
+                saveCounterToDataStore(0)
                 currentState.copy(
                     sets = currentState.sets.plus(1),
                     count = 0

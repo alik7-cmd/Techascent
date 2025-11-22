@@ -7,6 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -46,8 +47,6 @@ import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.tasbeeh.state.TasbeehUiState
 import kotlin.math.pow
 
-// ... other imports
-
 fun LazyListScope.parabolicTasbeeh(
     uiState: TasbeehUiState,
     onCounterIncrement: () -> Unit,
@@ -57,8 +56,6 @@ fun LazyListScope.parabolicTasbeeh(
         val animProgress = remember { Animatable(0f) }
         var isAnimating by remember { mutableStateOf(false) }
 
-        // --- Progress Calculation ---
-        // This logic remains the same
         val progressTarget = if (uiState.goal > 0) (uiState.count % uiState.goal).toFloat() / uiState.goal else 0f
         val animatedProgress by animateFloatAsState(
             targetValue = progressTarget,
@@ -133,23 +130,20 @@ fun LazyListScope.parabolicTasbeeh(
                 ) {
                     CircularProgressIndicator(
                         progress = { animatedProgress },
-                        modifier = Modifier.size(100.dp),
+                        modifier = Modifier.size(150.dp),
                         color = ComposaTheme.color.textAction,
-                        strokeWidth = ComposaSpacing.Small,
+                        strokeWidth = 12.dp,
                     )
                     Text(
                         // 3. Display the count within the goal (e.g., 32 instead of 65)
-                        text = (uiState.count % uiState.goal).toString(),
+                        text = "${uiState.count % uiState.goal}/${uiState.goal}", //(uiState.count % uiState.goal).toString()
                         style = ComposaTheme.typography.titleLargeDemi,
                     )
                 }
-
-                // --- 2. Canvas for Beads ---
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp), // Give the canvas a fixed height
-
+                        .height(200.dp), // Give the canvas a fixed height
                     contentAlignment = Alignment.Center,
                 ) {
                     Canvas(modifier = Modifier.fillMaxSize()) {
@@ -172,7 +166,7 @@ fun LazyListScope.parabolicTasbeeh(
                             val x = centerX + spacing * (i + 1) + shift
                             val y =
                                 baseHeight - arcHeight * ((x - centerX).pow(2) / totalWidth.pow(2))
-                            androidx.compose.ui.geometry.Offset(x, y)
+                            Offset(x, y)
                         }
 
                         // Moving bead
@@ -183,7 +177,7 @@ fun LazyListScope.parabolicTasbeeh(
                             val x = lerp(startX, endX, t)
                             val y =
                                 baseHeight - arcHeight * ((x - centerX).pow(2) / totalWidth.pow(2))
-                            androidx.compose.ui.geometry.Offset(x, y)
+                            Offset(x, y)
                         } else {
                             null
                         }
@@ -211,11 +205,15 @@ fun LazyListScope.parabolicTasbeeh(
                 // This is placed directly below the canvas within the same Column
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(ComposaSpacing.Medium)
                 ) {
                     // 4. Display the Set count
                     if (uiState.sets > 0) {
                         Text(
-                            text = stringResource(Res.string.text_tasbeeh_set_complete, uiState.sets),
+                            text = stringResource(Res.string.text_tasbeeh_set_complete,
+                                uiState.sets,
+                                (uiState.sets * uiState.goal).plus(uiState.count)
+                            ),
                             style = ComposaTheme.typography.body,
                             color = ComposaTheme.color.textAction,
                             modifier = Modifier.padding(bottom = ComposaSpacing.Small)
@@ -229,8 +227,6 @@ fun LazyListScope.parabolicTasbeeh(
                         messageType = MessageType.Info,
                         message = stringResource(Res.string.title_tasbeeh_instruction),
                     )
-
-                    Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
                     Text(
                         modifier = Modifier

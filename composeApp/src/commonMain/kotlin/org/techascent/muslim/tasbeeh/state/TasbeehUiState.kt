@@ -15,7 +15,7 @@ data class TasbeehUiState(
     val infoMessage: StringResource = Res.string.message_tasbeeh,
     val dialogProperty: DialogProperty = DialogProperty(),
     val shouldShowResetDialog: Boolean = false,
-    val goal: Int = 10,
+    val goal: Int = 50,
     val sets: Int = 0
 )
 
