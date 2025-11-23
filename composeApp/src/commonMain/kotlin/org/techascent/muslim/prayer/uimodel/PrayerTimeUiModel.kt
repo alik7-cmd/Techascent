@@ -14,7 +14,6 @@ import apphub.composeapp.generated.resources.text_fajr
 import apphub.composeapp.generated.resources.text_isha
 import apphub.composeapp.generated.resources.text_maghrib
 import apphub.composeapp.generated.resources.text_salat_ud_duha
-import kotlinx.datetime.Clock.System
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -22,7 +21,6 @@ import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.techascent.muslim.common.toHourMinuteString
-import org.techascent.muslim.common.toReadableDate
 import org.techascent.muslim.getPlaceName
 import org.techascent.shared.data.dto.PrayerName
 import org.techascent.shared.data.dto.PrayerTimeDto
@@ -91,7 +89,7 @@ internal suspend fun PrayerTimeDto.toUiModel(
         hijriDate = hijriDate,
         sunrise = sunrise.toHourMinuteString(false),
         sunset = sunset.toHourMinuteString(false),
-        currentDateTime = System.now().toEpochMilliseconds().toReadableDate(),
+        currentDateTime = currentDateTime,
         iftarTime = IftarTimeUiModel(
             iftarStartTime = iftarTime?.startTime?.toHourMinuteString(false),
             lastTimeOfSahri = iftarTime?.endTime?.toHourMinuteString(false),

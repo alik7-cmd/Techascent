@@ -2,7 +2,6 @@ package org.techascent.muslim.prayer.usecase
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -11,8 +10,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import org.techascent.muslim.common.getCurrentDateFormatted
 import org.techascent.muslim.common.getCurrentYearAndMonth
 import org.techascent.muslim.common.location.LocationService
+import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPlaceName
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toUiModel
@@ -29,14 +30,15 @@ class PrayerTimeViewUseCase(
         private fun getCacheKeyForMonthly(city: String, school: School, month: Int): String =
             "$DEFAULT${city}_${school.name}_${month}"
 
-        private const val DEFAULT = "monthly_prayer_times_"
+        private const val DEFAULT = DataStoreKey.MONTHLY_PRAYER_INITIAL
     }
 
-    suspend fun getMonthlyPrayerTimes(
-    ): Flow<ResultState<List<PrayerTimeUiModel>>> {
+    suspend fun getMonthlyPrayerTimes(): Flow<ResultState<PrayerTimeUiModel>> {
         val location = locationService.getCurrentLocation()
         val date = getCurrentYearAndMonth()
-        val code =  dataStore.data.first()[intPreferencesKey("school_preference")] ?: School.HANAFI.code
+        val code = dataStore.data.first()[intPreferencesKey(DataStoreKey.SCHOOL_PREFERENCE)]
+            ?: School.HANAFI.code
+        val currentDate = getCurrentDateFormatted()
 
         location?.let {
             val addressInfo = getPlaceName(it.latitude, it.longitude)
@@ -47,11 +49,15 @@ class PrayerTimeViewUseCase(
             )
             val cachedData = getCachedMonthlyPrayerTimes(cacheKey)
             if (cachedData != null) {
-                return flowOf(
-                    ResultState.Success(cachedData)
-                )
+                val prayerData = cachedData.find {
+                    currentDate == it.currentDateTime
+                }
+                if (prayerData != null) {
+                    return flowOf(
+                        ResultState.Success(prayerData)
+                    )
+                }
             }
-
 
             return repository.getMonthlyPrayerTimes(
                 year = date.year,
@@ -62,11 +68,19 @@ class PrayerTimeViewUseCase(
             ).map { resultState ->
                 when (resultState) {
                     is ResultState.Success -> {
-                        val uiModels = resultState.data.map { it.toUiModel(
-                            school = School.fromCode(code)
-                        ) }
+                        val uiModels = resultState.data.map {
+                            it.toUiModel(
+                                school = School.fromCode(code)
+                            )
+                        }
                         saveMonthlyPrayerTimesToCache(cacheKey, uiModels)
-                        ResultState.Success(uiModels)
+                        val data = uiModels.find {
+                            it.currentDateTime == currentDate
+                        }
+                        data?.let {
+                            ResultState.Success(it)
+                        } ?: ResultState.Error("")
+
                     }
 
                     is ResultState.Error -> resultState

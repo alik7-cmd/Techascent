@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock.System
-import org.techascent.muslim.common.toReadableDate
+import org.techascent.muslim.common.getCurrentDateFormatted
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
@@ -37,24 +36,12 @@ class PrayerTimeViewModel(
 
     @OptIn(ExperimentalTime::class)
     internal fun getMonthlyPrayerTimes() = viewModelScope.launch {
+        val currentDate = getCurrentDateFormatted()
         prayerTimeUseCase.getMonthlyPrayerTimes().collect {
             when (it) {
-                is ResultState.Success -> {
-                    val data = it.data.find { uiModel ->
-                        uiModel.currentDateTime == System.now().toEpochMilliseconds()
-                            .toReadableDate()
-
-                    }
-                    data?.let { uiModel ->
-                        _uiState.emit(
-                            value = PrayerTimeUiState.Success(data = uiModel)
-                        )
-                    } ?: _uiState.emit(
-                        value = PrayerTimeUiState.Error(
-                            message = "Nothing found"
-                        )
-                    )
-                }
+                is ResultState.Success -> _uiState.emit(
+                    value = PrayerTimeUiState.Success(data = it.data)
+                )
 
                 is ResultState.Error -> _uiState.emit(
                     value = PrayerTimeUiState.Error(
