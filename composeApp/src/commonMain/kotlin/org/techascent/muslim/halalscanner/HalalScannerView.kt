@@ -27,6 +27,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.ncgroup.kscan.BarcodeFormats
 import org.ncgroup.kscan.BarcodeResult
+import org.ncgroup.kscan.ScannerColors
 import org.ncgroup.kscan.ScannerView
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
@@ -96,6 +97,15 @@ private fun HalalScannerContent(
                         BarcodeFormats.FORMAT_QR_CODE,
                         BarcodeFormats.FORMAT_EAN_13,
                     ),
+                    colors = ScannerColors(
+                        headerContainerColor = ComposaTheme.color.backgroundAppBackground,
+                        zoomControllerContainerColor = ComposaTheme.color.backgroundAppBackground,
+                        barcodeFrameColor = ComposaTheme.color.backgroundAppBackground,
+                        headerTitleColor = ComposaTheme.color.textNeutral,
+                        headerNavigationIconColor = ComposaTheme.color.textNeutral,
+                        headerActionIconColor = ComposaTheme.color.textNeutral,
+                        zoomControllerContentColor = ComposaTheme.color.textNeutral
+                    )
                 ) { result ->
                     when (result) {
                         is BarcodeResult.OnSuccess -> {
