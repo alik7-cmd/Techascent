@@ -73,6 +73,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(projects.shared)
+            implementation(projects.kscan)
             implementation(projects.composa)
             implementation(libs.koin.core) // or latest
             implementation(libs.kotlinx.coroutines.core)
@@ -81,7 +82,7 @@ kotlin {
             implementation(libs.datastore)
             implementation(libs.navigation.compose)
             implementation(libs.screen.size)
-            implementation(libs.kscan)
+            //implementation(libs.kscan)
             implementation(libs.kotlinx.serialization.json)
 
 
@@ -115,7 +116,13 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
     compileOptions {

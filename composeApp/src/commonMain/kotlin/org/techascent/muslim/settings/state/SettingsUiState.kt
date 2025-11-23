@@ -9,6 +9,7 @@ import org.techascent.shared.data.enum.School
 
 data class SettingsUiState(
     val school: School = School.HANAFI,
+    val haptic: Boolean = true,
     val links: LinksUiModel
 )
 

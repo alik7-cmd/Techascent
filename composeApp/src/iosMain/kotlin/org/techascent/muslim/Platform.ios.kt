@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -40,6 +41,7 @@ import platform.Foundation.dictionaryWithValuesForKeys
 import kotlin.coroutines.resume
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
+import platform.UIKit.UIScreen
 
 /*class IOSPlatform: Platform {
     override val name: String = UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
@@ -180,7 +182,9 @@ actual suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInf
 
         geocoder.reverseGeocodeLocation(location) { placemarks, error ->
             if (error != null || placemarks == null || placemarks.count() == 0) {
-                continuation.resume("Unknown location")
+                continuation.resume(AddressInfo(
+                    "","","",""
+                ))
                 return@reverseGeocodeLocation
             }
 
@@ -218,8 +222,13 @@ actual fun openNearbyMosques() {
     }
 }
 
-actual fun getScreenWidthPx(): Int = UIScreen.mainScreen.bounds.width.toInt()
-actual fun getScreenHeightPx(): Int = UIScreen.mainScreen.bounds.height.toInt()
+@OptIn(ExperimentalForeignApi::class)
+actual fun getScreenWidthPx(): Int =
+    UIScreen.mainScreen.bounds.useContents { size.width.toInt() }
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun getScreenHeightPx(): Int =
+    UIScreen.mainScreen.bounds.useContents { size.height.toInt() }
 
 actual fun createDataStore(producePath: () -> String): DataStore<Preferences> =
     PreferenceDataStoreFactory.createWithPath(
