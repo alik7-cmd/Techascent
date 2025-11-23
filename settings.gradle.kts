@@ -31,3 +31,5 @@ dependencyResolutionManagement {
 include(":composeApp")
 include(":shared")
 include(":composa")
+include(":composa")
+include(":kscan")

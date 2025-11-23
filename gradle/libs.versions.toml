@@ -23,6 +23,10 @@ lifecycleViewModel = "2.8.3"
 lifecycleViewModelCompose = "2.8.0"
 material = "1.12.0"
 coil = "3.0.4"
+dokka = "2.1.0"
+klint = "13.1.0"
+mlkitBarcodeScanning-android = "17.3.0"
+androidx-camera = "1.5.1"
 
 [libraries]
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
@@ -53,6 +57,15 @@ screen-size = { module = "dev.chrisbanes.material3:material3-window-size-class-m
 moko-permissions = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+android-mlkitBarcodeScanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkitBarcodeScanning-android" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "androidx-camera" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "androidx-camera" }
+androidx-camera-extensions = { group = "androidx.camera", name = "camera-extensions", version.ref = "androidx-camera" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "androidx-camera" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "androidx-camera" }
+
+[bundles]
+camera = ["androidx-camera-core", "androidx-camera-lifecycle", "androidx-camera-camera2", "androidx-camera-view", "androidx-camera-extensions"]
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -62,4 +75,6 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "klint" }
 

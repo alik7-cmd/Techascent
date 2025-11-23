@@ -96,7 +96,6 @@ private fun HalalScannerContent(
                         BarcodeFormats.FORMAT_QR_CODE,
                         BarcodeFormats.FORMAT_EAN_13,
                     ),
-                    showUi = true
                 ) { result ->
                     when (result) {
                         is BarcodeResult.OnSuccess -> {
