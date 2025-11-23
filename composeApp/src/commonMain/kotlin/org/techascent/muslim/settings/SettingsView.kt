@@ -24,6 +24,8 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.unit.LayoutDirection
 import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.haptic_label
+import apphub.composeapp.generated.resources.haptic_title
 import apphub.composeapp.generated.resources.text_school_of
 import apphub.composeapp.generated.resources.text_school_suggestion
 import apphub.composeapp.generated.resources.title_settings
@@ -79,11 +81,14 @@ private fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val schoolPreference by viewModel.schoolPreference.collectAsState()
+    val hapticPreference by viewModel.hapticPreference.collectAsState()
     SettingsContent(
         uiState = uiState,
         schoolPreference = schoolPreference,
+        hapticPreference = hapticPreference,
         innerPadding = innerPadding,
         onUpdateSchool = viewModel::updateSchoolPreference,
+        onUpdateHaptic = viewModel::onUpdateHaptic,
         onHandleEvent = onHandleEvent
     )
 
@@ -94,7 +99,9 @@ private fun SettingsScreen(
 private fun SettingsContent(
     uiState: SettingsUiState,
     schoolPreference: Int,
+    hapticPreference: Boolean,
     onUpdateSchool: (Int) -> Unit,
+    onUpdateHaptic: (Boolean)-> Unit,
     onHandleEvent: (SettingsEvent) -> Unit,
     innerPadding: PaddingValues
 ) {
@@ -132,6 +139,19 @@ private fun SettingsContent(
                             Cell(
                                 leftSlot = LeftSlot.None,
                                 centerSlot = CenterSlot.TitleWithLabel(
+                                    title = stringResource(Res.string.haptic_title),
+                                    label = stringResource(Res.string.haptic_label),
+                                ),
+                                rightSlot = RightSlot.Switch(
+                                    checked = hapticPreference,
+                                    onCheckedChange = { isChecked ->
+                                       onUpdateHaptic(isChecked)
+                                    }
+                                )
+                            )
+                            Cell(
+                                leftSlot = LeftSlot.None,
+                                centerSlot = CenterSlot.TitleWithLabel(
                                     label = stringResource(Res.string.text_school_of),
                                     title = stringResource(
                                         School.fromCode(schoolPreference).toTextRes()
@@ -147,7 +167,6 @@ private fun SettingsContent(
                                     }
                                 )
                             )
-
                         }
                     )
                     MessageBox(

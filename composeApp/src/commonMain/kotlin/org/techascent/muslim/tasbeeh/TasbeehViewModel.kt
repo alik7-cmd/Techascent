@@ -2,6 +2,7 @@ package org.techascent.muslim.tasbeeh
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,7 @@ class TasbeehViewModel(
     companion object {
         private val COUNTER_KEY = intPreferencesKey(DataStoreKey.TASBBEH_COUNTER)
         private val SET_KEY = intPreferencesKey(DataStoreKey.SET_COUNTER)
+        private val HAPTIC_KEY = booleanPreferencesKey(DataStoreKey.HAPTIC_FEEDBACK)
 
     }
 
@@ -35,12 +37,13 @@ class TasbeehViewModel(
         viewModelScope.launch {
             kotlinx.coroutines.flow.combine(
                 dataStore.data.map { preferences -> preferences[COUNTER_KEY] ?: 0 },
-                dataStore.data.map { preferences -> preferences[SET_KEY] ?: 0 }
-            ) { count, sets ->
-                Pair(count, sets)
-            }.collect { (count, sets) ->
+                dataStore.data.map { preferences -> preferences[SET_KEY] ?: 0 },
+                dataStore.data.map { preferences -> preferences[HAPTIC_KEY] ?: true }
+            ) { count, sets, haptic ->
+                Triple(count, sets, haptic)
+            }.collect { (count, sets, haptic) ->
                 uiState.update { currentState ->
-                    currentState.copy(count = count, sets = sets)
+                    currentState.copy(count = count, sets = sets, haptic = haptic)
                 }
             }
         }

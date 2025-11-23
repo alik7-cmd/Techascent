@@ -5,4 +5,5 @@ object DataStoreKey {
     const val SET_COUNTER = "set_counter"
     const val MONTHLY_PRAYER_INITIAL = "monthly_prayer_times_"
     const val SCHOOL_PREFERENCE = "school_preference"
+    const val HAPTIC_FEEDBACK = "haptic_feedback"
 }

@@ -43,6 +43,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.messabebox.MessageBox
 import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.performHapticFeedback
 import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.tasbeeh.state.TasbeehUiState
 import kotlin.math.pow
@@ -82,7 +83,12 @@ fun LazyListScope.parabolicTasbeeh(
                 animProgress.animateTo(1f, tween(600))
 
                 // 2. Check if the goal has been reached
+                if(uiState.haptic){
+                    performHapticFeedback()
+                }
                 if (uiState.count + 1 == uiState.goal) {
+
+
                     onSetComplete() // Call the new function to increment sets and reset
                 } else {
                     onCounterIncrement() // Otherwise, just increment the counter

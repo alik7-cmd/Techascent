@@ -16,7 +16,8 @@ data class TasbeehUiState(
     val dialogProperty: DialogProperty = DialogProperty(),
     val shouldShowResetDialog: Boolean = false,
     val goal: Int = 50,
-    val sets: Int = 0
+    val sets: Int = 0,
+    val haptic: Boolean = true
 )
 
 data class DialogProperty(
