@@ -9,7 +9,8 @@ data class PrayerTimeDto(
     val hijriDate: String,
     val sunrise: LocalDateTime,
     val sunset: LocalDateTime,
-    val location: LocationDto
+    val location: LocationDto,
+    val currentDateTime: String
 )
 
 data class PrayerTimeInterval(

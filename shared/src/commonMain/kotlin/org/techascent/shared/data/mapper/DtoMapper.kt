@@ -88,7 +88,8 @@ fun PrayerData.toDto(): PrayerTimeDto {
         location = LocationDto(
             latitude = this.meta.latitude,
             longitude = this.meta.longitude
-        )
+        ),
+        currentDateTime = this.date.gregorian.date
     )
 }
 
@@ -160,11 +161,12 @@ fun Data.toDto(): PrayerTimeDto {
         location = LocationDto(
             latitude = this.meta.latitude,
             longitude = this.meta.longitude
-        )
+        ),
+        currentDateTime = this.date.gregorian.date
     )
 }
 
-fun PrayerTimesMonthlyResponse.toDto(): List<PrayerTimeDto>{
+fun PrayerTimesMonthlyResponse.toDto(): List<PrayerTimeDto> {
     return this.data.map {
         it.toDto()
     }
