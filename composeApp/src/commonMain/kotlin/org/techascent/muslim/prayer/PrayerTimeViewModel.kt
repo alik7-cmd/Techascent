@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import org.techascent.muslim.getPrayerNotificationService
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
@@ -71,9 +69,13 @@ class PrayerTimeViewModel(
             if (shouldSave) {
                 prayerNotificationUseCase.addPrayerToNotify(prayerName)
             } else prayerNotificationUseCase.removePrayerFromNotify(prayerName)
+            if (_uiState.value is PrayerTimeUiState.Success) {
+                val currentData = (_uiState.value as PrayerTimeUiState.Success).data
+                prayerNotificationUseCase.schedulePrayerNotifications(currentData.intervals)
+            }
         }
 
-    fun testNotificationNow() = viewModelScope.launch {
+    /*fun testNotificationNow() = viewModelScope.launch {
         val notificationService = getPrayerNotificationService()
         notificationService.scheduleNotification(
             prayerName = "TEST",
@@ -82,8 +84,8 @@ class PrayerTimeViewModel(
             message = "This is a test notification",
             audioUrl = "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg"
         )
-        //notificationService.playAudio("https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg")
-    }
+        notificationService.playAudio("https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg")
+    }*/
 
     fun onHandleEvent(event: PrayerTimeEvent) = viewModelScope.launch {
         when (event) {

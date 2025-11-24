@@ -16,6 +16,7 @@ import org.techascent.muslim.common.getCurrentYearAndMonth
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPlaceName
+import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.enum.School
@@ -32,6 +33,8 @@ class PrayerTimeViewUseCase(
             "$DEFAULT${city}_${school.name}_${month}"
 
         private const val DEFAULT = DataStoreKey.MONTHLY_PRAYER_INITIAL
+        private val NOTIFY_PRAYERS_KEY = stringPreferencesKey(DataStoreKey.NOTIFICATION_PRAYER_LIST)
+
     }
 
     suspend fun getMonthlyPrayerTimes(): Flow<ResultState<PrayerTimeUiModel>> {
@@ -95,7 +98,23 @@ class PrayerTimeViewUseCase(
 
     }
 
-    private fun updateCurrentPrayer(uiModel: PrayerTimeUiModel): PrayerTimeUiModel {
+    private suspend fun getNotifyPrayersList(): List<PrayerNameEnum> {
+        return try {
+            val jsonString = dataStore.data.first()[NOTIFY_PRAYERS_KEY] ?: "[]"
+            Json.decodeFromString<List<String>>(jsonString).mapNotNull {
+                try {
+                    PrayerNameEnum.valueOf(it)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+    private suspend fun updateCurrentPrayer(uiModel: PrayerTimeUiModel): PrayerTimeUiModel {
         val now = Clock.System.now()
         val currentPrayer = uiModel.intervals.find { interval ->
             interval.startTimeInstant != null &&
@@ -104,8 +123,15 @@ class PrayerTimeViewUseCase(
                     now < interval.endTimeInstant
         }
 
+        val currentList = getNotifyPrayersList().toMutableList()
+        
         return uiModel.copy(
             currentPrayer = currentPrayer,
+            intervals = uiModel.intervals.map {
+                it.copy(
+                    shouldNotify = currentList.contains(it.name)
+                )
+            }
         )
     }
 
