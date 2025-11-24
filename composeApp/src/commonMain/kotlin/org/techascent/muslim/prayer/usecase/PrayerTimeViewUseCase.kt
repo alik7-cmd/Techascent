@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import org.techascent.muslim.common.getCurrentDateFormatted
 import org.techascent.muslim.common.getCurrentYearAndMonth
@@ -53,8 +54,9 @@ class PrayerTimeViewUseCase(
                     currentDate == it.currentDateTime
                 }
                 if (prayerData != null) {
+                    val updatedData = updateCurrentPrayer(prayerData)
                     return flowOf(
-                        ResultState.Success(prayerData)
+                        ResultState.Success(updatedData)
                     )
                 }
             }
@@ -91,6 +93,20 @@ class PrayerTimeViewUseCase(
 
         return flowOf(ResultState.Error("Location not found"))
 
+    }
+
+    private fun updateCurrentPrayer(uiModel: PrayerTimeUiModel): PrayerTimeUiModel {
+        val now = Clock.System.now()
+        val currentPrayer = uiModel.intervals.find { interval ->
+            interval.startTimeInstant != null &&
+                    interval.endTimeInstant != null &&
+                    now >= interval.startTimeInstant &&
+                    now < interval.endTimeInstant
+        }
+
+        return uiModel.copy(
+            currentPrayer = currentPrayer,
+        )
     }
 
     suspend fun getCachedMonthlyPrayerTimes(cacheKey: String): List<PrayerTimeUiModel>? {
