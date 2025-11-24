@@ -1,6 +1,9 @@
 package org.techascent.muslim
 
 import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -26,9 +29,19 @@ import kotlin.math.*
 import android.content.Intent
 import androidx.core.net.toUri
 import android.content.res.Resources
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.datetime.Instant
 import okio.Path.Companion.toPath
+import java.util.concurrent.TimeUnit
 import kotlin.text.get
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 
 
 actual fun playBeep() {
@@ -198,5 +211,130 @@ actual fun createDataStore(producePath: () -> String): DataStore<Preferences> =
     PreferenceDataStoreFactory.createWithPath(
         produceFile = { producePath().toPath() }
     )
+
+actual fun getPrayerNotificationService(): PrayerNotificationService {
+    return AndroidPrayerNotificationService(appContext!!)
+}
+
+class AndroidPrayerNotificationService(private val context: Context) : PrayerNotificationService{
+    companion object {
+        private const val CHANNEL_ID = "prayer_times"
+        private const val CHANNEL_NAME = "Prayer Times"
+        private const val NOTIFICATION_ID_BASE = 1000
+    }
+    init {
+        createNotificationChannel()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifications for prayer times"
+                enableVibration(true)
+                setShowBadge(true)
+            }
+            val manager = context.getSystemService(NotificationManager::class.java)
+            manager?.createNotificationChannel(channel)
+        }
+    }
+
+    override suspend fun scheduleNotification(
+        prayerName: String,
+        scheduledTime: Instant,
+        title: String,
+        message: String
+    ){
+        val delay = scheduledTime.toEpochMilliseconds() - System.currentTimeMillis()
+
+        if (delay <= 0) return
+
+        val inputData = workDataOf(
+            "prayer_name" to prayerName,
+            "title" to title,
+            "message" to message,
+            "scheduled_time" to scheduledTime.toEpochMilliseconds()
+        )
+        val notificationRequest = OneTimeWorkRequestBuilder<PrayerNotificationWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setInputData(inputData)
+            .addTag("prayer_$prayerName")
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "prayer_$prayerName",
+            ExistingWorkPolicy.REPLACE,
+            notificationRequest
+        )
+    }
+
+    override suspend fun playAudio(audioUrl: String){
+        val mediaPlayer = android.media.MediaPlayer()
+        try {
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_NOTIFICATION)
+            mediaPlayer.setDataSource(audioUrl)
+            mediaPlayer.setOnCompletionListener { mp ->
+                mp.release()
+            }
+            mediaPlayer.setOnErrorListener { mp, what, extra ->
+                mp.release()
+                false
+            }
+            mediaPlayer.prepareAsync()
+        } catch (e: Exception) {
+            mediaPlayer.release()
+        }
+    }
+    override suspend fun cancelNotification(notificationId: String) {
+        WorkManager.getInstance(context).cancelUniqueWork("prayer_$notificationId")
+    }
+
+    override suspend fun cancelAllNotifications() {
+        WorkManager.getInstance(context).cancelAllWork()
+    }
+
+}
+
+class PrayerNotificationWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
+    override suspend fun doWork(): Result {
+        return try {
+            val prayerName = inputData.getString("prayer_name") ?: return Result.retry()
+            val title = inputData.getString("title") ?: "Prayer Time"
+            val message = inputData.getString("message") ?: "Time for prayer"
+
+            showNotification(prayerName, title, message)
+            Result.success()
+        } catch (e: Exception) {
+            Result.retry()
+        }
+    }
+
+    private fun showNotification(prayerName: String, title: String, message: String){
+        val notificationId = prayerName.hashCode()
+        val intent = Intent(appContext, Class.forName("org.techascent.muslim.MainActivity"))
+        val pendingIntent = PendingIntent.getActivity(
+            appContext,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(appContext!!, "prayer_times")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVibrate(longArrayOf(0, 500, 250, 500))
+            .build()
+        val notificationManager = NotificationManagerCompat.from(appContext!!)
+        notificationManager.notify(notificationId, notification)
+    }
+
+}
 
 

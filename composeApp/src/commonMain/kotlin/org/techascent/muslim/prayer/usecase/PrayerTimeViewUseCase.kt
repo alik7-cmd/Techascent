@@ -16,6 +16,8 @@ import org.techascent.muslim.common.getCurrentYearAndMonth
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPlaceName
+import org.techascent.muslim.getPrayerNotificationService
+import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.enum.School
@@ -33,6 +35,21 @@ class PrayerTimeViewUseCase(
 
         private const val DEFAULT = DataStoreKey.MONTHLY_PRAYER_INITIAL
     }
+
+    suspend fun schedulePrayerNotifications(intervals: List<PrayerTimeIntervalModel>) {
+        val notificationService = getPrayerNotificationService()
+        intervals.forEach { interval ->
+            interval.startTimeInstant?.let { instant ->
+                notificationService.scheduleNotification(
+                    prayerName = interval.name.name,
+                    scheduledTime = instant,
+                    title = "Prayer Time",
+                    message = "Time for ${interval.name.name}"
+                )
+            }
+        }
+    }
+
 
     suspend fun getMonthlyPrayerTimes(): Flow<ResultState<PrayerTimeUiModel>> {
         val location = locationService.getCurrentLocation()

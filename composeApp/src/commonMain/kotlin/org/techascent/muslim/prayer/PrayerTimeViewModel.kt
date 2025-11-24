@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import org.techascent.muslim.common.getCurrentDateFormatted
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
+import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
 import org.techascent.shared.network.ResultState
 import kotlin.time.ExperimentalTime
@@ -52,6 +53,10 @@ class PrayerTimeViewModel(
                 is ResultState.Loading -> _uiState.emit(value = PrayerTimeUiState.Loading)
             }
         }
+    }
+
+    private fun schedulePrayerNotifications(uiModel: PrayerTimeUiModel) = viewModelScope.launch {
+        prayerTimeUseCase.schedulePrayerNotifications(uiModel.intervals)
     }
 
 
