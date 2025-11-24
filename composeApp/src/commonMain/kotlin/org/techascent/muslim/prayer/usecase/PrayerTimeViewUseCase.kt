@@ -23,6 +23,7 @@ import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.enum.School
 import org.techascent.shared.data.repository.PrayerTimesRepository
 import org.techascent.shared.network.ResultState
+import kotlin.text.compareTo
 
 class PrayerTimeViewUseCase(
     private val repository: PrayerTimesRepository,
@@ -38,13 +39,21 @@ class PrayerTimeViewUseCase(
 
     suspend fun schedulePrayerNotifications(intervals: List<PrayerTimeIntervalModel>) {
         val notificationService = getPrayerNotificationService()
-        intervals.forEach { interval ->
+        val now = Clock.System.now()
+
+        // Find the next prayer that hasn't started yet
+        val nextPrayer = intervals.firstOrNull { interval ->
+            interval.startTimeInstant != null && interval.startTimeInstant > now
+        }
+
+        nextPrayer?.let { interval ->
             interval.startTimeInstant?.let { instant ->
                 notificationService.scheduleNotification(
                     prayerName = interval.name.name,
                     scheduledTime = instant,
                     title = "Prayer Time",
-                    message = "Time for ${interval.name.name}"
+                    message = "Time for ${interval.name.name}",
+                    audioUrl = "https://www.islamcan.com/audio/adhan/azan1.mp3"
                 )
             }
         }

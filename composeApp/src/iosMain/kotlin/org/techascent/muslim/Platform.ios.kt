@@ -8,17 +8,13 @@ import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Instant
+import okio.Path.Companion.toPath
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.preference.DATA_STORE_FILE_NAME
 import org.techascent.muslim.preference.createDataStore
 import platform.AudioToolbox.AudioServicesPlaySystemSound
-import platform.AVFoundation.AVAudioPlayer
-import platform.AVFoundation.AVAudioSession
-import platform.AVFoundation.AVAudioSessionCategoryPlayback
-import platform.AVFoundation.AVAudioSessionModeDefault
-import platform.AVFoundation.AVAudioSessionOptions
-import platform.AVFoundation.AVAudioSessionOptionDuckOthers
 import platform.CoreLocation.CLHeading
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
@@ -55,12 +51,24 @@ import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNUserNotificationCenter
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCancellableCoroutine
 import kotlin.math.*
 import platform.CoreLocation.CLGeocoder
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLPlacemark
 import org.techascent.muslim.prayer.uimodel.AddressInfo
+import platform.AVFAudio.setActive
+import platform.Foundation.NSCalendarUnitSecond
+import platform.Foundation.stringWithContentsOfFile
+import platform.UIKit.registerForRemoteNotifications
+import platform.Foundation.NSCalendarUnit
+import platform.AVFAudio.AVAudioPlayer
+import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.AVAudioSessionModeDefault
+import platform.UserNotifications.UNNotificationSound
+
+private var audioPlayer: AVAudioPlayer? = null
+
 
 actual fun playBeep() {
     AudioServicesPlaySystemSound(1057u)
@@ -240,6 +248,7 @@ actual fun getPrayerNotificationService(): PrayerNotificationService {
     return IOSPrayerNotificationService()
 }
 
+@OptIn(ExperimentalForeignApi::class)
 class IOSPrayerNotificationService : PrayerNotificationService {
 
     init {
@@ -249,13 +258,12 @@ class IOSPrayerNotificationService : PrayerNotificationService {
     private fun requestNotificationPermissions() {
         val center = UNUserNotificationCenter.currentNotificationCenter()
         center.requestAuthorizationWithOptions(
-            options = UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge,
-            completionHandler = { granted, error ->
-                if (granted) {
-                    UIApplication.sharedApplication.registerForRemoteNotifications()
-                }
+            UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge
+        ) { granted, error ->
+            if (granted) {
+                UIApplication.sharedApplication.registerForRemoteNotifications()
             }
-        )
+        }
     }
 
     @OptIn(ExperimentalForeignApi::class)
@@ -263,21 +271,38 @@ class IOSPrayerNotificationService : PrayerNotificationService {
         prayerName: String,
         scheduledTime: Instant,
         title: String,
-        message: String
+        message: String,
+        audioUrl: String
     ) {
         val content = UNMutableNotificationContent()
         content.setTitle(title)
         content.setBody(message)
-        content.setSound(null)
-        content.setBadgeNumber(1)
+        content.setSound(UNNotificationSound.defaultSound())
 
-        val dateMillis = scheduledTime.toEpochMilliseconds()
+        if (audioUrl.isNotEmpty()) {
+            try {
+                val soundUrl = NSURL(string = audioUrl)
+                if (soundUrl != null) {
+                    val sound = UNNotificationSound.soundNamed("custom_sound")
+                    content.setSound(sound)
+                }
+            } catch (e: Exception) {
+                println("Failed to set custom sound: ${e.message}")
+            }
+        }
+
+        val timeIntervalSince1970 = scheduledTime.toEpochMilliseconds() / 1000.0
+        val nsDate = NSDate(timeIntervalSince1970)
+
         val calendar = NSCalendar.currentCalendar
-        val components = calendar.componentsFromDate(
-            NSCalendarUnitYear or NSCalendarUnitMonth or NSCalendarUnitDay or
-                    NSCalendarUnitHour or NSCalendarUnitMinute,
-            dateMillis / 1000.0
-        )
+        val unitFlags = NSCalendarUnitYear or
+                NSCalendarUnitMonth or
+                NSCalendarUnitDay or
+                NSCalendarUnitHour or
+                NSCalendarUnitMinute or
+                NSCalendarUnitSecond
+
+        val components = calendar.components(unitFlags, fromDate = nsDate)
 
         val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
             components,
@@ -298,19 +323,22 @@ class IOSPrayerNotificationService : PrayerNotificationService {
             }
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     override suspend fun playAudio(audioUrl: String) {
         try {
             val url = NSURL(string = audioUrl)
-            val audioSession = AVAudioSession.sharedInstance()
-            audioSession.setCategoryWithOptions(
-                AVAudioSessionCategoryPlayback,
-                options = AVAudioSessionOptionDuckOthers,
-                error = null
-            )
-            audioSession.setMode(AVAudioSessionModeDefault, error = null)
+            if (url == null) {
+                println("Invalid audio URL")
+                return
+            }
 
-            val player = AVAudioPlayer(url, error = null)
-            player.play()
+            val audioSession = AVAudioSession.sharedInstance()
+            audioSession.setCategory(AVAudioSessionCategoryPlayback, error = null)
+            audioSession.setActive(true, error = null)
+
+            audioPlayer = AVAudioPlayer(contentsOfURL = url, fileTypeHint = "mp3", error = null)
+            audioPlayer?.volume = 1.0f
+            audioPlayer?.play()
         } catch (e: Exception) {
             println("Failed to play audio: ${e.message}")
         }
@@ -318,13 +346,23 @@ class IOSPrayerNotificationService : PrayerNotificationService {
 
     override suspend fun cancelNotification(notificationId: String) {
         UNUserNotificationCenter.currentNotificationCenter()
-            .removePendingNotificationRequestsWithIdentifiers(
-                listOf("prayer_$notificationId")
-            )
+            .removePendingNotificationRequestsWithIdentifiers(listOf("prayer_$notificationId"))
     }
 
     override suspend fun cancelAllNotifications() {
-        UNUserNotificationCenter.currentNotificationCenter()
-            .removeAllPendingNotificationRequests()
+        UNUserNotificationCenter.currentNotificationCenter().removeAllPendingNotificationRequests()
+        stopAudio()
+    }
+
+    private fun stopAudio() {
+        audioPlayer?.let {
+            if (it.isPlaying()) {
+                it.stop()
+                println("Audio stopped")
+            }
+            audioPlayer = null
+        }
     }
 }
+
+

@@ -44,7 +44,8 @@ interface PrayerNotificationService {
         prayerName: String,
         scheduledTime: Instant,
         title: String = "Prayer Time",
-        message: String
+        message: String,
+        audioUrl: String = ""
     )
 
     suspend fun playAudio(audioUrl: String)

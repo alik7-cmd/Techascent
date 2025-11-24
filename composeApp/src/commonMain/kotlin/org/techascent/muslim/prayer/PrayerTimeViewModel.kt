@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import org.techascent.muslim.common.getCurrentDateFormatted
+import org.techascent.muslim.getPrayerNotificationService
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
@@ -37,12 +39,15 @@ class PrayerTimeViewModel(
 
     @OptIn(ExperimentalTime::class)
     internal fun getMonthlyPrayerTimes() = viewModelScope.launch {
-        val currentDate = getCurrentDateFormatted()
         prayerTimeUseCase.getMonthlyPrayerTimes().collect {
             when (it) {
-                is ResultState.Success -> _uiState.emit(
-                    value = PrayerTimeUiState.Success(data = it.data)
-                )
+                is ResultState.Success -> {
+                    testNotificationNow()
+                    schedulePrayerNotifications(it.data)
+                    _uiState.emit(
+                        value = PrayerTimeUiState.Success(data = it.data)
+                    )
+                }
 
                 is ResultState.Error -> _uiState.emit(
                     value = PrayerTimeUiState.Error(
@@ -59,6 +64,17 @@ class PrayerTimeViewModel(
         prayerTimeUseCase.schedulePrayerNotifications(uiModel.intervals)
     }
 
+    fun testNotificationNow() = viewModelScope.launch {
+        val notificationService = getPrayerNotificationService()
+        notificationService.scheduleNotification(
+            prayerName = "TEST",
+            scheduledTime = Clock.System.now(),
+            title = "Test Notification",
+            message = "This is a test notification",
+            audioUrl = "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg"
+        )
+        notificationService.playAudio("https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg")
+    }
 
     fun onHandleEvent(event: PrayerTimeEvent) = viewModelScope.launch {
         when (event) {
@@ -66,3 +82,4 @@ class PrayerTimeViewModel(
         }
     }
 }
+
