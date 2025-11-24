@@ -11,11 +11,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.ic_calendar
+import apphub.composeapp.generated.resources.ic_notification_off
+import apphub.composeapp.generated.resources.ic_notification_on
 import apphub.composeapp.generated.resources.text_salat_ud_duha
 import apphub.composeapp.generated.resources.warning_prayer_time
 import org.jetbrains.compose.resources.stringResource
@@ -25,11 +33,13 @@ import org.techascent.composa.cell.center.CenterSlot
 import org.techascent.composa.cell.left.LeftSlot
 import org.techascent.composa.cell.right.RightSlot
 import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.common.DrawableData
 import org.techascent.composa.messabebox.MessageBox
 import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.common.toTextRes
 import org.techascent.muslim.prayer.tags.PrayerTags
+import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toDisplayString
 import org.techascent.shared.data.enum.School
@@ -40,10 +50,14 @@ import kotlin.time.ExperimentalTime
 fun LazyListScope.successContent(
     uiModel: PrayerTimeUiModel,
     onNavigateHalalScanner: () -> Unit,
+    onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
 ) {
     currentSalatContent(uiModel = uiModel)
     infoBox(school = uiModel.school)
-    salatTimeContent(uiModel = uiModel)
+    salatTimeContent(
+        uiModel = uiModel,
+        onUpdateNotification = onUpdateNotification
+    )
     featureCard(onClick = onNavigateHalalScanner)
     spacer()
 }
@@ -51,7 +65,8 @@ fun LazyListScope.successContent(
 
 @OptIn(ExperimentalTime::class)
 private fun LazyListScope.salatTimeContent(
-    uiModel: PrayerTimeUiModel
+    uiModel: PrayerTimeUiModel,
+    onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
 ) {
     item {
         Row(
@@ -91,6 +106,7 @@ private fun LazyListScope.salatTimeContent(
                 borderColor = ComposaTheme.color.strokeNeutralSubtle,
                 content = {
                     uiModel.intervals.forEach {
+                        var shouldNotify by remember { mutableStateOf(it.shouldNotify) }
                         if (it.name.toDisplayString() != Res.string.text_salat_ud_duha) {
                             val backgroundColor =
                                 if (it.displayableStartTime == uiModel.currentPrayer?.displayableStartTime) {
@@ -101,7 +117,21 @@ private fun LazyListScope.salatTimeContent(
                             SalatTimeCell(
                                 salatName = stringResource(resource = it.name.toDisplayString()),
                                 salatTime = "${it.displayableStartTime} - ${it.displayableEndTime}",
-                                backgroundColor = backgroundColor
+                                backgroundColor = backgroundColor,
+                                isRightIcon = true,
+                                onClick = {
+                                    shouldNotify = !shouldNotify
+                                    onUpdateNotification(shouldNotify, it.name)
+                                },
+                                rightDrawableData = if (shouldNotify) {
+                                    DrawableData(
+                                        imageRes = Res.drawable.ic_notification_on,
+                                        tint = ComposaTheme.color.textNeutral
+                                    )
+                                } else DrawableData(
+                                    imageRes = Res.drawable.ic_notification_off,
+                                    tint = ComposaTheme.color.textNeutral
+                                )
                             )
                         }
                     }
@@ -135,11 +165,30 @@ private fun LazyListScope.spacer() {
 
 @Composable
 fun SalatTimeCell(
-    salatName: String, salatTime: String, backgroundColor: Color
+    salatName: String,
+    salatTime: String,
+    backgroundColor: Color,
+    isRightIcon: Boolean = false,
+    onClick: (() -> Unit)? = null,
+    rightDrawableData: DrawableData = DrawableData(
+        imageRes = Res.drawable.ic_notification_off,
+        tint = ComposaTheme.color.textNeutral
+    )
 ) {
     Cell(
         leftSlot = LeftSlot.None, centerSlot = CenterSlot.TitleWithLabel(
             title = salatName, label = salatTime
-        ), rightSlot = RightSlot.None, backgroundColor = backgroundColor
+        ), rightSlot = if (isRightIcon) {
+            RightSlot.Icon(
+                data = rightDrawableData /*DrawableData(
+                    imageRes = Res.drawable.ic_notification_off,
+                    tint = ComposaTheme.color.iconAction
+                )*/
+            )
+        } else {
+            RightSlot.None
+        },
+        backgroundColor = backgroundColor,
+        onClick = onClick
     )
 }

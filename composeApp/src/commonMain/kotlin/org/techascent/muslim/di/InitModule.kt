@@ -13,6 +13,7 @@ import org.techascent.muslim.getPlatformLocationService
 import org.techascent.muslim.halalscanner.HalalScannerViewModel
 import org.techascent.muslim.method.MethodViewModel
 import org.techascent.muslim.prayer.PrayerTimeViewModel
+import org.techascent.muslim.prayer.usecase.PrayerNotificationUseCase
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
 import org.techascent.muslim.provideDataStore
 import org.techascent.muslim.settings.SettingsViewModel
@@ -23,8 +24,9 @@ import org.techascent.shared.di.prayerModule
 val appModule = module {
     single<DataStore<Preferences>> { provideDataStore() }
     single { PrayerTimeViewUseCase(repository = get(), dataStore = get(), locationService = get()) }
+    single { PrayerNotificationUseCase(dataStore = get()) }
     single<LocationService> { getPlatformLocationService() }
-    viewModel { PrayerTimeViewModel(prayerTimeUseCase = get()) }
+    viewModel { PrayerTimeViewModel(prayerTimeUseCase = get(), prayerNotificationUseCase = get()) }
     viewModel { CalendarViewModel(repository = get(), locationService = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }

@@ -16,14 +16,11 @@ import org.techascent.muslim.common.getCurrentYearAndMonth
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPlaceName
-import org.techascent.muslim.getPrayerNotificationService
-import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.enum.School
 import org.techascent.shared.data.repository.PrayerTimesRepository
 import org.techascent.shared.network.ResultState
-import kotlin.text.compareTo
 
 class PrayerTimeViewUseCase(
     private val repository: PrayerTimesRepository,
@@ -36,29 +33,6 @@ class PrayerTimeViewUseCase(
 
         private const val DEFAULT = DataStoreKey.MONTHLY_PRAYER_INITIAL
     }
-
-    suspend fun schedulePrayerNotifications(intervals: List<PrayerTimeIntervalModel>) {
-        val notificationService = getPrayerNotificationService()
-        val now = Clock.System.now()
-
-        // Find the next prayer that hasn't started yet
-        val nextPrayer = intervals.firstOrNull { interval ->
-            interval.startTimeInstant != null && interval.startTimeInstant > now
-        }
-
-        nextPrayer?.let { interval ->
-            interval.startTimeInstant?.let { instant ->
-                notificationService.scheduleNotification(
-                    prayerName = interval.name.name,
-                    scheduledTime = instant,
-                    title = "Prayer Time",
-                    message = "Time for ${interval.name.name}",
-                    audioUrl = "https://www.islamcan.com/audio/adhan/azan1.mp3"
-                )
-            }
-        }
-    }
-
 
     suspend fun getMonthlyPrayerTimes(): Flow<ResultState<PrayerTimeUiModel>> {
         val location = locationService.getCurrentLocation()

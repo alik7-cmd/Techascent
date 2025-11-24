@@ -11,17 +11,19 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import org.techascent.muslim.common.getCurrentDateFormatted
 import org.techascent.muslim.getPrayerNotificationService
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
+import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
+import org.techascent.muslim.prayer.usecase.PrayerNotificationUseCase
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
 import org.techascent.shared.network.ResultState
 import kotlin.time.ExperimentalTime
 
 class PrayerTimeViewModel(
-    private val prayerTimeUseCase: PrayerTimeViewUseCase
+    private val prayerTimeUseCase: PrayerTimeViewUseCase,
+    private val prayerNotificationUseCase: PrayerNotificationUseCase
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PrayerTimeUiState> =
@@ -42,7 +44,7 @@ class PrayerTimeViewModel(
         prayerTimeUseCase.getMonthlyPrayerTimes().collect {
             when (it) {
                 is ResultState.Success -> {
-                    testNotificationNow()
+                    //testNotificationNow()
                     schedulePrayerNotifications(it.data)
                     _uiState.emit(
                         value = PrayerTimeUiState.Success(data = it.data)
@@ -61,8 +63,15 @@ class PrayerTimeViewModel(
     }
 
     private fun schedulePrayerNotifications(uiModel: PrayerTimeUiModel) = viewModelScope.launch {
-        prayerTimeUseCase.schedulePrayerNotifications(uiModel.intervals)
+        prayerNotificationUseCase.schedulePrayerNotifications(uiModel.intervals)
     }
+
+    fun onUpdateNotification(shouldSave: Boolean, prayerName: PrayerNameEnum) =
+        viewModelScope.launch {
+            if (shouldSave) {
+                prayerNotificationUseCase.addPrayerToNotify(prayerName)
+            } else prayerNotificationUseCase.removePrayerFromNotify(prayerName)
+        }
 
     fun testNotificationNow() = viewModelScope.launch {
         val notificationService = getPrayerNotificationService()
@@ -73,7 +82,7 @@ class PrayerTimeViewModel(
             message = "This is a test notification",
             audioUrl = "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg"
         )
-        notificationService.playAudio("https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg")
+        //notificationService.playAudio("https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg")
     }
 
     fun onHandleEvent(event: PrayerTimeEvent) = viewModelScope.launch {

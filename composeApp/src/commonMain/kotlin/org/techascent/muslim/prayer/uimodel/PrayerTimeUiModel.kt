@@ -54,6 +54,7 @@ data class PrayerTimeIntervalModel(
     val displayableEndTime: String,
     val startTimeInstant: Instant? = null,
     val endTimeInstant: Instant? = null,
+    val shouldNotify: Boolean = false
 )
 
 @Serializable

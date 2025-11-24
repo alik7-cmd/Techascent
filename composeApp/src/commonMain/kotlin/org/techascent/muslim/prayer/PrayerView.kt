@@ -25,6 +25,7 @@ import org.techascent.muslim.prayer.composable.loadingContent
 import org.techascent.muslim.prayer.composable.successContent
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
+import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -62,6 +63,7 @@ private fun PrayerScreen(
         uiState = uiState,
         onFetchPrayers = onFetchPrayers,
         onNavigateHalalScanner = onNavigateHalalScanner,
+        onUpdateNotification = viewModel::onUpdateNotification,
         innerPadding = innerPadding
     )
 }
@@ -72,6 +74,7 @@ private fun PrayerContent(
     uiState: PrayerTimeUiState,
     onFetchPrayers: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
+    onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
     innerPadding: PaddingValues
 ) {
     Scaffold(
@@ -89,7 +92,8 @@ private fun PrayerContent(
                 is PrayerTimeUiState.Loading -> loadingContent()
                 is PrayerTimeUiState.Success -> successContent(
                     uiModel = uiState.data,
-                    onNavigateHalalScanner = onNavigateHalalScanner
+                    onNavigateHalalScanner = onNavigateHalalScanner,
+                    onUpdateNotification = onUpdateNotification
                 )
 
                 is PrayerTimeUiState.Error -> errorContent(
