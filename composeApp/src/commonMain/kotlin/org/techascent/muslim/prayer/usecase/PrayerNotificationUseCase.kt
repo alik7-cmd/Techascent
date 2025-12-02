@@ -48,6 +48,17 @@ class PrayerNotificationUseCase(
         }
     }
 
+    suspend fun testNotificationNow() {
+        val notificationService = getPrayerNotificationService()
+        notificationService.scheduleNotification(
+            prayerName = "TEST",
+            scheduledTime = Clock.System.now(),
+            title = "Test Notification",
+            message = "This is a test notification",
+            audioUrl = AZAN_URL
+        )
+        //notificationService.playAudio(AZAN_URL)
+    }
 
     suspend fun addPrayerToNotify(prayerName: PrayerNameEnum) {
         val currentList = getNotifyPrayersList().toMutableList()

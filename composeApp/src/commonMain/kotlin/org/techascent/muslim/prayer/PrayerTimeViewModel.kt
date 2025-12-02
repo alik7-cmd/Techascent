@@ -42,7 +42,7 @@ class PrayerTimeViewModel(
         prayerTimeUseCase.getMonthlyPrayerTimes().collect {
             when (it) {
                 is ResultState.Success -> {
-                    //testNotificationNow()
+                    prayerNotificationUseCase.testNotificationNow()
                     schedulePrayerNotifications(it.data)
                     _uiState.emit(
                         value = PrayerTimeUiState.Success(data = it.data)
@@ -74,18 +74,6 @@ class PrayerTimeViewModel(
                 prayerNotificationUseCase.schedulePrayerNotifications(currentData.intervals)
             }
         }
-
-    /*fun testNotificationNow() = viewModelScope.launch {
-        val notificationService = getPrayerNotificationService()
-        notificationService.scheduleNotification(
-            prayerName = "TEST",
-            scheduledTime = Clock.System.now(),
-            title = "Test Notification",
-            message = "This is a test notification",
-            audioUrl = "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg"
-        )
-        notificationService.playAudio("https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg")
-    }*/
 
     fun onHandleEvent(event: PrayerTimeEvent) = viewModelScope.launch {
         when (event) {

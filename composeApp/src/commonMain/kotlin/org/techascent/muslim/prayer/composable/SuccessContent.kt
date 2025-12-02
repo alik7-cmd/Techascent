@@ -14,18 +14,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.Res
-import apphub.composeapp.generated.resources.ic_calendar
+import apphub.composeapp.generated.resources.button_open_settings
 import apphub.composeapp.generated.resources.ic_notification_off
 import apphub.composeapp.generated.resources.ic_notification_on
+import apphub.composeapp.generated.resources.text_cancel
+import apphub.composeapp.generated.resources.text_notification_permission_description
+import apphub.composeapp.generated.resources.text_permission_title
 import apphub.composeapp.generated.resources.text_salat_ud_duha
 import apphub.composeapp.generated.resources.warning_prayer_time
+import dev.icerock.moko.permissions.DeniedAlwaysException
+import dev.icerock.moko.permissions.DeniedException
+import dev.icerock.moko.permissions.Permission
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.card.ComposaCardFrame
 import org.techascent.composa.cell.Cell
@@ -42,6 +51,7 @@ import org.techascent.muslim.prayer.tags.PrayerTags
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toDisplayString
+import org.techascent.muslim.showNativeResetDialog as showPermissionRationalDialog
 import org.techascent.shared.data.enum.School
 import kotlin.ranges.coerceAtLeast
 import kotlin.time.Duration
@@ -98,6 +108,18 @@ private fun LazyListScope.salatTimeContent(
                 }
             }
 
+            val coroutineScope = rememberCoroutineScope()
+            val factory = rememberPermissionsControllerFactory()
+            val controller = remember(factory) {
+                factory.createPermissionsController()
+            }
+            BindEffect(controller)
+
+            val title = stringResource(Res.string.text_permission_title)
+            val message = stringResource(Res.string.text_notification_permission_description)
+            val confirmText = stringResource(Res.string.button_open_settings)
+            val cancelText = stringResource(Res.string.text_cancel)
+
             ComposaCardFrame(
                 modifier = Modifier
                     .weight(0.5f)
@@ -120,8 +142,37 @@ private fun LazyListScope.salatTimeContent(
                                 backgroundColor = backgroundColor,
                                 isRightIcon = true,
                                 onClick = {
-                                    shouldNotify = !shouldNotify
-                                    onUpdateNotification(shouldNotify, it.name)
+                                    coroutineScope.launch {
+                                        try {
+                                            controller.providePermission(Permission.CAMERA)
+                                            shouldNotify = !shouldNotify
+                                            onUpdateNotification(shouldNotify, it.name)
+                                        } catch (e: DeniedException) {
+                                            e.printStackTrace()
+                                            showPermissionRationalDialog(
+                                                title = title,
+                                                message = message,
+                                                confirmText = confirmText,
+                                                cancelText = cancelText,
+                                                onConfirm = {
+                                                    controller.openAppSettings()
+                                                },
+                                            )
+                                        } catch (e: DeniedAlwaysException) {
+                                            e.printStackTrace()
+                                            showPermissionRationalDialog(
+                                                title = title,
+                                                message = message,
+                                                confirmText = confirmText,
+                                                cancelText = cancelText,
+                                                onConfirm = {
+                                                    controller.openAppSettings()
+                                                },
+                                            )
+                                        }
+                                    }
+                                    /*shouldNotify = !shouldNotify
+                                    onUpdateNotification(shouldNotify, it.name)*/
                                 },
                                 rightDrawableData = if (shouldNotify) {
                                     DrawableData(

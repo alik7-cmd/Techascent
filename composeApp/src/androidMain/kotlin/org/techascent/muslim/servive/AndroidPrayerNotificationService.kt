@@ -1,6 +1,7 @@
 package org.techascent.muslim.servive
 
-import android.R
+import android.Manifest
+import android.R as Muslim
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -13,8 +14,10 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -29,7 +32,7 @@ import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-private var mediaPlayer: MediaPlayer? = null
+var mediaPlayer: MediaPlayer? = null
 
 class AndroidPrayerNotificationService(private val context: Context) : PrayerNotificationService {
     companion object {
@@ -50,7 +53,12 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED)
         } else {
-            context.registerReceiver(receiver, intentFilter)
+            ContextCompat.registerReceiver(
+                context,
+                receiver,
+                intentFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
         }
     }
 
@@ -70,6 +78,7 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         }
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun scheduleNotification(
         prayerName: String,
         scheduledTime: Instant,
@@ -82,7 +91,7 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         val delay = scheduledTimeMillis - currentTimeMillis
 
         if (delay <= 0) {
-            showNotificationImmediately(prayerName, title, message, showStopButton = true)
+            showNotificationImmediately(prayerName, title, message)
             return
         }
 
@@ -106,11 +115,11 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         )
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun showNotificationImmediately(
         prayerName: String,
         title: String,
-        message: String,
-        showStopButton: Boolean = false
+        message: String
     ) {
         val notificationId = prayerName.hashCode()
         val intent = Intent(context, MainActivity::class.java).apply {
@@ -134,7 +143,7 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         )
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_dialog_info)
+            .setSmallIcon(Muslim.drawable.stat_sys_headset)
             .setContentTitle(title)
             .setContentText(message)
             .setContentIntent(pendingIntent)
@@ -143,13 +152,11 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
             .setVibrate(longArrayOf(0, 500, 250, 500))
             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
 
-        if (showStopButton) {
-            builder.addAction(
-                R.drawable.ic_media_pause,
-                "Stop",
-                stopPendingIntent
-            )
-        }
+        builder.addAction(
+            Muslim.drawable.ic_media_pause,
+            "Stop",
+            stopPendingIntent
+        )
 
         NotificationManagerCompat.from(context).notify(notificationId, builder.build())
     }
