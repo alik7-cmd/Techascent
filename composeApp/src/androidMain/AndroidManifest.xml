@@ -12,6 +12,8 @@
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
 
     <application
@@ -31,6 +33,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name="org.techascent.muslim.servive.StopAudioReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.techascent.muslim.STOP_AUDIO" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

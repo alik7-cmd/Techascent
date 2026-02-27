@@ -5,22 +5,23 @@ import android.R as Muslim
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
+import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.media.RingtoneManager
+import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.techascent.muslim.MainActivity
 import org.techascent.muslim.servive.mediaPlayer
 import java.io.File
 import java.net.URL
+import kotlin.coroutines.resume
 
 
 const val AZAN_URL =
@@ -31,6 +32,10 @@ class PrayerNotificationWorker(
 ) :
     CoroutineWorker(context, params) {
 
+    companion object {
+        private const val CHANNEL_ID = "prayer_times"
+    }
+
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun doWork(): Result {
         return try {
@@ -39,94 +44,28 @@ class PrayerNotificationWorker(
             val message = inputData.getString("message") ?: "Time for prayer"
             val audioUrl = inputData.getString("audio_url") ?: AZAN_URL
 
-            showNotificationImmediately(prayerName, title, message)
+            // Promote to foreground so the worker stays alive for audio playback
+            setForeground(createForegroundInfo(prayerName, title, message))
 
             if (audioUrl.isNotEmpty()) {
-                playAudio(audioUrl = audioUrl)
+                playAudioAndWait(audioUrl)
             }
 
-            // Keep worker alive for audio to play
-            delay(15000)
             Result.success()
         } catch (e: Exception) {
             Log.e("PrayerNotificationWorker", "Error showing notification", e)
-            Result.retry()
-        }
-    }
-
-    private suspend fun downloadAndCacheAudio(audioUrl: String): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val fileName = "prayer_audio_${audioUrl.hashCode()}.mp3"
-                val cacheFile = File(context.cacheDir, fileName)
-
-                // Return cached file if it already exists
-                if (cacheFile.exists()) {
-                    Log.d("downloadAndCacheAudio", "Using cached audio: ${cacheFile.absolutePath}")
-                    return@withContext cacheFile.absolutePath
-                }
-
-                Log.d("downloadAndCacheAudio", "Downloading audio from: $audioUrl")
-                val url = URL(audioUrl)
-                url.openStream().use { input ->
-                    cacheFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
-
-                Log.d("downloadAndCacheAudio", "Audio cached to: ${cacheFile.absolutePath}")
-                cacheFile.absolutePath
-            } catch (e: Exception) {
-                Log.e("downloadAndCacheAudio", "Failed to cache audio: ${e.message}", e)
-                null
-            }
-        }
-    }
-
-    suspend fun playAudio(audioUrl: String) {
-        try {
-            withContext(Dispatchers.IO) {
-                Log.d("playAudio", "Starting audio playback")
-
-                val cachedAudioPath = downloadAndCacheAudio(audioUrl) ?: run {
-                    Log.e("playAudio", "Failed to cache audio")
-                    return@withContext
-                }
-
-                mediaPlayer?.release()
-                mediaPlayer = MediaPlayer().apply {
-                    setAudioStreamType(AudioManager.STREAM_NOTIFICATION)
-                    setDataSource(cachedAudioPath)
-                    setOnPreparedListener { mp ->
-                        Log.d("playAudio", "Audio prepared, starting playback")
-                        mp.start()
-                    }
-                    setOnCompletionListener { mp ->
-                        Log.d("playAudio", "Audio completed")
-                        mp.release()
-                        mediaPlayer = null
-                    }
-                    setOnErrorListener { mp, what, extra ->
-                        Log.e("playAudio", "MediaPlayer Error: $what, $extra")
-                        mp.release()
-                        mediaPlayer = null
-                        false
-                    }
-                    prepareAsync()
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("playAudio", "Failed: ${e.message}", e)
+            Result.failure()
         }
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    private fun showNotificationImmediately(
+    private fun createForegroundInfo(
         prayerName: String,
         title: String,
         message: String
-    ) {
+    ): ForegroundInfo {
         val notificationId = prayerName.hashCode()
+
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
@@ -142,27 +81,132 @@ class PrayerNotificationWorker(
         }
         val stopPendingIntent = PendingIntent.getBroadcast(
             applicationContext,
-            notificationId,
+            notificationId + 1,
             stopIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val builder = NotificationCompat.Builder(applicationContext, "prayer_times")
+        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(Muslim.drawable.stat_sys_headset)
             .setContentTitle(title)
             .setContentText(message)
             .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
+            .setAutoCancel(false)
+            .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVibrate(longArrayOf(0, 500, 250, 500))
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .addAction(
+                Muslim.drawable.ic_media_pause,
+                "Stop Azan",
+                stopPendingIntent
+            )
+            .build()
 
-        builder.addAction(
-            Muslim.drawable.ic_media_pause,
-            "Stop",
-            stopPendingIntent
-        )
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                notificationId,
+                notification,
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            )
+        } else {
+            ForegroundInfo(notificationId, notification)
+        }
+    }
 
-        NotificationManagerCompat.from(applicationContext).notify(notificationId, builder.build())
+    private suspend fun downloadAndCacheAudio(audioUrl: String): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val fileName = "prayer_audio_${audioUrl.hashCode()}.ogg"
+                val cacheFile = File(context.cacheDir, fileName)
+
+                // Return cached file if it already exists
+                if (cacheFile.exists() && cacheFile.length() > 0) {
+                    Log.d("PrayerWorker", "Using cached audio: ${cacheFile.absolutePath}")
+                    return@withContext cacheFile.absolutePath
+                }
+
+                Log.d("PrayerWorker", "Downloading audio from: $audioUrl")
+                val url = URL(audioUrl)
+                url.openStream().use { input ->
+                    cacheFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+
+                Log.d("PrayerWorker", "Audio cached to: ${cacheFile.absolutePath}")
+                cacheFile.absolutePath
+            } catch (e: Exception) {
+                Log.e("PrayerWorker", "Failed to cache audio: ${e.message}", e)
+                null
+            }
+        }
+    }
+
+    /**
+     * Plays audio and suspends until playback is complete (or an error occurs).
+     * This ensures the worker stays alive for the full duration of the Azan.
+     */
+    private suspend fun playAudioAndWait(audioUrl: String) {
+        try {
+            val cachedAudioPath = downloadAndCacheAudio(audioUrl)
+            if (cachedAudioPath == null) {
+                Log.e("PrayerWorker", "Failed to cache audio, skipping playback")
+                return
+            }
+
+            withContext(Dispatchers.IO) {
+                suspendCancellableCoroutine<Unit> { cont ->
+                    mediaPlayer?.release()
+                    val player = MediaPlayer()
+                    player.setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build()
+                    )
+                    player.setDataSource(cachedAudioPath)
+
+                    player.setOnPreparedListener(
+                        MediaPlayer.OnPreparedListener { mp ->
+                            Log.d("PrayerWorker", "Audio prepared, starting playback")
+                            mp.start()
+                        }
+                    )
+
+                    player.setOnCompletionListener(
+                        MediaPlayer.OnCompletionListener { mp ->
+                            Log.d("PrayerWorker", "Audio completed")
+                            mp.release()
+                            mediaPlayer = null
+                            if (cont.isActive) cont.resume(Unit)
+                        }
+                    )
+
+                    player.setOnErrorListener(
+                        MediaPlayer.OnErrorListener { mp, what, extra ->
+                            Log.e("PrayerWorker", "MediaPlayer Error: $what, $extra")
+                            mp.release()
+                            mediaPlayer = null
+                            if (cont.isActive) cont.resume(Unit)
+                            true
+                        }
+                    )
+
+                    mediaPlayer = player
+                    player.prepareAsync()
+
+                    cont.invokeOnCancellation {
+                        Log.d("PrayerWorker", "Coroutine cancelled, stopping audio")
+                        try {
+                            if (player.isPlaying) player.stop()
+                            player.release()
+                        } catch (_: Exception) {}
+                        mediaPlayer = null
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("PrayerWorker", "Failed: ${e.message}", e)
+        }
     }
 }

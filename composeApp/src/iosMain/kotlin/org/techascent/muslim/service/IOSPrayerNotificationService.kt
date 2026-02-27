@@ -14,8 +14,15 @@ import platform.Foundation.NSCalendarUnitMinute
 import platform.Foundation.NSCalendarUnitMonth
 import platform.Foundation.NSCalendarUnitSecond
 import platform.Foundation.NSCalendarUnitYear
+import platform.Foundation.NSData
 import platform.Foundation.NSDate
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSCachesDirectory
+import platform.Foundation.NSUserDomainMask
 import platform.Foundation.NSURL
+import platform.Foundation.dataWithContentsOfURL
+import platform.Foundation.writeToFile
 import platform.UIKit.UIApplication
 import platform.UIKit.registerForRemoteNotifications
 import platform.UserNotifications.UNAuthorizationOptionAlert
@@ -42,7 +49,7 @@ class IOSPrayerNotificationService : PrayerNotificationService {
         val center = UNUserNotificationCenter.currentNotificationCenter()
         center.requestAuthorizationWithOptions(
             UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge
-        ) { granted, error ->
+        ) { granted, _ ->
             if (granted) {
                 UIApplication.sharedApplication.registerForRemoteNotifications()
             }
@@ -61,18 +68,6 @@ class IOSPrayerNotificationService : PrayerNotificationService {
         content.setTitle(title)
         content.setBody(message)
         content.setSound(UNNotificationSound.defaultSound())
-
-        if (audioUrl.isNotEmpty()) {
-            try {
-                val soundUrl = NSURL(string = audioUrl)
-                if (soundUrl != null) {
-                    val sound = UNNotificationSound.soundNamed("custom_sound")
-                    content.setSound(sound)
-                }
-            } catch (e: Exception) {
-                println("Failed to set custom sound: ${e.message}")
-            }
-        }
 
         val timeIntervalSince1970 = scheduledTime.toEpochMilliseconds() / 1000.0
         val nsDate = NSDate(timeIntervalSince1970)
@@ -102,6 +97,8 @@ class IOSPrayerNotificationService : PrayerNotificationService {
             .addNotificationRequest(request) { error ->
                 if (error != null) {
                     println("Failed to schedule notification: ${error.localizedDescription}")
+                } else {
+                    println("Scheduled notification for $prayerName")
                 }
             }
     }
@@ -109,21 +106,63 @@ class IOSPrayerNotificationService : PrayerNotificationService {
     @OptIn(ExperimentalForeignApi::class)
     override suspend fun playAudio(audioUrl: String) {
         try {
-            val url = NSURL(string = audioUrl)
-            if (url == null) {
-                println("Invalid audio URL")
+            // Download to local cache first since AVAudioPlayer doesn't support remote URLs
+            val localPath = downloadAndCacheAudio(audioUrl) ?: run {
+                println("Failed to download audio for playback")
                 return
             }
+
+            val fileUrl = NSURL.fileURLWithPath(localPath)
 
             val audioSession = AVAudioSession.sharedInstance()
             audioSession.setCategory(AVAudioSessionCategoryPlayback, error = null)
             audioSession.setActive(true, error = null)
 
-            audioPlayer = AVAudioPlayer(contentsOfURL = url, fileTypeHint = "mp3", error = null)
+            audioPlayer?.stop()
+            audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null)
             audioPlayer?.volume = 1.0f
-            audioPlayer?.play()
+            audioPlayer?.prepareToPlay()
+            val started = audioPlayer?.play() ?: false
+            if (started) {
+                println("Audio playback started")
+            } else {
+                println("Audio playback failed to start")
+            }
         } catch (e: Exception) {
             println("Failed to play audio: ${e.message}")
+        }
+    }
+
+    private fun downloadAndCacheAudio(audioUrl: String): String? {
+        return try {
+            val cacheDir = NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull() as? String ?: return null
+
+            val fileName = "prayer_audio_${audioUrl.hashCode()}.ogg"
+            val localPath = "$cacheDir/$fileName"
+
+            // Return cached file if exists
+            if (NSFileManager.defaultManager.fileExistsAtPath(localPath)) {
+                println("Using cached audio: $localPath")
+                return localPath
+            }
+
+            val url = NSURL(string = audioUrl)
+            val data = NSData.dataWithContentsOfURL(url)
+            if (data != null) {
+                data.writeToFile(localPath, atomically = true)
+                println("Audio cached to: $localPath")
+                localPath
+            } else {
+                println("Failed to download audio from: $audioUrl")
+                null
+            }
+        } catch (e: Exception) {
+            println("Error caching audio: ${e.message}")
+            null
         }
     }
 

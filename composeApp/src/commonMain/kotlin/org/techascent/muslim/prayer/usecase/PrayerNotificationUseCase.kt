@@ -28,14 +28,17 @@ class PrayerNotificationUseCase(
         val notificationService = getPrayerNotificationService()
         val now = Clock.System.now()
 
-        // Find the next prayer that hasn't started yet and is in the notify list
-        val nextPrayer = intervals.firstOrNull { interval ->
+        // Cancel all existing prayer notifications first
+        notificationService.cancelAllNotifications()
+
+        // Schedule ALL upcoming prayers that are in the notify list
+        val upcomingPrayers = intervals.filter { interval ->
             interval.startTimeInstant != null &&
                     interval.startTimeInstant > now &&
                     currentList.contains(interval.name)
         }
 
-        nextPrayer?.let { interval ->
+        upcomingPrayers.forEach { interval ->
             interval.startTimeInstant?.let { instant ->
                 notificationService.scheduleNotification(
                     prayerName = interval.name.name,
