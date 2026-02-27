@@ -42,7 +42,6 @@ class PrayerTimeViewModel(
         prayerTimeUseCase.getMonthlyPrayerTimes().collect {
             when (it) {
                 is ResultState.Success -> {
-                    prayerNotificationUseCase.testNotificationNow()
                     schedulePrayerNotifications(it.data)
                     _uiState.emit(
                         value = PrayerTimeUiState.Success(data = it.data)

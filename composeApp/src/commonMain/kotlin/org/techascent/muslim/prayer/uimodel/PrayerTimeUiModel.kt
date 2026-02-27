@@ -133,6 +133,15 @@ fun getImageByPrayer(name: PrayerName?) = when (name) {
     null -> "${BASE}img_fajr.webp"
 }
 
+fun getImageByPrayerEnum(name: PrayerNameEnum?) = when (name) {
+    PrayerNameEnum.FAJR, PrayerNameEnum.SALAT_UD_DUHA -> "${BASE}img_fajr.webp"
+    PrayerNameEnum.DUHR -> "${BASE}img_dhuhr.webp"
+    PrayerNameEnum.ASR -> "${BASE}img_asr.webp"
+    PrayerNameEnum.MAGHRIB -> "${BASE}img_maghrib.webp"
+    PrayerNameEnum.ISHA -> "${BASE}img_isha.webp"
+    null -> "${BASE}img_fajr.webp"
+}
+
 fun PrayerName.toPrayerNameEnum(): PrayerNameEnum {
     return when (this) {
         PrayerName.FAJR -> PrayerNameEnum.FAJR

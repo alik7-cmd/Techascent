@@ -18,6 +18,7 @@ import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPlaceName
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
+import org.techascent.muslim.prayer.uimodel.getImageByPrayerEnum
 import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.enum.School
 import org.techascent.shared.data.repository.PrayerTimesRepository
@@ -83,7 +84,7 @@ class PrayerTimeViewUseCase(
                             it.currentDateTime == currentDate
                         }
                         data?.let {
-                            ResultState.Success(it)
+                            ResultState.Success(updateCurrentPrayer(it))
                         } ?: ResultState.Error("")
 
                     }
@@ -127,6 +128,7 @@ class PrayerTimeViewUseCase(
         
         return uiModel.copy(
             currentPrayer = currentPrayer,
+            prayerImage = getImageByPrayerEnum(currentPrayer?.name),
             intervals = uiModel.intervals.map {
                 it.copy(
                     shouldNotify = currentList.contains(it.name)
