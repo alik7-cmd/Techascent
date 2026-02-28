@@ -53,6 +53,8 @@
 
     <string name="text_permission_title">Permission Required</string>
     <string name="text_permission_description">Camera permission is required to use the Halal Scanner. Please enable it in the app settings.</string>
+    <string name="text_notification_permission_description">To receive timely alerts for prayer times, please enable notifications. Once permissions are granted, we’ll make sure you’re notified right on time.</string>
+
 
     <string name="title_appearance">Appearance</string>
     <string name="title_widgets">Widgets</string>

@@ -1,4 +1,5 @@
 
+import org.gradle.kotlin.dsl.implementation
 import org.gradle.kotlin.dsl.libs
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -30,6 +31,8 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            linkerOpts.add("-framework")
+            linkerOpts.add("AVFoundation")
         }
     }
 
@@ -54,7 +57,6 @@ kotlin {
     }
     
     sourceSets {
-
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -62,6 +64,13 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             //implementation(libs.material)
             implementation("com.google.android.gms:play-services-location:21.0.1")
+
+
+            // WorkManager for scheduling notifications
+            implementation("androidx.work:work-runtime-ktx:2.8.1")
+
+            // Coroutine support for WorkManager
+            implementation("androidx.work:work-runtime:2.8.1")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -134,4 +143,6 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
+
+
 

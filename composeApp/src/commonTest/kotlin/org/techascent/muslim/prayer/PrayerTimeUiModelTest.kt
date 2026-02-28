@@ -51,7 +51,8 @@ class PrayerTimeUiModelTest {
             location = LocationDto(
                 latitude = 23.8041,
                 longitude = 90.4152
-            )
+            ),
+            currentDateTime = ""
         )
     }
 

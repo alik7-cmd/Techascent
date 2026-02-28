@@ -6,6 +6,7 @@ object DataStoreKey {
     const val MONTHLY_PRAYER_INITIAL = "monthly_prayer_times_"
     const val SCHOOL_PREFERENCE = "school_preference"
     const val HAPTIC_FEEDBACK = "haptic_feedback"
+    const val NOTIFICATION_PRAYER_LIST = "notify_prayers_list"
 
     val motivationHtml = """
     <h3>Why I Built This App</h3>

@@ -8,6 +8,9 @@ import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.datetime.Instant
+import okio.Path.Companion.toPath
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.preference.DATA_STORE_FILE_NAME
 import org.techascent.muslim.preference.createDataStore
@@ -17,37 +20,32 @@ import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSString
 import platform.Foundation.NSUserDomainMask
+import platform.Foundation.NSURL
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.NSBundle
 import platform.UIKit.UIAlertAction
 import platform.UIKit.UIAlertActionStyleCancel
 import platform.UIKit.UIAlertActionStyleDefault
 import platform.UIKit.UIAlertController
 import platform.UIKit.UIAlertControllerStyleAlert
+import platform.UIKit.UIApplication
 import platform.UIKit.UIImpactFeedbackGenerator
 import platform.UIKit.UIImpactFeedbackStyle
+import platform.UIKit.UIScreen
 import platform.darwin.NSObject
+import kotlin.coroutines.resume
 import kotlin.math.*
-import platform.Foundation.NSBundle
-import platform.Foundation.NSString
-import platform.Foundation.stringWithContentsOfFile
-import platform.Foundation.NSUTF8StringEncoding
 import platform.CoreLocation.CLGeocoder
 import platform.CoreLocation.CLLocation
-import kotlinx.coroutines.suspendCancellableCoroutine
-import okio.Path.Companion.toPath
-import org.techascent.muslim.prayer.uimodel.AddressInfo
 import platform.CoreLocation.CLPlacemark
-import platform.Foundation.dictionaryWithValuesForKeys
-import kotlin.coroutines.resume
-import platform.Foundation.NSURL
-import platform.UIKit.UIApplication
-import platform.UIKit.UIScreen
+import org.techascent.muslim.prayer.uimodel.AddressInfo
+import org.techascent.muslim.service.IOSLocationService
+import org.techascent.muslim.service.IOSPrayerNotificationService
+import platform.Foundation.stringWithContentsOfFile
 
-/*class IOSPlatform: Platform {
-    override val name: String = UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
-}
 
-actual fun getPlatform(): Platform = IOSPlatform()*/
 
 actual fun playBeep() {
     AudioServicesPlaySystemSound(1057u)
@@ -105,27 +103,19 @@ private const val qiblaLng = 39.8262
 
 actual fun getQiblaDirection(currentLat: Double, currentLng: Double): Flow<Float> = callbackFlow {
     val locationManager = CLLocationManager().apply {
-        // Request permission (make sure your iOS app requests it in Info.plist)
         requestWhenInUseAuthorization()
-        headingFilter = 1.0 // Minimum heading change in degrees to trigger update
+        headingFilter = 1.0
     }
 
     val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
         override fun locationManager(manager: CLLocationManager, didUpdateHeading: CLHeading) {
-            val heading =
-                didUpdateHeading.magneticHeading.toDouble() // Current device heading in degrees
-
-            // Calculate bearing from current location to Qibla
+            val heading = didUpdateHeading.magneticHeading.toDouble()
             val bearingToQibla = calculateBearing(currentLat, currentLng, qiblaLat, qiblaLng)
-
-            // Calculate relative direction to Qibla
             val direction = (bearingToQibla - heading + 360) % 360
-
             trySend(direction.toFloat())
         }
 
         override fun locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager): Boolean {
-            // Return true to show calibration UI if needed
             return true
         }
     }
@@ -139,7 +129,6 @@ actual fun getQiblaDirection(currentLat: Double, currentLng: Double): Flow<Float
     }
 }
 
-// Calculate bearing between two latitude/longitude points
 fun calculateBearing(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
     val φ1 = lat1.toRadians()
     val φ2 = lat2.toRadians()
@@ -182,22 +171,19 @@ actual suspend fun getPlaceName(latitude: Double, longitude: Double): AddressInf
 
         geocoder.reverseGeocodeLocation(location) { placemarks, error ->
             if (error != null || placemarks == null || placemarks.count() == 0) {
-                continuation.resume(AddressInfo(
-                    "","","",""
-                ))
+                continuation.resume(
+                    AddressInfo("", "", "", "")
+                )
                 return@reverseGeocodeLocation
             }
 
             val placemark = placemarks[0] as? CLPlacemark
-            val keys = listOf("name", "locality", "country")
-            val valuesMap = placemark?.dictionaryWithValuesForKeys(keys) as? Map<*, *>
 
-            val name = valuesMap?.get("name") as? String
-            val locality = valuesMap?.get("locality") as? String
-            val country = valuesMap?.get("country") as? String
-
-            val address = listOfNotNull(name, locality, country).joinToString(", ")
-
+            val address = listOfNotNull(
+                placemark?.name,
+                placemark?.locality,
+                placemark?.country
+            ).joinToString(", ")
 
             continuation.resume(
                 AddressInfo(
@@ -218,7 +204,7 @@ actual fun openNearbyMosques() {
     val app = UIApplication.sharedApplication
     when {
         app.canOpenURL(googleMapsUrl) -> app.openURL(googleMapsUrl)
-        true -> app.openURL(appleMapsUrl)
+        else -> app.openURL(appleMapsUrl)
     }
 }
 
@@ -234,3 +220,9 @@ actual fun createDataStore(producePath: () -> String): DataStore<Preferences> =
     PreferenceDataStoreFactory.createWithPath(
         produceFile = { producePath().toPath() }
     )
+
+actual fun getPrayerNotificationService(): PrayerNotificationService {
+    return IOSPrayerNotificationService()
+}
+
+

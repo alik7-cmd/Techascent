@@ -1,11 +1,13 @@
-package org.techascent.muslim
+package org.techascent.muslim.service
 
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.techascent.muslim.common.location.Location
 import org.techascent.muslim.common.location.LocationService
-import platform.CoreLocation.*
+import platform.CoreLocation.CLLocation
+import platform.CoreLocation.CLLocationManager
+import platform.CoreLocation.CLLocationManagerDelegateProtocol
 import platform.Foundation.NSError
 import platform.darwin.NSObject
 import kotlin.coroutines.Continuation
@@ -22,7 +24,10 @@ class IOSLocationService : LocationService {
             // Set up delegate
             val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
                 @OptIn(ExperimentalForeignApi::class)
-                override fun locationManager(manager: CLLocationManager, didUpdateLocations: List<*>) {
+                override fun locationManager(
+                    manager: CLLocationManager,
+                    didUpdateLocations: List<*>
+                ) {
                     val loc = (didUpdateLocations.firstOrNull() as? CLLocation)
                     val coordinate = loc?.coordinate
                     if (coordinate != null) {
@@ -35,7 +40,10 @@ class IOSLocationService : LocationService {
                     locationManager.delegate = null // remove delegate to avoid leaks
                 }
 
-                override fun locationManager(manager: CLLocationManager, didFailWithError: NSError) {
+                override fun locationManager(
+                    manager: CLLocationManager,
+                    didFailWithError: NSError
+                ) {
                     cont.resume(null)
                     locationManager.delegate = null
                 }

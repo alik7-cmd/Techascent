@@ -54,6 +54,7 @@ data class PrayerTimeIntervalModel(
     val displayableEndTime: String,
     val startTimeInstant: Instant? = null,
     val endTimeInstant: Instant? = null,
+    val shouldNotify: Boolean = false
 )
 
 @Serializable
@@ -129,6 +130,15 @@ fun getImageByPrayer(name: PrayerName?) = when (name) {
     PrayerName.ASR -> "${BASE}img_asr.webp"
     PrayerName.MAGHRIB -> "${BASE}img_maghrib.webp"
     PrayerName.ISHA -> "${BASE}img_isha.webp"
+    null -> "${BASE}img_fajr.webp"
+}
+
+fun getImageByPrayerEnum(name: PrayerNameEnum?) = when (name) {
+    PrayerNameEnum.FAJR, PrayerNameEnum.SALAT_UD_DUHA -> "${BASE}img_fajr.webp"
+    PrayerNameEnum.DUHR -> "${BASE}img_dhuhr.webp"
+    PrayerNameEnum.ASR -> "${BASE}img_asr.webp"
+    PrayerNameEnum.MAGHRIB -> "${BASE}img_maghrib.webp"
+    PrayerNameEnum.ISHA -> "${BASE}img_isha.webp"
     null -> "${BASE}img_fajr.webp"
 }
 

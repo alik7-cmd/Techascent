@@ -2,6 +2,7 @@ package org.techascent.shared.data.mapper
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -26,7 +27,15 @@ fun PrayerData.toDto(): PrayerTimeDto {
 
     // Current date and time in given timezone
     val nowDateTime = Clock.System.now().toLocalDateTime(timezone).truncateToMinute()
-    val today = nowDateTime.date
+
+    // Use the actual date from the API response, NOT today's date
+    // The API gregorian date format is "DD-MM-YYYY"
+    val dateParts = this.date.gregorian.date.split("-")
+    val apiDate = LocalDate(
+        year = dateParts[2].toInt(),
+        monthNumber = dateParts[1].toInt(),
+        dayOfMonth = dateParts[0].toInt()
+    )
 
     // Parse prayer times (LocalTime)
     val fajrTime = LocalTime.parse(timings.fajr)
@@ -38,15 +47,15 @@ fun PrayerData.toDto(): PrayerTimeDto {
     val ishaTime = LocalTime.parse(timings.isha)
     val imsakTime = LocalTime.parse(timings.imsak)
 
-    // Construct LocalDateTime for today
-    val fajrStart = LocalDateTime(today, fajrTime).truncateToMinute()
-    val sunriseStart = LocalDateTime(today, sunriseTime).truncateToMinute()
-    val sunsetStart = LocalDateTime(today, sunsetTime).truncateToMinute()
-    val dhuhrStart = LocalDateTime(today, dhuhrTime).truncateToMinute()
-    val asrStart = LocalDateTime(today, asrTime).truncateToMinute()
-    val maghribStart = LocalDateTime(today, maghribTime).truncateToMinute()
-    val ishaStart = LocalDateTime(today, ishaTime).truncateToMinute()
-    val imsak = LocalDateTime(today, imsakTime).truncateToMinute()
+    // Construct LocalDateTime using the API response date
+    val fajrStart = LocalDateTime(apiDate, fajrTime).truncateToMinute()
+    val sunriseStart = LocalDateTime(apiDate, sunriseTime).truncateToMinute()
+    val sunsetStart = LocalDateTime(apiDate, sunsetTime).truncateToMinute()
+    val dhuhrStart = LocalDateTime(apiDate, dhuhrTime).truncateToMinute()
+    val asrStart = LocalDateTime(apiDate, asrTime).truncateToMinute()
+    val maghribStart = LocalDateTime(apiDate, maghribTime).truncateToMinute()
+    val ishaStart = LocalDateTime(apiDate, ishaTime).truncateToMinute()
+    val imsak = LocalDateTime(apiDate, imsakTime).truncateToMinute()
 
     // Next day's fajr (Isha interval ends next day fajr)
     val nextDay = fajrStart.date.plus(1, DateTimeUnit.DAY) // or fajrStart.date.nextDay()
@@ -64,10 +73,12 @@ fun PrayerData.toDto(): PrayerTimeDto {
         PrayerTimeInterval(PrayerName.ISHA, ishaStart, nextDayFajrStart)
     )
 
-    // Find current prayer based on now
-    val currentPrayer = intervals.find {
-        nowDateTime >= it.startTime && nowDateTime < it.endTime
-    }
+    // Find current prayer only if this entry's date is today
+    val currentPrayer = if (apiDate == nowDateTime.date) {
+        intervals.find {
+            nowDateTime >= it.startTime && nowDateTime < it.endTime
+        }
+    } else null
 
     // Hijri date string from API response
     val hijriDate = this.date.hijri.day
@@ -99,7 +110,15 @@ fun Data.toDto(): PrayerTimeDto {
 
     // Current date and time in given timezone
     val nowDateTime = Clock.System.now().toLocalDateTime(timezone).truncateToMinute()
-    val today = nowDateTime.date
+
+    // Use the actual date from the API response, NOT today's date.
+    // The API gregorian date format is "DD-MM-YYYY"
+    val dateParts = this.date.gregorian.date.split("-")
+    val apiDate = LocalDate(
+        year = dateParts[2].toInt(),
+        monthNumber = dateParts[1].toInt(),
+        dayOfMonth = dateParts[0].toInt()
+    )
 
     // Parse prayer times (LocalTime)
     val fajrTime = LocalTime.parse(timings.fajr.substringBefore(" ("))
@@ -111,15 +130,15 @@ fun Data.toDto(): PrayerTimeDto {
     val ishaTime = LocalTime.parse(timings.isha.substringBefore(" ("))
     val imsakTime = LocalTime.parse(timings.imsak.substringBefore(" ("))
 
-    // Construct LocalDateTime for today
-    val fajrStart = LocalDateTime(today, fajrTime).truncateToMinute()
-    val sunriseStart = LocalDateTime(today, sunriseTime).truncateToMinute()
-    val sunsetStart = LocalDateTime(today, sunsetTime).truncateToMinute()
-    val dhuhrStart = LocalDateTime(today, dhuhrTime).truncateToMinute()
-    val asrStart = LocalDateTime(today, asrTime).truncateToMinute()
-    val maghribStart = LocalDateTime(today, maghribTime).truncateToMinute()
-    val ishaStart = LocalDateTime(today, ishaTime).truncateToMinute()
-    val imsak = LocalDateTime(today, imsakTime).truncateToMinute()
+    // Construct LocalDateTime using the API response date, not today
+    val fajrStart = LocalDateTime(apiDate, fajrTime).truncateToMinute()
+    val sunriseStart = LocalDateTime(apiDate, sunriseTime).truncateToMinute()
+    val sunsetStart = LocalDateTime(apiDate, sunsetTime).truncateToMinute()
+    val dhuhrStart = LocalDateTime(apiDate, dhuhrTime).truncateToMinute()
+    val asrStart = LocalDateTime(apiDate, asrTime).truncateToMinute()
+    val maghribStart = LocalDateTime(apiDate, maghribTime).truncateToMinute()
+    val ishaStart = LocalDateTime(apiDate, ishaTime).truncateToMinute()
+    val imsak = LocalDateTime(apiDate, imsakTime).truncateToMinute()
 
     // Next day's fajr (Isha interval ends next day fajr)
     val nextDay = fajrStart.date.plus(1, DateTimeUnit.DAY) // or fajrStart.date.nextDay()
@@ -137,10 +156,12 @@ fun Data.toDto(): PrayerTimeDto {
         PrayerTimeInterval(PrayerName.ISHA, ishaStart, nextDayFajrStart)
     )
 
-    // Find current prayer based on now
-    val currentPrayer = intervals.find {
-        nowDateTime >= it.startTime && nowDateTime < it.endTime
-    }
+    // Find current prayer only if this entry's date is today
+    val currentPrayer = if (apiDate == nowDateTime.date) {
+        intervals.find {
+            nowDateTime >= it.startTime && nowDateTime < it.endTime
+        }
+    } else null
 
     // Hijri date string from API response
     val hijriDate = this.date.hijri.day

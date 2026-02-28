@@ -1,16 +1,17 @@
-package org.techascent.muslim
+package org.techascent.muslim.manager
 
 import android.content.Context
 import android.content.Intent
-import org.techascent.muslim.common.AppRatingManager
 import androidx.core.net.toUri
+import org.techascent.muslim.common.AppRatingManager
 
 class AndroidRateUsManager (private val context: Context) : AppRatingManager {
     override fun rateApp() {
         val packageName = context.packageName
         val uri = "market://details?id=$packageName".toUri()
         val goToMarket = Intent(Intent.ACTION_VIEW, uri).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or
+            addFlags(
+                Intent.FLAG_ACTIVITY_NO_HISTORY or
                     Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
                     Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
         }

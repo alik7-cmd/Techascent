@@ -3,6 +3,7 @@ package org.techascent.muslim
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.prayer.uimodel.AddressInfo
 
@@ -35,3 +36,21 @@ expect fun getScreenWidthPx(): Int
 expect fun getScreenHeightPx(): Int
 
 expect fun createDataStore(producePath: () -> String): DataStore<Preferences>
+
+expect fun getPrayerNotificationService(): PrayerNotificationService
+
+interface PrayerNotificationService {
+    suspend fun scheduleNotification(
+        prayerName: String,
+        scheduledTime: Instant,
+        title: String = "Prayer Time",
+        message: String,
+        audioUrl: String = ""
+    )
+
+    suspend fun playAudio(audioUrl: String)
+
+    suspend fun cancelNotification(notificationId: String)
+
+    suspend fun cancelAllNotifications()
+}

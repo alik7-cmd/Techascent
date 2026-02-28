@@ -28,7 +28,8 @@ import androidx.core.net.toUri
 import android.content.res.Resources
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import okio.Path.Companion.toPath
-import kotlin.text.get
+import org.techascent.muslim.servive.AndroidLocationService
+import org.techascent.muslim.servive.AndroidPrayerNotificationService
 
 
 actual fun playBeep() {
@@ -198,5 +199,14 @@ actual fun createDataStore(producePath: () -> String): DataStore<Preferences> =
     PreferenceDataStoreFactory.createWithPath(
         produceFile = { producePath().toPath() }
     )
+
+actual fun getPrayerNotificationService(): PrayerNotificationService {
+    return AndroidPrayerNotificationService(appContext!!)
+}
+
+
+
+
+
 
 
