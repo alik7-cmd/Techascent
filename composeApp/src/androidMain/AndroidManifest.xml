@@ -41,6 +41,11 @@
                 <action android:name="org.techascent.muslim.STOP_AUDIO" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false" />
     </application>
 
 </manifest>

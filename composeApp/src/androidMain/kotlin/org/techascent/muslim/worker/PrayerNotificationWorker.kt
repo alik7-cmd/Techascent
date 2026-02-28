@@ -18,14 +18,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.techascent.muslim.MainActivity
+import org.techascent.muslim.R
+import org.techascent.muslim.prayer.usecase.AZAN_AUDIO_FILE
 import org.techascent.muslim.servive.mediaPlayer
-import java.io.File
-import java.net.URL
 import kotlin.coroutines.resume
 
-
-const val AZAN_URL =
-    "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg"
 
 class PrayerNotificationWorker(
     val context: Context, params: WorkerParameters
@@ -42,7 +39,7 @@ class PrayerNotificationWorker(
             val prayerName = inputData.getString("prayer_name") ?: return Result.retry()
             val title = inputData.getString("title") ?: "Prayer Time"
             val message = inputData.getString("message") ?: "Time for prayer"
-            val audioUrl = inputData.getString("audio_url") ?: AZAN_URL
+            val audioUrl = inputData.getString("audio_url") ?: AZAN_AUDIO_FILE
 
             // Promote to foreground so the worker stays alive for audio playback
             setForeground(createForegroundInfo(prayerName, title, message))
@@ -113,47 +110,13 @@ class PrayerNotificationWorker(
         }
     }
 
-    private suspend fun downloadAndCacheAudio(audioUrl: String): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val fileName = "prayer_audio_${audioUrl.hashCode()}.ogg"
-                val cacheFile = File(context.cacheDir, fileName)
-
-                // Return cached file if it already exists
-                if (cacheFile.exists() && cacheFile.length() > 0) {
-                    Log.d("PrayerWorker", "Using cached audio: ${cacheFile.absolutePath}")
-                    return@withContext cacheFile.absolutePath
-                }
-
-                Log.d("PrayerWorker", "Downloading audio from: $audioUrl")
-                val url = URL(audioUrl)
-                url.openStream().use { input ->
-                    cacheFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
-
-                Log.d("PrayerWorker", "Audio cached to: ${cacheFile.absolutePath}")
-                cacheFile.absolutePath
-            } catch (e: Exception) {
-                Log.e("PrayerWorker", "Failed to cache audio: ${e.message}", e)
-                null
-            }
-        }
-    }
-
     /**
-     * Plays audio and suspends until playback is complete (or an error occurs).
+     * Plays audio from local R.raw.azan resource and suspends until playback is complete.
      * This ensures the worker stays alive for the full duration of the Azan.
+     * No network required — audio is bundled with the app.
      */
-    private suspend fun playAudioAndWait(audioUrl: String) {
+    private suspend fun playAudioAndWait(audioFile: String) {
         try {
-            val cachedAudioPath = downloadAndCacheAudio(audioUrl)
-            if (cachedAudioPath == null) {
-                Log.e("PrayerWorker", "Failed to cache audio, skipping playback")
-                return
-            }
-
             withContext(Dispatchers.IO) {
                 suspendCancellableCoroutine<Unit> { cont ->
                     mediaPlayer?.release()
@@ -164,11 +127,15 @@ class PrayerNotificationWorker(
                             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                             .build()
                     )
-                    player.setDataSource(cachedAudioPath)
+
+                    // Play from local raw resource
+                    val afd = context.resources.openRawResourceFd(R.raw.azan)
+                    player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                    afd.close()
 
                     player.setOnPreparedListener(
                         MediaPlayer.OnPreparedListener { mp ->
-                            Log.d("PrayerWorker", "Audio prepared, starting playback")
+                            Log.d("PrayerWorker", "Audio prepared, starting playback from local resource")
                             mp.start()
                         }
                     )

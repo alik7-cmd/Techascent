@@ -12,8 +12,7 @@ import org.techascent.muslim.getPrayerNotificationService
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
 
-const val AZAN_URL =
-    "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.ogg"
+const val AZAN_AUDIO_FILE = "azan.ogg"
 
 class PrayerNotificationUseCase(
     private val dataStore: DataStore<Preferences>
@@ -45,7 +44,7 @@ class PrayerNotificationUseCase(
                     scheduledTime = instant,
                     title = "Prayer Time",
                     message = "Time for ${interval.name.name}",
-                    audioUrl = AZAN_URL
+                    audioUrl = AZAN_AUDIO_FILE
                 )
             }
         }
@@ -58,9 +57,8 @@ class PrayerNotificationUseCase(
             scheduledTime = Clock.System.now(),
             title = "Test Notification",
             message = "This is a test notification",
-            audioUrl = AZAN_URL
+            audioUrl = AZAN_AUDIO_FILE
         )
-        //notificationService.playAudio(AZAN_URL)
     }
 
     suspend fun addPrayerToNotify(prayerName: PrayerNameEnum) {

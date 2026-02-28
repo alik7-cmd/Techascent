@@ -27,9 +27,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import org.techascent.muslim.MainActivity
 import org.techascent.muslim.PrayerNotificationService
+import org.techascent.muslim.R
 import org.techascent.muslim.worker.PrayerNotificationWorker
-import java.io.File
-import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 
@@ -116,41 +115,8 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         Log.d("PrayerNotification", "Scheduled $prayerName in ${delay / 1000}s")
     }
 
-    private suspend fun downloadAndCacheAudio(audioUrl: String): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val fileName = "prayer_audio_${audioUrl.hashCode()}.ogg"
-                val cacheFile = File(context.cacheDir, fileName)
-
-                if (cacheFile.exists() && cacheFile.length() > 0) {
-                    Log.d("playAudio", "Using cached audio: ${cacheFile.absolutePath}")
-                    return@withContext cacheFile.absolutePath
-                }
-
-                Log.d("playAudio", "Downloading audio from: $audioUrl")
-                val url = URL(audioUrl)
-                url.openStream().use { input ->
-                    cacheFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
-
-                Log.d("playAudio", "Audio cached to: ${cacheFile.absolutePath}")
-                cacheFile.absolutePath
-            } catch (e: Exception) {
-                Log.e("playAudio", "Failed to cache audio: ${e.message}", e)
-                null
-            }
-        }
-    }
-
     override suspend fun playAudio(audioUrl: String) {
         try {
-            val cachedAudioPath = downloadAndCacheAudio(audioUrl) ?: run {
-                Log.e("playAudio", "Failed to cache audio")
-                return
-            }
-
             withContext(Dispatchers.IO) {
                 suspendCancellableCoroutine<Unit> { cont ->
                     mediaPlayer?.release()
@@ -161,11 +127,15 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
                             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                             .build()
                     )
-                    player.setDataSource(cachedAudioPath)
+
+                    // Play from local raw resource — no network required
+                    val afd = context.resources.openRawResourceFd(R.raw.azan)
+                    player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                    afd.close()
 
                     player.setOnPreparedListener(
                         MediaPlayer.OnPreparedListener { mp ->
-                            Log.d("playAudio", "Audio prepared, starting playback")
+                            Log.d("playAudio", "Audio prepared, starting playback from local resource")
                             mp.start()
                         }
                     )

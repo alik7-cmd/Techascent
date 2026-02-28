@@ -14,15 +14,9 @@ import platform.Foundation.NSCalendarUnitMinute
 import platform.Foundation.NSCalendarUnitMonth
 import platform.Foundation.NSCalendarUnitSecond
 import platform.Foundation.NSCalendarUnitYear
-import platform.Foundation.NSData
+import platform.Foundation.NSBundle
 import platform.Foundation.NSDate
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSCachesDirectory
-import platform.Foundation.NSUserDomainMask
 import platform.Foundation.NSURL
-import platform.Foundation.dataWithContentsOfURL
-import platform.Foundation.writeToFile
 import platform.UIKit.UIApplication
 import platform.UIKit.registerForRemoteNotifications
 import platform.UserNotifications.UNAuthorizationOptionAlert
@@ -106,9 +100,9 @@ class IOSPrayerNotificationService : PrayerNotificationService {
     @OptIn(ExperimentalForeignApi::class)
     override suspend fun playAudio(audioUrl: String) {
         try {
-            // Download to local cache first since AVAudioPlayer doesn't support remote URLs
-            val localPath = downloadAndCacheAudio(audioUrl) ?: run {
-                println("Failed to download audio for playback")
+            // Look for the audio file in the app bundle (placed via composeResources/files/)
+            val localPath = getBundledAudioPath() ?: run {
+                println("Failed to find bundled audio file")
                 return
             }
 
@@ -124,7 +118,7 @@ class IOSPrayerNotificationService : PrayerNotificationService {
             audioPlayer?.prepareToPlay()
             val started = audioPlayer?.play() ?: false
             if (started) {
-                println("Audio playback started")
+                println("Audio playback started from local bundle")
             } else {
                 println("Audio playback failed to start")
             }
@@ -133,37 +127,33 @@ class IOSPrayerNotificationService : PrayerNotificationService {
         }
     }
 
-    private fun downloadAndCacheAudio(audioUrl: String): String? {
-        return try {
-            val cacheDir = NSSearchPathForDirectoriesInDomains(
-                NSCachesDirectory,
-                NSUserDomainMask,
-                true
-            ).firstOrNull() as? String ?: return null
+    /**
+     * Finds the bundled azan audio file in the app bundle.
+     * Compose Resources places files from composeResources/files/ into the bundle.
+     */
+    private fun getBundledAudioPath(): String? {
+        // Compose Multiplatform bundles files from composeResources/files/ into the app bundle
+        // Try the compose resources bundle path first
+        val bundle = NSBundle.mainBundle
 
-            val fileName = "prayer_audio_${audioUrl.hashCode()}.ogg"
-            val localPath = "$cacheDir/$fileName"
+        // Try finding the file with common Compose Resources bundle paths
+        val path = bundle.pathForResource("azan", ofType = "ogg")
+            ?: bundle.pathForResource("files/azan", ofType = "ogg")
+            ?: bundle.pathForResource("compose-resources/composeapp.composeapp.generated.resources/files/azan", ofType = "ogg")
 
-            // Return cached file if exists
-            if (NSFileManager.defaultManager.fileExistsAtPath(localPath)) {
-                println("Using cached audio: $localPath")
-                return localPath
-            }
-
-            val url = NSURL(string = audioUrl)
-            val data = NSData.dataWithContentsOfURL(url)
-            if (data != null) {
-                data.writeToFile(localPath, atomically = true)
-                println("Audio cached to: $localPath")
-                localPath
-            } else {
-                println("Failed to download audio from: $audioUrl")
-                null
-            }
-        } catch (e: Exception) {
-            println("Error caching audio: ${e.message}")
-            null
+        if (path != null) {
+            println("Found bundled audio at: $path")
+            return path
         }
+
+        // Search all bundle resources for the file
+        val resourcePath = bundle.resourcePath
+        if (resourcePath != null) {
+            println("Bundle resource path: $resourcePath")
+        }
+
+        println("Could not find azan.ogg in app bundle")
+        return null
     }
 
     override suspend fun cancelNotification(notificationId: String) {
