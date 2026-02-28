@@ -13,7 +13,7 @@ import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
 import kotlin.time.Duration.Companion.minutes
 
-const val AZAN_AUDIO_FILE = "azan.ogg"
+const val AZAN_AUDIO_FILE = "azan.mp3"
 
 class PrayerNotificationUseCase(
     private val dataStore: DataStore<Preferences>
@@ -28,10 +28,12 @@ class PrayerNotificationUseCase(
         val notificationService = getPrayerNotificationService()
         val now = Clock.System.now()
 
-        // Cancel all existing prayer notifications first
-        notificationService.cancelAllNotifications()
+        // Cancel individual prayer notifications (not test ones, not audio)
+        PrayerNameEnum.entries.forEach { prayer ->
+            notificationService.cancelNotification(prayer.name)
+        }
 
-        // Schedule ALL upcoming prayers that are in the notify list
+        // Schedule upcoming prayers that are in the notify list
         val upcomingPrayers = intervals.filter { interval ->
             interval.startTimeInstant != null &&
                     interval.startTimeInstant > now &&

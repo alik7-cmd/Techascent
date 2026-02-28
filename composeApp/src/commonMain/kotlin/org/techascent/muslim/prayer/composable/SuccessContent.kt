@@ -144,7 +144,7 @@ private fun LazyListScope.salatTimeContent(
                                 onClick = {
                                     coroutineScope.launch {
                                         try {
-                                            controller.providePermission(Permission.CAMERA)
+                                            controller.providePermission(Permission.REMOTE_NOTIFICATION)
                                             shouldNotify = !shouldNotify
                                             onUpdateNotification(shouldNotify, it.name)
                                         } catch (e: DeniedException) {

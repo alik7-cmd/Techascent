@@ -188,7 +188,7 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
     }
 
     override suspend fun cancelAllNotifications() {
-        // Only cancel prayer-related work, not all work
+        // Cancel all prayer-related work
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_FAJR")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_SALAT_UD_DUHA")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_DUHR")
@@ -196,6 +196,9 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_MAGHRIB")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_ISHA")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_TEST")
+        for (i in 1..5) {
+            WorkManager.getInstance(context).cancelAllWorkByTag("prayer_TEST_REPEAT_$i")
+        }
         // Stop any currently playing audio
         mediaPlayer?.let {
             if (it.isPlaying) it.stop()

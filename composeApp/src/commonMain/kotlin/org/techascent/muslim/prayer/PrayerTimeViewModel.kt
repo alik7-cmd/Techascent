@@ -67,10 +67,28 @@ class PrayerTimeViewModel(
         viewModelScope.launch {
             if (shouldSave) {
                 prayerNotificationUseCase.addPrayerToNotify(prayerName)
-            } else prayerNotificationUseCase.removePrayerFromNotify(prayerName)
-            if (_uiState.value is PrayerTimeUiState.Success) {
-                val currentData = (_uiState.value as PrayerTimeUiState.Success).data
-                prayerNotificationUseCase.schedulePrayerNotifications(currentData.intervals)
+            } else {
+                prayerNotificationUseCase.removePrayerFromNotify(prayerName)
+            }
+
+            val currentState = _uiState.value
+            if (currentState is PrayerTimeUiState.Success) {
+                val currentData = currentState.data
+                // Update the shouldNotify flag in the UI model
+                val updatedIntervals = currentData.intervals.map { interval ->
+                    if (interval.name == prayerName) {
+                        interval.copy(shouldNotify = shouldSave)
+                    } else {
+                        interval
+                    }
+                }
+                val updatedData = currentData.copy(intervals = updatedIntervals)
+
+                // Update UI state first
+                _uiState.emit(PrayerTimeUiState.Success(data = updatedData))
+
+                // Then reschedule notifications with updated intervals
+                prayerNotificationUseCase.schedulePrayerNotifications(updatedIntervals)
             }
         }
 

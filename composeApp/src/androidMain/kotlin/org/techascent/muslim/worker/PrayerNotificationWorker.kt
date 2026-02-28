@@ -2,7 +2,6 @@ package org.techascent.muslim.worker
 
 import android.Manifest
 import android.R as Muslim
-import android.app.ForegroundServiceStartNotAllowedException
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -39,6 +38,7 @@ class PrayerNotificationWorker(
      * Required for setExpedited() — provides the ForegroundInfo when the system
      * needs to promote this worker to a foreground service.
      */
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return createForegroundInfo(
             prayerName = inputData.getString("prayer_name") ?: "PRAYER",

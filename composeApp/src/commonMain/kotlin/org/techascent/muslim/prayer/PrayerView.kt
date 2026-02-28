@@ -20,6 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
@@ -114,33 +116,36 @@ private fun PrayerContent(
                     )
 
                     // TODO: Remove test buttons before release
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = ComposaSpacing.Medium),
-                            horizontalArrangement = Arrangement.spacedBy(ComposaSpacing.Small)
-                        ) {
-                            Button(
-                                onClick = onStartTestAzan,
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF4CAF50)
-                                )
+                    if(false){
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = ComposaSpacing.Medium),
+                                horizontalArrangement = Arrangement.spacedBy(ComposaSpacing.Small)
                             ) {
-                                Text("▶ Start Test Azan\n(every 1 min × 5)")
-                            }
-                            Button(
-                                onClick = onStopTestAzan,
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFF44336)
-                                )
-                            ) {
-                                Text("⏹ Stop Test Azan")
+                                Button(
+                                    onClick = onStartTestAzan,
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF4CAF50)
+                                    )
+                                ) {
+                                    Text("▶ Start Test Azan\n(every 1 min × 5)")
+                                }
+                                Button(
+                                    onClick = onStopTestAzan,
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFFF44336)
+                                    )
+                                ) {
+                                    Text("⏹ Stop Test Azan")
+                                }
                             }
                         }
                     }
+
                 }
 
                 is PrayerTimeUiState.Error -> errorContent(
