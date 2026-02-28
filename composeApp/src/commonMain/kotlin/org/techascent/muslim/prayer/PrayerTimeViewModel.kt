@@ -79,5 +79,20 @@ class PrayerTimeViewModel(
             is PrayerTimeEvent.OpenExternalLink -> _event.send(element = event)
         }
     }
+
+    /**
+     * Schedules 5 test azan notifications at 1-minute intervals.
+     * Works even after the app is killed. Call this and then kill the app to test.
+     */
+    fun startRepeatingTestAzan() = viewModelScope.launch {
+        prayerNotificationUseCase.startRepeatingTestNotification()
+    }
+
+    /**
+     * Cancels all repeating test notifications.
+     */
+    fun stopRepeatingTestAzan() = viewModelScope.launch {
+        prayerNotificationUseCase.stopRepeatingTestNotification()
+    }
 }
 

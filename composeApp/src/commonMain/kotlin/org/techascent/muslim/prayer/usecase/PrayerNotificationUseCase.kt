@@ -11,6 +11,7 @@ import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPrayerNotificationService
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
+import kotlin.time.Duration.Companion.minutes
 
 const val AZAN_AUDIO_FILE = "azan.ogg"
 
@@ -59,6 +60,40 @@ class PrayerNotificationUseCase(
             message = "This is a test notification",
             audioUrl = AZAN_AUDIO_FILE
         )
+    }
+
+    /**
+     * Schedules 5 test azan notifications at 1-minute intervals.
+     * Each gets a unique work name so they all fire independently.
+     * Works even after the app is killed (WorkManager persists them).
+     */
+    suspend fun startRepeatingTestNotification() {
+        val notificationService = getPrayerNotificationService()
+        // Cancel any previous test notifications first
+        for (i in 1..5) {
+            notificationService.cancelNotification("TEST_REPEAT_$i")
+        }
+        val now = Clock.System.now()
+        for (i in 1..5) {
+            val scheduledTime = now + i.minutes
+            notificationService.scheduleNotification(
+                prayerName = "TEST_REPEAT_$i",
+                scheduledTime = scheduledTime,
+                title = "🔔 Test Azan #$i",
+                message = "Repeating test notification ($i of 5) — fires every 1 min",
+                audioUrl = AZAN_AUDIO_FILE
+            )
+        }
+    }
+
+    /**
+     * Cancels all repeating test notifications.
+     */
+    suspend fun stopRepeatingTestNotification() {
+        val notificationService = getPrayerNotificationService()
+        for (i in 1..5) {
+            notificationService.cancelNotification("TEST_REPEAT_$i")
+        }
     }
 
     suspend fun addPrayerToNotify(prayerName: PrayerNameEnum) {

@@ -19,6 +19,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import kotlinx.coroutines.Dispatchers
@@ -104,6 +105,9 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
 
         if (delay > 0) {
             builder.setInitialDelay(delay, TimeUnit.MILLISECONDS)
+        } else {
+            // For immediate execution, use expedited to get better background privileges
+            builder.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
         }
 
         WorkManager.getInstance(context).enqueueUniqueWork(

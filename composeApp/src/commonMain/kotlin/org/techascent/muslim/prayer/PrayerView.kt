@@ -1,19 +1,27 @@
 package org.techascent.muslim.prayer
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import org.koin.compose.viewmodel.koinViewModel
@@ -45,7 +53,9 @@ internal fun PrayerView(
         PrayerScreen(
             onFetchPrayers = viewModel::getMonthlyPrayerTimes,
             innerPadding = innerPadding,
-            onNavigateHalalScanner = onNavigateHalalScanner
+            onNavigateHalalScanner = onNavigateHalalScanner,
+            onStartTestAzan = viewModel::startRepeatingTestAzan,
+            onStopTestAzan = viewModel::stopRepeatingTestAzan
         )
     }
 }
@@ -56,6 +66,8 @@ private fun PrayerScreen(
     viewModel: PrayerTimeViewModel = koinViewModel<PrayerTimeViewModel>(),
     onFetchPrayers: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
+    onStartTestAzan: () -> Unit,
+    onStopTestAzan: () -> Unit,
     innerPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -64,7 +76,9 @@ private fun PrayerScreen(
         onFetchPrayers = onFetchPrayers,
         onNavigateHalalScanner = onNavigateHalalScanner,
         onUpdateNotification = viewModel::onUpdateNotification,
-        innerPadding = innerPadding
+        innerPadding = innerPadding,
+        onStartTestAzan = onStartTestAzan,
+        onStopTestAzan = onStopTestAzan
     )
 }
 
@@ -75,6 +89,8 @@ private fun PrayerContent(
     onFetchPrayers: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
     onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
+    onStartTestAzan: () -> Unit,
+    onStopTestAzan: () -> Unit,
     innerPadding: PaddingValues
 ) {
     Scaffold(
@@ -90,11 +106,42 @@ private fun PrayerContent(
         ) {
             when (uiState) {
                 is PrayerTimeUiState.Loading -> loadingContent()
-                is PrayerTimeUiState.Success -> successContent(
-                    uiModel = uiState.data,
-                    onNavigateHalalScanner = onNavigateHalalScanner,
-                    onUpdateNotification = onUpdateNotification
-                )
+                is PrayerTimeUiState.Success -> {
+                    successContent(
+                        uiModel = uiState.data,
+                        onNavigateHalalScanner = onNavigateHalalScanner,
+                        onUpdateNotification = onUpdateNotification
+                    )
+
+                    // TODO: Remove test buttons before release
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = ComposaSpacing.Medium),
+                            horizontalArrangement = Arrangement.spacedBy(ComposaSpacing.Small)
+                        ) {
+                            Button(
+                                onClick = onStartTestAzan,
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF4CAF50)
+                                )
+                            ) {
+                                Text("▶ Start Test Azan\n(every 1 min × 5)")
+                            }
+                            Button(
+                                onClick = onStopTestAzan,
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFF44336)
+                                )
+                            ) {
+                                Text("⏹ Stop Test Azan")
+                            }
+                        }
+                    }
+                }
 
                 is PrayerTimeUiState.Error -> errorContent(
                     onRetry = onFetchPrayers

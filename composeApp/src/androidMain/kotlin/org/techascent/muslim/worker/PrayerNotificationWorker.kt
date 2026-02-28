@@ -2,6 +2,7 @@ package org.techascent.muslim.worker
 
 import android.Manifest
 import android.R as Muslim
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -11,6 +12,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
@@ -33,6 +35,18 @@ class PrayerNotificationWorker(
         private const val CHANNEL_ID = "prayer_times"
     }
 
+    /**
+     * Required for setExpedited() — provides the ForegroundInfo when the system
+     * needs to promote this worker to a foreground service.
+     */
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return createForegroundInfo(
+            prayerName = inputData.getString("prayer_name") ?: "PRAYER",
+            title = inputData.getString("title") ?: "Prayer Time",
+            message = inputData.getString("message") ?: "Time for prayer"
+        )
+    }
+
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun doWork(): Result {
         return try {
@@ -41,8 +55,14 @@ class PrayerNotificationWorker(
             val message = inputData.getString("message") ?: "Time for prayer"
             val audioUrl = inputData.getString("audio_url") ?: AZAN_AUDIO_FILE
 
-            // Promote to foreground so the worker stays alive for audio playback
-            setForeground(createForegroundInfo(prayerName, title, message))
+            // Try to promote to foreground; on Android 12+ this can fail from background
+            try {
+                setForeground(createForegroundInfo(prayerName, title, message))
+            } catch (e: Exception) {
+                Log.w("PrayerNotificationWorker", "Cannot start foreground: ${e.message}")
+                // Fallback: show a regular notification instead
+                showFallbackNotification(prayerName, title, message)
+            }
 
             if (audioUrl.isNotEmpty()) {
                 playAudioAndWait(audioUrl)
@@ -53,6 +73,51 @@ class PrayerNotificationWorker(
             Log.e("PrayerNotificationWorker", "Error showing notification", e)
             Result.failure()
         }
+    }
+
+    /**
+     * Fallback notification when foreground service cannot be started (Android 12+ background restriction).
+     */
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    private fun showFallbackNotification(prayerName: String, title: String, message: String) {
+        val notificationId = prayerName.hashCode()
+
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val stopIntent = Intent("org.techascent.muslim.STOP_AUDIO").apply {
+            setPackage(applicationContext.packageName)
+        }
+        val stopPendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            notificationId + 1,
+            stopIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(Muslim.drawable.stat_sys_headset)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVibrate(longArrayOf(0, 500, 250, 500))
+            .addAction(
+                Muslim.drawable.ic_media_pause,
+                "Stop Azan",
+                stopPendingIntent
+            )
+            .build()
+
+        NotificationManagerCompat.from(applicationContext).notify(notificationId, notification)
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
