@@ -3,113 +3,100 @@ package org.techascent.muslim.prayer.usecase
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
+import org.techascent.muslim.common.getCurrentDateFormatted
+import org.techascent.muslim.common.getCurrentYearAndMonth
+import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.datastore.DataStoreKey
-import org.techascent.muslim.getPrayerNotificationService
+import org.techascent.muslim.getPlaceName
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
-import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
-import kotlin.time.Duration.Companion.minutes
+import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
+import org.techascent.muslim.prayer.uimodel.getImageByPrayerEnum
+import org.techascent.muslim.prayer.uimodel.toUiModel
+import org.techascent.shared.data.enum.School
+import org.techascent.shared.data.repository.PrayerTimesRepository
+import org.techascent.shared.network.ResultState
 
-const val AZAN_AUDIO_FILE = "azan.mp3"
-
-class PrayerNotificationUseCase(
+class PrayerTimeViewUseCase(
+    private val repository: PrayerTimesRepository,
+    private val locationService: LocationService,
     private val dataStore: DataStore<Preferences>
 ) {
-
     companion object {
+        private fun getCacheKeyForMonthly(city: String, school: School, month: Int): String =
+            "$DEFAULT${city}_${school.name}_${month}"
+
+        private const val DEFAULT = DataStoreKey.MONTHLY_PRAYER_INITIAL
         private val NOTIFY_PRAYERS_KEY = stringPreferencesKey(DataStoreKey.NOTIFICATION_PRAYER_LIST)
+
     }
 
-    suspend fun schedulePrayerNotifications(intervals: List<PrayerTimeIntervalModel>) {
-        val currentList = getNotifyPrayersList()
-        val notificationService = getPrayerNotificationService()
-        val now = Clock.System.now()
+    suspend fun getMonthlyPrayerTimes(): Flow<ResultState<PrayerTimeUiModel>> {
+        val location = locationService.getCurrentLocation()
+        val date = getCurrentYearAndMonth()
+        val code = dataStore.data.first()[intPreferencesKey(DataStoreKey.SCHOOL_PREFERENCE)]
+            ?: School.HANAFI.code
+        val currentDate = getCurrentDateFormatted()
 
-        // Cancel individual prayer notifications (not test ones, not audio)
-        PrayerNameEnum.entries.forEach { prayer ->
-            notificationService.cancelNotification(prayer.name)
-        }
+        location?.let {
+            val addressInfo = getPlaceName(it.latitude, it.longitude)
+            val cacheKey = getCacheKeyForMonthly(
+                city = addressInfo.district ?: DEFAULT,
+                school = School.fromCode(code),
+                month = date.month
+            )
+            val cachedData = getCachedMonthlyPrayerTimes(cacheKey)
+            if (cachedData != null) {
+                val prayerData = cachedData.find {
+                    currentDate == it.currentDateTime
+                }
+                if (prayerData != null) {
+                    val updatedData = updateCurrentPrayer(prayerData)
+                    return flowOf(
+                        ResultState.Success(updatedData)
+                    )
+                }
+            }
 
-        // Schedule upcoming prayers that are in the notify list
-        val upcomingPrayers = intervals.filter { interval ->
-            interval.startTimeInstant != null &&
-                    interval.startTimeInstant > now &&
-                    currentList.contains(interval.name)
-        }
+            return repository.getMonthlyPrayerTimes(
+                year = date.year,
+                month = date.month,
+                latitude = it.latitude,
+                longitude = it.longitude,
+                school = School.fromCode(code).code
+            ).map { resultState ->
+                when (resultState) {
+                    is ResultState.Success -> {
+                        val uiModels = resultState.data.map {
+                            it.toUiModel(
+                                school = School.fromCode(code)
+                            )
+                        }
+                        saveMonthlyPrayerTimesToCache(cacheKey, uiModels)
+                        val data = uiModels.find {
+                            it.currentDateTime == currentDate
+                        }
+                        data?.let {
+                            ResultState.Success(updateCurrentPrayer(it))
+                        } ?: ResultState.Error("")
 
-        upcomingPrayers.forEach { interval ->
-            interval.startTimeInstant?.let { instant ->
-                notificationService.scheduleNotification(
-                    prayerName = interval.name.name,
-                    scheduledTime = instant,
-                    title = "Prayer Time",
-                    message = "Time for ${interval.name.name}",
-                    audioUrl = AZAN_AUDIO_FILE
-                )
+                    }
+
+                    is ResultState.Error -> resultState
+                    is ResultState.Loading -> resultState
+                }
             }
         }
-    }
 
-    suspend fun testNotificationNow() {
-        val notificationService = getPrayerNotificationService()
-        notificationService.scheduleNotification(
-            prayerName = "TEST",
-            scheduledTime = Clock.System.now(),
-            title = "Test Notification",
-            message = "This is a test notification",
-            audioUrl = AZAN_AUDIO_FILE
-        )
-    }
+        return flowOf(ResultState.Error("Location not found"))
 
-    /**
-     * Schedules 5 test azan notifications at 1-minute intervals.
-     * Each gets a unique work name so they all fire independently.
-     * Works even after the app is killed (WorkManager persists them).
-     */
-    suspend fun startRepeatingTestNotification() {
-        val notificationService = getPrayerNotificationService()
-        // Cancel any previous test notifications first
-        for (i in 1..5) {
-            notificationService.cancelNotification("TEST_REPEAT_$i")
-        }
-        val now = Clock.System.now()
-        for (i in 1..5) {
-            val scheduledTime = now + i.minutes
-            notificationService.scheduleNotification(
-                prayerName = "TEST_REPEAT_$i",
-                scheduledTime = scheduledTime,
-                title = "🔔 Test Azan #$i",
-                message = "Repeating test notification ($i of 5) — fires every 1 min",
-                audioUrl = AZAN_AUDIO_FILE
-            )
-        }
-    }
-
-    /**
-     * Cancels all repeating test notifications.
-     */
-    suspend fun stopRepeatingTestNotification() {
-        val notificationService = getPrayerNotificationService()
-        for (i in 1..5) {
-            notificationService.cancelNotification("TEST_REPEAT_$i")
-        }
-    }
-
-    suspend fun addPrayerToNotify(prayerName: PrayerNameEnum) {
-        val currentList = getNotifyPrayersList().toMutableList()
-        if (!currentList.contains(prayerName)) {
-            currentList.add(prayerName)
-            saveNotifyPrayersList(currentList)
-        }
-    }
-
-    suspend fun removePrayerFromNotify(prayerName: PrayerNameEnum) {
-        val currentList = getNotifyPrayersList().toMutableList()
-        currentList.remove(prayerName)
-        saveNotifyPrayersList(currentList)
     }
 
     private suspend fun getNotifyPrayersList(): List<PrayerNameEnum> {
@@ -128,11 +115,54 @@ class PrayerNotificationUseCase(
         }
     }
 
-    private suspend fun saveNotifyPrayersList(prayers: List<PrayerNameEnum>) {
+    private suspend fun updateCurrentPrayer(uiModel: PrayerTimeUiModel): PrayerTimeUiModel {
+        val now = Clock.System.now()
+        val currentPrayer = uiModel.intervals.find { interval ->
+            interval.startTimeInstant != null &&
+                    interval.endTimeInstant != null &&
+                    now >= interval.startTimeInstant &&
+                    now < interval.endTimeInstant
+        }
+
+        val currentList = getNotifyPrayersList().toMutableList()
+
+        return uiModel.copy(
+            currentPrayer = currentPrayer,
+            prayerImage = getImageByPrayerEnum(currentPrayer?.name),
+            intervals = uiModel.intervals.map {
+                it.copy(
+                    shouldNotify = currentList.contains(it.name)
+                )
+            }
+        )
+    }
+
+    suspend fun getCachedMonthlyPrayerTimes(cacheKey: String): List<PrayerTimeUiModel>? {
+        return try {
+            val jsonString = dataStore.data.first()[stringPreferencesKey(cacheKey)]
+            jsonString?.let {
+                Json.decodeFromString<List<PrayerTimeUiModel>>(it)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private suspend fun saveMonthlyPrayerTimesToCache(
+        cacheKey: String,
+        uiModels: List<PrayerTimeUiModel>
+    ) {
         try {
-            val jsonString = Json.encodeToString(prayers.map { it.name })
+            val jsonString = Json.encodeToString(uiModels)
             dataStore.edit { preferences ->
-                preferences[NOTIFY_PRAYERS_KEY] = jsonString
+                val keysToRemove = preferences.asMap().keys
+                    .filter { it.name.startsWith(DEFAULT) }
+
+                keysToRemove.forEach { key ->
+                    preferences.remove(key)
+                }
+                preferences[stringPreferencesKey(cacheKey)] = jsonString
             }
         } catch (e: Exception) {
             e.printStackTrace()
