@@ -69,6 +69,14 @@ class SettingsViewModel(
         }
     }
 
+    fun onUpdateAdhanNotification(isChecked: Boolean){
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[booleanPreferencesKey(DataStoreKey.ADHAN_NOTIFICATION_PREFERENCE)] = isChecked
+            }
+        }
+    }
+
     fun onHandleEvent(event: SettingsEvent) = viewModelScope.launch {
         when (event) {
             is SettingsEvent.OpenExternalLink -> _event.send(element = event)

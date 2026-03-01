@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.haptic_label
 import apphub.composeapp.generated.resources.haptic_title
+import apphub.composeapp.generated.resources.text_adhan_notification
+import apphub.composeapp.generated.resources.text_adhan_notification_desc
 import apphub.composeapp.generated.resources.text_school_of
 import apphub.composeapp.generated.resources.text_school_suggestion
 import apphub.composeapp.generated.resources.title_settings
@@ -89,6 +91,7 @@ private fun SettingsScreen(
         innerPadding = innerPadding,
         onUpdateSchool = viewModel::updateSchoolPreference,
         onUpdateHaptic = viewModel::onUpdateHaptic,
+        onUpdateAdhanNotification = viewModel::onUpdateAdhanNotification,
         onHandleEvent = onHandleEvent
     )
 
@@ -101,7 +104,8 @@ private fun SettingsContent(
     schoolPreference: Int,
     hapticPreference: Boolean,
     onUpdateSchool: (Int) -> Unit,
-    onUpdateHaptic: (Boolean)-> Unit,
+    onUpdateAdhanNotification: (Boolean) -> Unit,
+    onUpdateHaptic: (Boolean) -> Unit,
     onHandleEvent: (SettingsEvent) -> Unit,
     innerPadding: PaddingValues
 ) {
@@ -145,7 +149,20 @@ private fun SettingsContent(
                                 rightSlot = RightSlot.Switch(
                                     checked = hapticPreference,
                                     onCheckedChange = { isChecked ->
-                                       onUpdateHaptic(isChecked)
+                                        onUpdateHaptic(isChecked)
+                                    }
+                                )
+                            )
+                            Cell(
+                                leftSlot = LeftSlot.None,
+                                centerSlot = CenterSlot.TitleWithLabel(
+                                    title = stringResource(Res.string.text_adhan_notification),
+                                    label = stringResource(Res.string.text_adhan_notification_desc)
+                                ),
+                                rightSlot = RightSlot.Switch(
+                                    checked = School.fromCode(schoolPreference).toVisibility(),
+                                    onCheckedChange = { isChecked ->
+                                        onUpdateAdhanNotification(isChecked)
                                     }
                                 )
                             )

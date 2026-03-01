@@ -111,6 +111,8 @@ There isn’t enough reliable information about this product’s ingredients or 
     <string name="text_hanafi">Hanafi</string>
     <string name="text_shafi">Shafi'i</string>
     <string name="text_school_suggestion">Switch on to follow Hanafi guidance, switch off for Shafi‘i guidance — and if you’re ever unsure which to pick, keeping it on will safely follow the Hanafi view.</string>
+    <string name="text_adhan_notification">Play Adhan at Prayer Time</string>
+    <string name="text_adhan_notification_desc">When enabled, the Adhan will play at prayer time. When disabled, you’ll receive a silent notification only.</string>
     <string name="haptic_title">Haptic Feedback</string>
     <string name="haptic_label">Provide vibration feedback during tasbih counting</string>
 
