@@ -5,12 +5,15 @@ import androidx.compose.ui.graphics.Color
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_halal
 import apphub.composeapp.generated.resources.ic_mosque
+import apphub.composeapp.generated.resources.ic_prayer
 import apphub.composeapp.generated.resources.ic_quibla
+import apphub.composeapp.generated.resources.ic_quran
 import apphub.composeapp.generated.resources.ic_tasbeeh
 import apphub.composeapp.generated.resources.ic_zakat
 import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_nearby_mosque
 import apphub.composeapp.generated.resources.title_quibla
+import apphub.composeapp.generated.resources.title_quran
 import apphub.composeapp.generated.resources.title_tasbeeh
 import apphub.composeapp.generated.resources.title_zakat_calculator
 import org.jetbrains.compose.resources.DrawableResource
@@ -29,18 +32,21 @@ data class FeatureItem(
 
 private val featureList = listOf(
     FeatureItem(
+        titleRes = Res.string.title_halal_scanner,
+        imageRes = Res.drawable.ic_halal,
+        tint = Color.Green
+    ),
+    FeatureItem(
+        titleRes = Res.string.title_quran,
+        imageRes = Res.drawable.ic_quran
+    ),
+    FeatureItem(
         titleRes = Res.string.title_tasbeeh,
         imageRes = Res.drawable.ic_tasbeeh
     ),
     FeatureItem(
         titleRes = Res.string.title_quibla,
         imageRes = Res.drawable.ic_quibla
-    ),
-
-    FeatureItem(
-        titleRes = Res.string.title_halal_scanner,
-        imageRes = Res.drawable.ic_halal,
-        tint = Color.Green
     ),
 
     FeatureItem(
@@ -53,4 +59,4 @@ private val featureList = listOf(
         imageRes = Res.drawable.ic_zakat
     ),
 
-)
+    )

@@ -36,6 +36,7 @@ import apphub.composeapp.generated.resources.text_permission_title
 import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_nearby_mosque
 import apphub.composeapp.generated.resources.title_quibla
+import apphub.composeapp.generated.resources.title_quran
 import apphub.composeapp.generated.resources.title_tasbeeh
 import apphub.composeapp.generated.resources.title_zakat_calculator
 import dev.icerock.moko.permissions.DeniedAlwaysException
@@ -63,12 +64,14 @@ fun UtilityView(
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
+    onNavigateToQuran: () -> Unit,
 ) {
     ComposaTheme {
         UtilityScreen(
             onNavigateToCompass = onNavigateToCompass,
             onNavigateToTasbeeh = onNavigateToTasbeeh,
-            onNavigateHalalScanner = onNavigateHalalScanner
+            onNavigateHalalScanner = onNavigateHalalScanner,
+            onNavigateToQuran = onNavigateToQuran,
         )
     }
 }
@@ -79,6 +82,7 @@ private fun UtilityScreen(
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
+    onNavigateToQuran: () -> Unit,
     viewModel: UtilityViewModel = koinViewModel<UtilityViewModel>(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -108,7 +112,8 @@ private fun UtilityScreen(
                         item = item,
                         onNavigateToCompass = onNavigateToCompass,
                         onNavigateToTasbeeh = onNavigateToTasbeeh,
-                        onNavigateHalalScanner = onNavigateHalalScanner
+                        onNavigateHalalScanner = onNavigateHalalScanner,
+                        onNavigateToQuran = onNavigateToQuran,
                     )
                 }
             }
@@ -123,6 +128,7 @@ fun CenteredCardWithImageAndTitle(
     onNavigateToTasbeeh: () -> Unit,
     onNavigateToCompass: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
+    onNavigateToQuran: () -> Unit,
 ) {
     Box(
         modifier = modifier.fillMaxSize().padding(ComposaSpacing.ExtraSmall),
@@ -143,6 +149,7 @@ fun CenteredCardWithImageAndTitle(
             borderColor = ComposaTheme.color.strokeNeutralSubtle,
             modifier = Modifier.clickable {
                 when (item.titleRes) {
+                    Res.string.title_quran -> onNavigateToQuran()
                     Res.string.title_tasbeeh -> onNavigateToTasbeeh()
                     Res.string.title_quibla -> onNavigateToCompass()
                     Res.string.title_halal_scanner -> {
