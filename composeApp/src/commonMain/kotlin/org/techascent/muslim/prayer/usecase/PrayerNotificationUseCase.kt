@@ -1,7 +1,9 @@
 package org.techascent.muslim.prayer.usecase
 
+import androidx.compose.ui.text.capitalize
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
@@ -21,12 +23,34 @@ class PrayerNotificationUseCase(
 
     companion object {
         private val NOTIFY_PRAYERS_KEY = stringPreferencesKey(DataStoreKey.NOTIFICATION_PRAYER_LIST)
+        private val ADHAN_PREFERENCE_KEY = booleanPreferencesKey(DataStoreKey.ADHAN_NOTIFICATION_PREFERENCE)
+    }
+
+    /**
+     * Returns true if the user wants adhan audio with notifications, false for silent notifications.
+     * Defaults to true if no preference is set.
+     */
+    private suspend fun isAdhanEnabled(): Boolean {
+        return try {
+            dataStore.data.first()[ADHAN_PREFERENCE_KEY] ?: true
+        } catch (e: Exception) {
+            true
+        }
+    }
+
+    /**
+     * Returns the local audio file name if adhan is enabled, empty string otherwise.
+     * When audioFile is empty, the worker/service will show notification without playing audio.
+     */
+    private suspend fun getAudioForNotification(): String {
+        return if (isAdhanEnabled()) AZAN_AUDIO_FILE else ""
     }
 
     suspend fun schedulePrayerNotifications(intervals: List<PrayerTimeIntervalModel>) {
         val currentList = getNotifyPrayersList()
         val notificationService = getPrayerNotificationService()
         val now = Clock.System.now()
+        val audioFile = getAudioForNotification()
 
         // Cancel individual prayer notifications (not test ones, not audio)
         PrayerNameEnum.entries.forEach { prayer ->
@@ -45,9 +69,9 @@ class PrayerNotificationUseCase(
                 notificationService.scheduleNotification(
                     prayerName = interval.name.name,
                     scheduledTime = instant,
-                    title = "Prayer Time",
-                    message = "Time for ${interval.name.name}",
-                    audioUrl = AZAN_AUDIO_FILE
+                    title = "🔔 Prayer Time",
+                    message = "Time for ${interval.name.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                    audioFile = audioFile
                 )
             }
         }
@@ -55,12 +79,13 @@ class PrayerNotificationUseCase(
 
     suspend fun testNotificationNow() {
         val notificationService = getPrayerNotificationService()
+        val audioFile = getAudioForNotification()
         notificationService.scheduleNotification(
             prayerName = "TEST",
             scheduledTime = Clock.System.now(),
             title = "Test Notification",
             message = "This is a test notification",
-            audioUrl = AZAN_AUDIO_FILE
+            audioFile = audioFile
         )
     }
 
@@ -71,6 +96,7 @@ class PrayerNotificationUseCase(
      */
     suspend fun startRepeatingTestNotification() {
         val notificationService = getPrayerNotificationService()
+        val audioFile = getAudioForNotification()
         // Cancel any previous test notifications first
         for (i in 1..5) {
             notificationService.cancelNotification("TEST_REPEAT_$i")
@@ -83,7 +109,7 @@ class PrayerNotificationUseCase(
                 scheduledTime = scheduledTime,
                 title = "🔔 Test Azan #$i",
                 message = "Repeating test notification ($i of 5) — fires every 1 min",
-                audioUrl = AZAN_AUDIO_FILE
+                audioFile = audioFile
             )
         }
     }

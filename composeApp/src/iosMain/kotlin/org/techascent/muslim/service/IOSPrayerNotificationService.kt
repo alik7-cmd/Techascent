@@ -56,12 +56,16 @@ class IOSPrayerNotificationService : PrayerNotificationService {
         scheduledTime: Instant,
         title: String,
         message: String,
-        audioUrl: String
+        audioFile: String
     ) {
         val content = UNMutableNotificationContent()
         content.setTitle(title)
         content.setBody(message)
-        content.setSound(UNNotificationSound.defaultSound())
+
+        // Only play sound if audioFile is provided (adhan enabled)
+        if (audioFile.isNotEmpty()) {
+            content.setSound(UNNotificationSound.defaultSound())
+        }
 
         val timeIntervalSince1970 = scheduledTime.toEpochMilliseconds() / 1000.0
         val nsDate = NSDate(timeIntervalSince1970)
@@ -98,7 +102,7 @@ class IOSPrayerNotificationService : PrayerNotificationService {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun playAudio(audioUrl: String) {
+    override suspend fun playAudio(audioFile: String) {
         try {
             // Look for the audio file in the app bundle (placed via composeResources/files/)
             val localPath = getBundledAudioPath() ?: run {
