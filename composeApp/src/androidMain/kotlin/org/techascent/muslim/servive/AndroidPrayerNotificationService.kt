@@ -86,7 +86,7 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         scheduledTime: Instant,
         title: String,
         message: String,
-        audioUrl: String
+        audioFile: String
     ) {
         val currentTimeMillis = System.currentTimeMillis()
         val scheduledTimeMillis = scheduledTime.toEpochMilliseconds()
@@ -96,7 +96,7 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
             "prayer_name" to prayerName,
             "title" to title,
             "message" to message,
-            "audio_url" to audioUrl
+            "audio_file" to audioFile
         )
 
         val builder = OneTimeWorkRequestBuilder<PrayerNotificationWorker>()
@@ -105,8 +105,8 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
 
         if (delay > 0) {
             builder.setInitialDelay(delay, TimeUnit.MILLISECONDS)
-        } else {
-            // For immediate execution, use expedited to get better background privileges
+        } else if (audioFile.isNotEmpty()) {
+            // Only use expedited (foreground service) when audio needs to play
             builder.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
         }
 
@@ -119,7 +119,7 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
         Log.d("PrayerNotification", "Scheduled $prayerName in ${delay / 1000}s")
     }
 
-    override suspend fun playAudio(audioUrl: String) {
+    override suspend fun playAudio(audioFile: String) {
         try {
             withContext(Dispatchers.IO) {
                 suspendCancellableCoroutine<Unit> { cont ->

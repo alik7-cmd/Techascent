@@ -20,7 +20,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.techascent.muslim.MainActivity
 import org.techascent.muslim.R
-import org.techascent.muslim.prayer.usecase.AZAN_AUDIO_FILE
 import org.techascent.muslim.servive.mediaPlayer
 import kotlin.coroutines.resume
 
@@ -40,10 +39,12 @@ class PrayerNotificationWorker(
      */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun getForegroundInfo(): ForegroundInfo {
+        val audioFile = inputData.getString("audio_file") ?: ""
         return createForegroundInfo(
             prayerName = inputData.getString("prayer_name") ?: "PRAYER",
             title = inputData.getString("title") ?: "Prayer Time",
-            message = inputData.getString("message") ?: "Time for prayer"
+            message = inputData.getString("message") ?: "Time for prayer",
+            shouldPlayAudio = audioFile.isNotEmpty()
         )
     }
 
@@ -53,19 +54,22 @@ class PrayerNotificationWorker(
             val prayerName = inputData.getString("prayer_name") ?: return Result.retry()
             val title = inputData.getString("title") ?: "Prayer Time"
             val message = inputData.getString("message") ?: "Time for prayer"
-            val audioUrl = inputData.getString("audio_url") ?: AZAN_AUDIO_FILE
+            val audioFile = inputData.getString("audio_file") ?: ""
+            val shouldPlayAudio = audioFile.isNotEmpty()
 
-            // Try to promote to foreground; on Android 12+ this can fail from background
-            try {
-                setForeground(createForegroundInfo(prayerName, title, message))
-            } catch (e: Exception) {
-                Log.w("PrayerNotificationWorker", "Cannot start foreground: ${e.message}")
-                // Fallback: show a regular notification instead
-                showFallbackNotification(prayerName, title, message)
-            }
-
-            if (audioUrl.isNotEmpty()) {
-                playAudioAndWait(audioUrl)
+            if (shouldPlayAudio) {
+                // Adhan enabled: use foreground service to keep worker alive during audio playback
+                try {
+                    setForeground(createForegroundInfo(prayerName, title, message, true))
+                } catch (e: Exception) {
+                    Log.w("PrayerNotificationWorker", "Cannot start foreground: ${e.message}")
+                    // Fallback: show notification with stop button, audio may get cut short
+                    showNotification(prayerName, title, message, true)
+                }
+                playAudioAndWait(audioFile)
+            } else {
+                // Adhan disabled: just show a simple notification, no foreground service needed
+                showNotification(prayerName, title, message, false)
             }
 
             Result.success()
@@ -76,10 +80,12 @@ class PrayerNotificationWorker(
     }
 
     /**
-     * Fallback notification when foreground service cannot be started (Android 12+ background restriction).
+     * Shows a regular (non-foreground) notification.
+     * When shouldPlayAudio is true, includes "Stop Azan" button.
+     * When false, shows a simple auto-dismissing notification.
      */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    private fun showFallbackNotification(prayerName: String, title: String, message: String) {
+    private fun showNotification(prayerName: String, title: String, message: String, shouldPlayAudio: Boolean) {
         val notificationId = prayerName.hashCode()
 
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
@@ -92,17 +98,7 @@ class PrayerNotificationWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val stopIntent = Intent("org.techascent.muslim.STOP_AUDIO").apply {
-            setPackage(applicationContext.packageName)
-        }
-        val stopPendingIntent = PendingIntent.getBroadcast(
-            applicationContext,
-            notificationId + 1,
-            stopIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(Muslim.drawable.stat_sys_headset)
             .setContentTitle(title)
             .setContentText(message)
@@ -110,21 +106,33 @@ class PrayerNotificationWorker(
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVibrate(longArrayOf(0, 500, 250, 500))
-            .addAction(
+
+        if (shouldPlayAudio) {
+            val stopIntent = Intent("org.techascent.muslim.STOP_AUDIO").apply {
+                setPackage(applicationContext.packageName)
+            }
+            val stopPendingIntent = PendingIntent.getBroadcast(
+                applicationContext,
+                notificationId + 1,
+                stopIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            builder.addAction(
                 Muslim.drawable.ic_media_pause,
                 "Stop Azan",
                 stopPendingIntent
             )
-            .build()
+        }
 
-        NotificationManagerCompat.from(applicationContext).notify(notificationId, notification)
+        NotificationManagerCompat.from(applicationContext).notify(notificationId, builder.build())
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun createForegroundInfo(
         prayerName: String,
         title: String,
-        message: String
+        message: String,
+        shouldPlayAudio: Boolean
     ): ForegroundInfo {
         val notificationId = prayerName.hashCode()
 
@@ -138,40 +146,46 @@ class PrayerNotificationWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val stopIntent = Intent("org.techascent.muslim.STOP_AUDIO").apply {
-            setPackage(applicationContext.packageName)
-        }
-        val stopPendingIntent = PendingIntent.getBroadcast(
-            applicationContext,
-            notificationId + 1,
-            stopIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(Muslim.drawable.stat_sys_headset)
             .setContentTitle(title)
             .setContentText(message)
             .setContentIntent(pendingIntent)
-            .setAutoCancel(false)
-            .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVibrate(longArrayOf(0, 500, 250, 500))
-            .addAction(
+
+        if (shouldPlayAudio) {
+            // Ongoing notification with Stop button when audio is playing
+            builder.setAutoCancel(false)
+            builder.setOngoing(true)
+
+            val stopIntent = Intent("org.techascent.muslim.STOP_AUDIO").apply {
+                setPackage(applicationContext.packageName)
+            }
+            val stopPendingIntent = PendingIntent.getBroadcast(
+                applicationContext,
+                notificationId + 1,
+                stopIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            builder.addAction(
                 Muslim.drawable.ic_media_pause,
                 "Stop Azan",
                 stopPendingIntent
             )
-            .build()
+        } else {
+            // Auto-dismiss notification when no audio
+            builder.setAutoCancel(true)
+        }
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ForegroundInfo(
                 notificationId,
-                notification,
+                builder.build(),
                 android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
             )
         } else {
-            ForegroundInfo(notificationId, notification)
+            ForegroundInfo(notificationId, builder.build())
         }
     }
 

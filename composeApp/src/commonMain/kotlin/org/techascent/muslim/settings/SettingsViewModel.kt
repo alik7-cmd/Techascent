@@ -46,6 +46,16 @@ class SettingsViewModel(
             initialValue = true
         )
 
+    val adhanPreference: StateFlow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[booleanPreferencesKey(DataStoreKey.ADHAN_NOTIFICATION_PREFERENCE)] ?: true
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = true
+        )
+
     private val _uiState = MutableStateFlow(getSettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState
 

@@ -84,10 +84,12 @@ private fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val schoolPreference by viewModel.schoolPreference.collectAsState()
     val hapticPreference by viewModel.hapticPreference.collectAsState()
+    val adhanPreference by viewModel.adhanPreference.collectAsState()
     SettingsContent(
         uiState = uiState,
         schoolPreference = schoolPreference,
         hapticPreference = hapticPreference,
+        adhanPreference = adhanPreference,
         innerPadding = innerPadding,
         onUpdateSchool = viewModel::updateSchoolPreference,
         onUpdateHaptic = viewModel::onUpdateHaptic,
@@ -103,6 +105,7 @@ private fun SettingsContent(
     uiState: SettingsUiState,
     schoolPreference: Int,
     hapticPreference: Boolean,
+    adhanPreference: Boolean,
     onUpdateSchool: (Int) -> Unit,
     onUpdateAdhanNotification: (Boolean) -> Unit,
     onUpdateHaptic: (Boolean) -> Unit,
@@ -160,7 +163,7 @@ private fun SettingsContent(
                                     label = stringResource(Res.string.text_adhan_notification_desc)
                                 ),
                                 rightSlot = RightSlot.Switch(
-                                    checked = School.fromCode(schoolPreference).toVisibility(),
+                                    checked = adhanPreference,
                                     onCheckedChange = { isChecked ->
                                         onUpdateAdhanNotification(isChecked)
                                     }

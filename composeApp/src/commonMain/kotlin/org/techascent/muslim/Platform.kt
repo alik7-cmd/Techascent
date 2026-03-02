@@ -45,10 +45,10 @@ interface PrayerNotificationService {
         scheduledTime: Instant,
         title: String = "Prayer Time",
         message: String,
-        audioUrl: String = ""
+        audioFile: String = ""
     )
 
-    suspend fun playAudio(audioUrl: String)
+    suspend fun playAudio(audioFile: String)
 
     suspend fun cancelNotification(notificationId: String)
 
