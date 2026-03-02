@@ -50,6 +50,7 @@
     <string name="title_quibla">Quibla</string>
     <string name="title_halal_scanner">Halal Scanner</string>
     <string name="title_nearby_mosque">Nearby Mosque</string>
+    <string name="title_zakat_calculator">Calculate Zakat</string>
 
     <string name="text_permission_title">Permission Required</string>
     <string name="text_permission_description">Camera permission is required to use the Halal Scanner. Please enable it in the app settings.</string>
