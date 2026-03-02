@@ -177,7 +177,7 @@ fun CenteredCardWithImageAndTitle(
                     }
 
                     Res.string.title_nearby_mosque -> openNearbyMosques()
-                    Res.string.title_zakat_calculator -> uriHandler.openUri("https://pennyappeal.ca/calculate-your-zakat/?gad_source=1&gad_campaignid=23047703232&gbraid=0AAAAAC0jpgBpva79tM7NlOMP_k950wDEl&gclid=CjwKCAiAh5XNBhAAEiwA_Bu8FQs5iSnVFs8WeEYSJyaHXwZglBN3mGxiCDJYZYj336okPF45iB1OdRoC4lYQAvD_BwE")
+                    Res.string.title_zakat_calculator -> uriHandler.openUri("https://idrf.ca/zakat-calculator/")
                 }
             },
             content = {
