@@ -1,5 +1,6 @@
 package org.techascent.muslim.prayer.usecase
 
+import androidx.compose.ui.text.capitalize
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -68,8 +69,8 @@ class PrayerNotificationUseCase(
                 notificationService.scheduleNotification(
                     prayerName = interval.name.name,
                     scheduledTime = instant,
-                    title = "Prayer Time",
-                    message = "Time for ${interval.name.name}",
+                    title = "🔔 Prayer Time",
+                    message = "Time for ${interval.name.name.lowercase().replaceFirstChar { it.uppercase() }}",
                     audioFile = audioFile
                 )
             }

@@ -116,7 +116,7 @@ private fun PrayerContent(
                     )
 
                     // TODO: Remove test buttons before release
-                    if(true){
+                    if(false){
                         item {
                             Row(
                                 modifier = Modifier
