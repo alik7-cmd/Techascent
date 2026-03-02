@@ -8,6 +8,8 @@ object DataStoreKey {
     const val ADHAN_NOTIFICATION_PREFERENCE = "azan_preference"
     const val HAPTIC_FEEDBACK = "haptic_feedback"
     const val NOTIFICATION_PRAYER_LIST = "notify_prayers_list"
+    const val LAST_SURAH_NUMBER = "last_surah_number"
+    const val LAST_AYAH_INDEX = "last_ayah_index"
 
     val motivationHtml = """
     <h3>Why I Built This App</h3>
