@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.button_open_settings
@@ -36,6 +37,7 @@ import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_nearby_mosque
 import apphub.composeapp.generated.resources.title_quibla
 import apphub.composeapp.generated.resources.title_tasbeeh
+import apphub.composeapp.generated.resources.title_zakat_calculator
 import dev.icerock.moko.permissions.DeniedAlwaysException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
@@ -135,6 +137,7 @@ fun CenteredCardWithImageAndTitle(
         val message = stringResource(Res.string.text_permission_description)
         val confirmText = stringResource(Res.string.button_open_settings)
         val cancelText = stringResource(Res.string.text_cancel)
+        val uriHandler = LocalUriHandler.current
         BindEffect(controller)
         ComposaCardFrame(
             borderColor = ComposaTheme.color.strokeNeutralSubtle,
@@ -174,6 +177,7 @@ fun CenteredCardWithImageAndTitle(
                     }
 
                     Res.string.title_nearby_mosque -> openNearbyMosques()
+                    Res.string.title_zakat_calculator -> uriHandler.openUri("https://pennyappeal.ca/calculate-your-zakat/?gad_source=1&gad_campaignid=23047703232&gbraid=0AAAAAC0jpgBpva79tM7NlOMP_k950wDEl&gclid=CjwKCAiAh5XNBhAAEiwA_Bu8FQs5iSnVFs8WeEYSJyaHXwZglBN3mGxiCDJYZYj336okPF45iB1OdRoC4lYQAvD_BwE")
                 }
             },
             content = {
