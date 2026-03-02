@@ -17,7 +17,7 @@ import org.techascent.muslim.prayer.PrayerView
 import org.techascent.muslim.quran.SurahDetailView
 import org.techascent.muslim.quran.SurahListView
 import org.techascent.muslim.settings.SettingsView
-import org.techascent.muslim.tasbeeh.TasbeehView
+import org.techascent.muslim.tasbeeh.TasbeehViewV2
 import org.techascent.muslim.utility.UtilityView
 
 private const val LOCATION_PICKER_VIEW = "LOCATION_PICKER_VIEW"
@@ -72,7 +72,7 @@ fun RootNavGraph(
         composable(
             route = Screen.TasbeehView.route,
         ) {
-            TasbeehView(
+            TasbeehViewV2(
                 onNavigateBack = { rootNavController.popBackStack() }
             )
         }
