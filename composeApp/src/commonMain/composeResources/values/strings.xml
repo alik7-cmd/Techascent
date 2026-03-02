@@ -117,6 +117,7 @@ There isn’t enough reliable information about this product’s ingredients or 
     <string name="haptic_title">Haptic Feedback</string>
     <string name="haptic_label">Provide vibration feedback during tasbih counting</string>
 
+    <string name="title_quran">Al-Quran</string>
 
 
 </resources>

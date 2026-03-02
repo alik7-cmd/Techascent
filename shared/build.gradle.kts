@@ -39,6 +39,10 @@ kotlin {
                 // Koin Core for Multiplatform
                 implementation(libs.koin.core)
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+
+                // DataStore
+                implementation(libs.datastore.preferences)
+                implementation(libs.datastore)
             }
         }
 
