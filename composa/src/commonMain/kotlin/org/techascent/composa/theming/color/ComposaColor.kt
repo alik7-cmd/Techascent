@@ -146,4 +146,15 @@ data class PrayerColors(
     val announcementBg: Color = Color.Transparent,
     val announcementAccent: Color = Color.Transparent,
     val cardBg: Color = Color.Transparent,
+    // Night / moon / twilight colours
+    val nightSkyStart: Color = Color(0xFF0D1B2A),
+    val nightSkyEnd: Color = Color(0xFF1B2838),
+    val moonBody: Color = Color(0xFFF5F5DC),
+    val moonGlow: Color = Color(0x60F5F5DC),
+    val moonCrater: Color = Color(0x30A0A080),
+    val starColor: Color = Color(0xFFFFFFFF),
+    val twilightSkyStart: Color = Color(0xFF1A237E),
+    val twilightSkyEnd: Color = Color(0xFFFF8A65),
+    val dawnSkyStart: Color = Color(0xFF283593),
+    val dawnSkyEnd: Color = Color(0xFFFFAB91),
 )
