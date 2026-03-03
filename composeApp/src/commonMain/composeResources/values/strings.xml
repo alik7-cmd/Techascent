@@ -24,7 +24,16 @@
 
     <string name="warning_prayer_time">Your prayer times are based on the %1$s school of thought. You can change this from the settings anytime.</string>
     <string name="text_scan_promotion_title">Scan to check Halal</string>
-    <string name="text_halal_promotion">Shop with confidence.\nScan a product’s barcode to instantly see if it's halal—quick, clear, and worry-free.</string>
+    <string name="text_halal_promotion">Shop with confidence.\nScan a product's barcode to instantly see if it's halal—quick, clear, and worry-free.</string>
+    <string name="text_halal_scan_action">Scan Barcode</string>
+    <string name="text_halal_quick_desc">Check if a product is halal</string>
+    <string name="text_prayer_current_waqt">Current Waqt</string>
+    <string name="text_prayer_all_times">Today\'s Prayer Times</string>
+    <string name="text_prayer_fasting">Fasting</string>
+    <string name="text_prayer_announcement">Announcements</string>
+    <string name="text_prayer_no_announcement">No announcements at this time.</string>
+    <string name="text_prayer_next_fast">Next Fasting Time</string>
+    <string name="text_prayer_sun_progress">Sun Progress</string>
 
 
     <string name="title_location_picker">Why We Need Your Location Permission</string>

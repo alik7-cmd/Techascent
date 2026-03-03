@@ -60,7 +60,9 @@ data class PrayerTimeIntervalModel(
 @Serializable
 data class IftarTimeUiModel(
     val iftarStartTime: String?,
-    val lastTimeOfSahri: String?
+    val lastTimeOfSahri: String?,
+    val iftarInstant: Instant? = null,
+    val sahriInstant: Instant? = null,
 )
 
 @Serializable
@@ -94,6 +96,8 @@ internal suspend fun PrayerTimeDto.toUiModel(
         iftarTime = IftarTimeUiModel(
             iftarStartTime = iftarTime?.startTime?.toHourMinuteString(false),
             lastTimeOfSahri = iftarTime?.endTime?.toHourMinuteString(false),
+            iftarInstant = iftarTime?.startTime?.toInstant(TimeZone.currentSystemDefault()),
+            sahriInstant = iftarTime?.endTime?.toInstant(TimeZone.currentSystemDefault()),
         ),
         addressInfo = getPlaceName(location.latitude, location.longitude),
         prayerImage = getImageByPrayer(currentPrayer?.name),
