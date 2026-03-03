@@ -124,4 +124,26 @@ data class ComposaColor(
     val textPositiveBold: Color,
     val textWarningBold: Color,
     val textWarningBoldAlternative: Color,
+
+    // Prayer screen semantic colours (grouped to avoid DEX register limit)
+    val prayer: PrayerColors = PrayerColors(),
+)
+
+data class PrayerColors(
+    val skyStart: Color = Color.Transparent,
+    val skyEnd: Color = Color.Transparent,
+    val sunBody: Color = Color.Transparent,
+    val sunGlow: Color = Color.Transparent,
+    val horizon: Color = Color.Transparent,
+    val timerAccent: Color = Color.Transparent,
+    val timerTrack: Color = Color.Transparent,
+    val fastingAccent: Color = Color.Transparent,
+    val fastingSubtle: Color = Color.Transparent,
+    val currentWaqtBg: Color = Color.Transparent,
+    val currentWaqtText: Color = Color.Transparent,
+    val scannerAccent: Color = Color.Transparent,
+    val scannerSubtle: Color = Color.Transparent,
+    val announcementBg: Color = Color.Transparent,
+    val announcementAccent: Color = Color.Transparent,
+    val cardBg: Color = Color.Transparent,
 )

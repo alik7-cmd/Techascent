@@ -1,5 +1,7 @@
 package org.techascent.composa.theming.color
 
+import androidx.compose.ui.graphics.Color
+
 val composaDarkTheme = ComposaColor(
     backgroundAction = ComposaGreen400,
     backgroundActionAlternative = ComposaPurple400,
@@ -122,4 +124,24 @@ val composaDarkTheme = ComposaColor(
     textPositiveBold = ComposaGreen500,
     textWarningBold = ComposaYellow600,
     textWarningBoldAlternative = ComposaYellow600,
+
+    // Prayer screen
+    prayer = PrayerColors(
+        skyStart = Color(0xFF1A237E),
+        skyEnd = Color(0xFF212121),
+        sunBody = Color(0xFFFFB74D),
+        sunGlow = Color(0x40FFB74D),
+        horizon = Color(0xFF616161),
+        timerAccent = ComposaBlue300,
+        timerTrack = ComposaGrey800,
+        fastingAccent = ComposaOrange400,
+        fastingSubtle = Color(0xFF3E2723),
+        currentWaqtBg = Color(0xFF1A237E),
+        currentWaqtText = ComposaBlue300,
+        scannerAccent = ComposaGreen400,
+        scannerSubtle = ComposaGreen950,
+        announcementBg = ComposaYellow950,
+        announcementAccent = ComposaYellow600,
+        cardBg = ComposaGrey900,
+    ),
 )
