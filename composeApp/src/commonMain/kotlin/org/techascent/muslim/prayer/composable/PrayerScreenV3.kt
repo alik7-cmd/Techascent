@@ -639,13 +639,13 @@ private fun PrayerTimesCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                Modifier.size(32.dp).clip(CircleShape).background(currentWaqtText.copy(0.12f)),
+                Modifier.size(34.dp).clip(CircleShape).background(currentWaqtText.copy(0.12f)),
                 contentAlignment = Alignment.Center,
-            ) { Text("🕌", fontSize = 16.sp) }
+            ) { Text("🕌", fontSize = 18.sp) }
             Spacer(Modifier.width(8.dp))
             Text(
                 stringResource(Res.string.text_prayer_all_times),
-                style = ComposaTheme.typography.captionEmphasized,
+                style = ComposaTheme.typography.footnoteEmphasized,
                 color = ComposaTheme.color.textNeutral,
             )
         }
@@ -693,14 +693,14 @@ private fun CompactPrayerRow(
 
     Row(
         modifier = Modifier.fillMaxWidth().background(bg).clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 12.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(emoji, fontSize = 14.sp)
+        Text(emoji, fontSize = 16.sp)
         Spacer(Modifier.width(6.dp))
         Text(
             name,
-            style = if (isCurrent) ComposaTheme.typography.captionEmphasized else ComposaTheme.typography.caption,
+            style = if (isCurrent) ComposaTheme.typography.footnoteEmphasized else ComposaTheme.typography.footnote,
             color = if (isCurrent) currentWaqtText else ComposaTheme.color.textNeutral,
             modifier = Modifier.weight(1f),
             maxLines = 1,
@@ -709,13 +709,13 @@ private fun CompactPrayerRow(
         Spacer(Modifier.width(4.dp))
         Text(
             time,
-            style = ComposaTheme.typography.captionEmphasized,
+            style = ComposaTheme.typography.footnoteEmphasized,
             color = if (isCurrent) currentWaqtText else ComposaTheme.color.textNeutralSubtle,
         )
         Spacer(Modifier.width(6.dp))
         val iconRes = if (shouldNotify) Res.drawable.ic_notification_on else Res.drawable.ic_notification_off
         val tint = if (shouldNotify) currentWaqtText else ComposaTheme.color.textNeutralSubtle
-        Icon(painterResource(iconRes), null, tint = tint, modifier = Modifier.size(16.dp))
+        Icon(painterResource(iconRes), null, tint = tint, modifier = Modifier.size(18.dp))
     }
 }
 
@@ -757,13 +757,13 @@ private fun FastingSideCard(iftar: IftarTimeUiModel) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                Modifier.size(32.dp).clip(CircleShape).background(accent.copy(0.12f)),
+                Modifier.size(34.dp).clip(CircleShape).background(accent.copy(0.12f)),
                 contentAlignment = Alignment.Center,
-            ) { Text("🌙", fontSize = 16.sp) }
+            ) { Text("🌙", fontSize = 18.sp) }
             Spacer(Modifier.width(8.dp))
             Text(
                 stringResource(Res.string.text_prayer_fasting),
-                style = ComposaTheme.typography.captionEmphasized,
+                style = ComposaTheme.typography.footnoteEmphasized,
                 color = ComposaTheme.color.textNeutral,
             )
         }
@@ -785,7 +785,7 @@ private fun FastingSideCard(iftar: IftarTimeUiModel) {
             ) {
                 Text(
                     if (closerIsIftar) "🍽️ ${stringResource(Res.string.text_iftar)}" else "🥣 ${stringResource(Res.string.text_suhur)}",
-                    style = ComposaTheme.typography.caption,
+                    style = ComposaTheme.typography.footnote,
                     color = ComposaTheme.color.textNeutralSubtle,
                 )
                 Spacer(Modifier.height(2.dp))
@@ -802,13 +802,13 @@ private fun FastingSideCard(iftar: IftarTimeUiModel) {
 @Composable
 private fun FastingCompactRow(emoji: String, label: String, value: String, accent: Color) {
     Row(
-        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(emoji, fontSize = 14.sp)
+        Text(emoji, fontSize = 16.sp)
         Spacer(Modifier.width(6.dp))
-        Text(label, style = ComposaTheme.typography.caption, color = ComposaTheme.color.textNeutral, modifier = Modifier.weight(1f))
-        Text(value, style = ComposaTheme.typography.captionEmphasized, color = accent)
+        Text(label, style = ComposaTheme.typography.footnote, color = ComposaTheme.color.textNeutral, modifier = Modifier.weight(1f))
+        Text(value, style = ComposaTheme.typography.footnoteEmphasized, color = accent)
     }
 }
 
