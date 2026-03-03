@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,7 +45,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.appbar.TopAppBar
 import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.shimmer.shimmerEffect
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.prayer.composable.ErrorScreen
 import org.techascent.muslim.quran.state.AyahUiModel
 
 @Composable
@@ -99,38 +100,16 @@ private fun SurahDetailScreen(
     ) { innerPadding ->
 
         if (uiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+            SurahDetailSkeleton(innerPadding = innerPadding)
             return@Scaffold
         }
 
         if (uiState.error != null) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = uiState.error ?: "An error occurred",
-                        style = ComposaTheme.typography.bodyEmphasized,
-                        color = ComposaTheme.color.textNeutral,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
-                    Text(
-                        text = "Tap to retry",
-                        modifier = Modifier.clickable {
-                            viewModel.loadSurahDetail(surahNumber)
-                        },
-                        style = ComposaTheme.typography.bodyEmphasized,
-                        color = ComposaTheme.color.textNeutral
-                    )
-                }
-            }
+            ErrorScreen(
+                description = uiState.error,
+                onRetry = { viewModel.loadSurahDetail(surahNumber) },
+                modifier = Modifier.padding(innerPadding),
+            )
             return@Scaffold
         }
 
@@ -306,6 +285,143 @@ private fun AyahCard(
                     color = ComposaTheme.color.textNeutral.copy(alpha = 0.7f),
                 )
             }
+        }
+    }
+}
+
+// ─── Surah Detail Skeleton ──────────────────────────────────────────────────────
+
+@Composable
+private fun SurahDetailSkeleton(innerPadding: PaddingValues) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(innerPadding),
+        contentPadding = PaddingValues(
+            horizontal = ComposaSpacing.Medium,
+            vertical = ComposaSpacing.Small,
+        ),
+        verticalArrangement = Arrangement.spacedBy(ComposaSpacing.Small),
+    ) {
+        // Header skeleton
+        item { SurahHeaderSkeleton() }
+        // Ayah skeletons
+        items(6) { AyahCardSkeleton() }
+    }
+}
+
+@Composable
+private fun SurahHeaderSkeleton() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = ComposaTheme.color.strokeNeutralSubtle.copy(alpha = 0.1f)
+        ),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(ComposaSpacing.Medium),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            // Arabic surah name
+            Box(
+                modifier = Modifier
+                    .size(width = 140.dp, height = 28.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
+            Spacer(Modifier.height(ComposaSpacing.ExtraSmall))
+            // Translation
+            Box(
+                modifier = Modifier
+                    .size(width = 100.dp, height = 14.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
+            Spacer(Modifier.height(ComposaSpacing.Small))
+            // Bismillah
+            Box(
+                modifier = Modifier
+                    .size(width = 220.dp, height = 22.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AyahCardSkeleton() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = ComposaTheme.color.backgroundAppBackground
+        ),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(ComposaSpacing.Medium),
+        ) {
+            // Header: badge + play button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .shimmerEffect(true)
+                )
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .shimmerEffect(true)
+                )
+            }
+            Spacer(Modifier.height(ComposaSpacing.Small))
+            // Arabic text lines
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
+            Spacer(Modifier.height(6.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+                    .align(Alignment.End)
+            )
+            Spacer(Modifier.height(ComposaSpacing.Small))
+            // Translation lines
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(14.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
+            Spacer(Modifier.height(4.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .height(14.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
+            Spacer(Modifier.height(4.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(14.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
         }
     }
 }

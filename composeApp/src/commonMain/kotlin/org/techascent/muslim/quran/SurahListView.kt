@@ -2,7 +2,6 @@ package org.techascent.muslim.quran
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,7 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -32,16 +31,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_back
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.appbar.TopAppBar
 import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.shimmer.shimmerEffect
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.prayer.composable.ErrorScreen
 import org.techascent.muslim.quran.state.SurahListUiState
 import org.techascent.shared.data.SurahInfo
 
@@ -82,35 +81,15 @@ private fun SurahListScreen(
     ) { innerPadding ->
         when (val state = uiState) {
             is SurahListUiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                SurahListSkeleton(innerPadding = innerPadding)
             }
 
             is SurahListUiState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = state.message,
-                            style = ComposaTheme.typography.bodyEmphasized,
-                            color = ComposaTheme.color.textNeutral,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
-                        Text(
-                            text = "Tap to retry",
-                            modifier = Modifier.clickable { viewModel.loadSurahList() },
-                            style = ComposaTheme.typography.bodyEmphasized,
-                            color = ComposaTheme.color.textNeutral
-                        )
-                    }
-                }
+                ErrorScreen(
+                    description = state.message,
+                    onRetry = { viewModel.loadSurahList() },
+                    modifier = Modifier.padding(innerPadding),
+                )
             }
 
             is SurahListUiState.Success -> {
@@ -211,3 +190,70 @@ private fun SurahItem(
     }
 }
 
+// ─── Surah List Skeleton ────────────────────────────────────────────────────────
+
+@Composable
+private fun SurahListSkeleton(innerPadding: PaddingValues) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(innerPadding),
+        contentPadding = PaddingValues(vertical = ComposaSpacing.Small),
+    ) {
+        items(12) { idx ->
+            SurahItemSkeleton()
+            if (idx < 11) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
+                    color = ComposaTheme.color.strokeNeutralSubtle.copy(alpha = 0.4f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SurahItemSkeleton() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = ComposaSpacing.Medium,
+                vertical = ComposaSpacing.Small + ComposaSpacing.ExtraSmall,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // Number badge
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .shimmerEffect(true)
+        )
+
+        Spacer(modifier = Modifier.width(ComposaSpacing.Medium))
+
+        // Name + translation
+        Column(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .size(width = 120.dp, height = 16.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Box(
+                modifier = Modifier
+                    .size(width = 160.dp, height = 12.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect(true)
+            )
+        }
+
+        // Arabic name
+        Box(
+            modifier = Modifier
+                .size(width = 60.dp, height = 22.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .shimmerEffect(true)
+        )
+    }
+}
