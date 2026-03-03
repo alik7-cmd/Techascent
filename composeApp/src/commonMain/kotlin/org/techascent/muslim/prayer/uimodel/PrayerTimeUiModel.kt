@@ -40,6 +40,8 @@ data class PrayerTimeUiModel(
     val iftarTime: IftarTimeUiModel?,
     val sunrise: String,
     val sunset: String,
+    val sunriseInstant: Instant? = null,
+    val sunsetInstant: Instant? = null,
     val currentDateTime: String,
     val apiUrl: String = "https://aladhan.com/about",
     val addressInfo: AddressInfo,
@@ -92,6 +94,8 @@ internal suspend fun PrayerTimeDto.toUiModel(
         hijriDate = hijriDate,
         sunrise = sunrise.toHourMinuteString(false),
         sunset = sunset.toHourMinuteString(false),
+        sunriseInstant = sunrise.toInstant(TimeZone.currentSystemDefault()),
+        sunsetInstant = sunset.toInstant(TimeZone.currentSystemDefault()),
         currentDateTime = currentDateTime,
         iftarTime = IftarTimeUiModel(
             iftarStartTime = iftarTime?.startTime?.toHourMinuteString(false),
