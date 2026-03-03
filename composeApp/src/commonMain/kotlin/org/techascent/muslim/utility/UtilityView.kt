@@ -67,7 +67,7 @@ fun UtilityView(
     onNavigateToQuran: () -> Unit,
 ) {
     ComposaTheme {
-        UtilityScreen(
+        UtilityScreenV2(
             onNavigateToCompass = onNavigateToCompass,
             onNavigateToTasbeeh = onNavigateToTasbeeh,
             onNavigateHalalScanner = onNavigateHalalScanner,
