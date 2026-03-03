@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import org.techascent.muslim.calendar.CalendarView
-import org.techascent.muslim.compass.CompassView
+import org.techascent.muslim.compass.CompassViewV2
 import org.techascent.muslim.halalscanner.HalalScannerView
 import org.techascent.muslim.location.LocationPickerView
 import org.techascent.muslim.prayer.PrayerView
@@ -78,7 +78,7 @@ fun RootNavGraph(
         }
 
         composable(Screen.CompassView.route) {
-            CompassView(
+            CompassViewV2(
                 onNavigateBack = { rootNavController.popBackStack() }
             )
         }

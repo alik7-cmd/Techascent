@@ -117,7 +117,33 @@ There isn’t enough reliable information about this product’s ingredients or 
     <string name="haptic_title">Haptic Feedback</string>
     <string name="haptic_label">Provide vibration feedback during tasbih counting</string>
 
+    <string name="text_settings_prayer">Prayer</string>
+    <string name="text_settings_prayer_desc">Configure your prayer calculation preferences</string>
+    <string name="text_settings_experience">Experience</string>
+    <string name="text_settings_experience_desc">Personalise how the app feels</string>
+    <string name="text_settings_about">About</string>
+
     <string name="title_quran">Al-Quran</string>
+
+    <string name="text_utility_desc_halal">Scan any product barcode to check halal status</string>
+    <string name="text_utility_desc_quran">Read, listen and explore the Holy Quran</string>
+    <string name="text_utility_desc_tasbeeh">Digital counter for your daily dhikr</string>
+    <string name="text_utility_desc_qibla">Find the direction of the Kaaba</string>
+    <string name="text_utility_desc_mosque">Discover mosques near your location</string>
+    <string name="text_utility_desc_zakat">Calculate your obligatory charity</string>
+    <string name="text_utility_greeting">Assalamu Alaikum</string>
+    <string name="text_utility_subtitle">Explore tools to enrich your daily worship</string>
+
+    <string name="text_qibla_direction">Qibla Direction</string>
+    <string name="text_qibla_subtitle">Face the Kaaba in Mecca</string>
+    <string name="text_qibla_degree">%1$.0f°</string>
+    <string name="text_qibla_aligned">You are facing the Qibla</string>
+    <string name="text_qibla_tip_title">How to use</string>
+    <string name="text_qibla_tip">Hold your phone flat and rotate until the arrow points to the Kaaba. For best accuracy, calibrate by moving your phone in a figure-eight pattern.</string>
+    <string name="text_north">N</string>
+    <string name="text_south">S</string>
+    <string name="text_east">E</string>
+    <string name="text_west">W</string>
 
 
 </resources>
