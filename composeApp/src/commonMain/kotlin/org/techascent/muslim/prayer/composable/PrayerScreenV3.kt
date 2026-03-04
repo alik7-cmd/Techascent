@@ -71,6 +71,7 @@ import apphub.composeapp.generated.resources.text_suhur
 import apphub.composeapp.generated.resources.text_sunrise
 import apphub.composeapp.generated.resources.text_sunset
 import apphub.composeapp.generated.resources.text_utility_greeting
+import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.warning_prayer_time
 import dev.icerock.moko.permissions.DeniedAlwaysException
 import dev.icerock.moko.permissions.DeniedException
@@ -205,7 +206,7 @@ private fun HalalPill(onClick: () -> Unit) {
         ) { Text("🔍", fontSize = 14.sp) }
         Spacer(Modifier.width(8.dp))
         Text(
-            stringResource(Res.string.text_halal_scan_action),
+            stringResource(Res.string.title_halal_scanner),
             style = ComposaTheme.typography.captionEmphasized, color = accent,
             maxLines = 1, overflow = TextOverflow.Ellipsis,
         )

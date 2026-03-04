@@ -33,7 +33,7 @@
     <string name="text_halal_scan_action">Scan Barcode</string>
     <string name="text_halal_quick_desc">Check if a product is halal</string>
     <string name="text_prayer_current_waqt">Current Waqt</string>
-    <string name="text_prayer_all_times">Today\'s Prayer Times</string>
+    <string name="text_prayer_all_times">Today's Prayer Times</string>
     <string name="text_prayer_fasting">Fasting</string>
     <string name="text_prayer_announcement">Announcements</string>
     <string name="text_prayer_no_announcement">No announcements at this time.</string>
