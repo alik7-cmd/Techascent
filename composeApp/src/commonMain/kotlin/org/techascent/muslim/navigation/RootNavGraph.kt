@@ -12,7 +12,7 @@ import androidx.navigation.navArgument
 import org.techascent.muslim.calendar.CalendarView
 import org.techascent.muslim.compass.CompassViewV2
 import org.techascent.muslim.halalscanner.HalalScannerView
-import org.techascent.muslim.location.LocationPickerView
+import org.techascent.muslim.location.LocationPickerViewV2
 import org.techascent.muslim.prayer.PrayerView
 import org.techascent.muslim.quran.SurahDetailView
 import org.techascent.muslim.quran.SurahListView
@@ -60,7 +60,7 @@ fun RootNavGraph(
         startDestination = Screen.LocationPickerView.route
     ) {
         composable(Screen.LocationPickerView.route) {
-            LocationPickerView(
+            LocationPickerViewV2(
                 onNavigatePrayerView = {
                     rootNavController.navigate(Screen.HomeGraph.route) {
                         popUpTo(Screen.LocationPickerView.route) { inclusive = true }
