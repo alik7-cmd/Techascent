@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -107,30 +108,35 @@ private fun LocationPickerContentV2(
             .fillMaxSize()
             .background(ComposaTheme.color.backgroundAppBackground),
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center,
-        ) {
-            when (uiState.state) {
-                PermissionState.NotDetermined,
-                PermissionState.NotGranted,
-                PermissionState.Denied -> PermissionRequestScreen(
-                    uiState = uiState,
-                    isDeniedAlways = false,
-                    onAction = onProvideOrRequestLocationPermission,
-                )
+        LazyColumn {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when (uiState.state) {
+                        PermissionState.NotDetermined,
+                        PermissionState.NotGranted,
+                        PermissionState.Denied -> PermissionRequestScreen(
+                            uiState = uiState,
+                            isDeniedAlways = false,
+                            onAction = onProvideOrRequestLocationPermission,
+                        )
 
-                PermissionState.Granted -> onNavigatePrayerView()
+                        PermissionState.Granted -> onNavigatePrayerView()
 
-                PermissionState.DeniedAlways -> PermissionRequestScreen(
-                    uiState = uiState,
-                    isDeniedAlways = true,
-                    onAction = { controller.openAppSettings() },
-                )
+                        PermissionState.DeniedAlways -> PermissionRequestScreen(
+                            uiState = uiState,
+                            isDeniedAlways = true,
+                            onAction = { controller.openAppSettings() },
+                        )
+                    }
+                }
             }
         }
+
     }
 }
 
