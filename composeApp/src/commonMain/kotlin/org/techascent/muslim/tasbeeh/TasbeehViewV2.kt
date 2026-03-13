@@ -57,6 +57,7 @@ import org.techascent.composa.appbar.TrailingAction
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.performHapticFeedback
+import org.techascent.muslim.showNativeResetDialog
 import org.techascent.muslim.tasbeeh.state.TasbeehUiState
 
 @Composable
@@ -355,5 +356,23 @@ private fun DhikrSuggestion() {
             textAlign = TextAlign.Center,
         )
     }
+}
+
+fun ResetWarningDialog(
+    title: String,
+    message: String,
+    confirmText: String,
+    cancelText: String,
+    onDismissRequest: () -> Unit,
+    onProceedClick: () -> Unit
+) {
+    showNativeResetDialog(
+        title = title,
+        message = message,
+        confirmText = confirmText,
+        cancelText = cancelText,
+        onConfirm = onProceedClick,
+        onCancel = onDismissRequest
+    )
 }
 

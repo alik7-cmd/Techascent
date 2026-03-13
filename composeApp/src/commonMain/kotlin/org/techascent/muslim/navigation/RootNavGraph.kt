@@ -9,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import org.techascent.muslim.calendar.CalendarView
 import org.techascent.muslim.compass.CompassViewV2
 import org.techascent.muslim.halalscanner.HalalScannerView
 import org.techascent.muslim.halalscanner.ManualHalalCheckView

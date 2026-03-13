@@ -55,14 +55,12 @@ import apphub.composeapp.generated.resources.button_open_settings
 import apphub.composeapp.generated.resources.ic_notification_off
 import apphub.composeapp.generated.resources.ic_notification_on
 import apphub.composeapp.generated.resources.text_cancel
-import apphub.composeapp.generated.resources.text_halal_scan_action
 import apphub.composeapp.generated.resources.text_iftar
 import apphub.composeapp.generated.resources.text_notification_permission_description
 import apphub.composeapp.generated.resources.text_permission_description
 import apphub.composeapp.generated.resources.text_permission_title
 import apphub.composeapp.generated.resources.text_prayer_all_times
 import apphub.composeapp.generated.resources.text_prayer_announcement
-import apphub.composeapp.generated.resources.text_prayer_current_waqt
 import apphub.composeapp.generated.resources.text_prayer_fasting
 import apphub.composeapp.generated.resources.text_prayer_no_announcement
 import apphub.composeapp.generated.resources.text_remaining_time
@@ -72,7 +70,6 @@ import apphub.composeapp.generated.resources.text_sunrise
 import apphub.composeapp.generated.resources.text_sunset
 import apphub.composeapp.generated.resources.text_utility_greeting
 import apphub.composeapp.generated.resources.title_halal_scanner
-import apphub.composeapp.generated.resources.warning_prayer_time
 import dev.icerock.moko.permissions.DeniedAlwaysException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
@@ -85,11 +82,8 @@ import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.common.ComposaSpacing
-import org.techascent.composa.messabebox.MessageBox
-import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.common.formatDuration
-import org.techascent.muslim.common.toTextRes
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.IftarTimeUiModel
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
