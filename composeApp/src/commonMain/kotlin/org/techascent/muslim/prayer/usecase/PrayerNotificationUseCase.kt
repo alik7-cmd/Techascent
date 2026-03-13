@@ -1,6 +1,5 @@
 package org.techascent.muslim.prayer.usecase
 
-import androidx.compose.ui.text.capitalize
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -8,11 +7,16 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPrayerNotificationService
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
+import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import kotlin.time.Duration.Companion.minutes
 
 const val AZAN_AUDIO_FILE = "azan.mp3"
@@ -46,6 +50,10 @@ class PrayerNotificationUseCase(
         return if (isAdhanEnabled()) AZAN_AUDIO_FILE else ""
     }
 
+    /**
+     * Schedules notifications for today's remaining prayers.
+     * Also tries to schedule next-day prayers from the cached monthly data.
+     */
     suspend fun schedulePrayerNotifications(intervals: List<PrayerTimeIntervalModel>) {
         val currentList = getNotifyPrayersList()
         val notificationService = getPrayerNotificationService()
@@ -56,8 +64,12 @@ class PrayerNotificationUseCase(
         PrayerNameEnum.entries.forEach { prayer ->
             notificationService.cancelNotification(prayer.name)
         }
+        // Also cancel next-day prefixed notifications
+        PrayerNameEnum.entries.forEach { prayer ->
+            notificationService.cancelNotification("NEXT_${prayer.name}")
+        }
 
-        // Schedule upcoming prayers that are in the notify list
+        // Schedule upcoming prayers that are in the notify list (today)
         val upcomingPrayers = intervals.filter { interval ->
             interval.startTimeInstant != null &&
                     interval.startTimeInstant > now &&
@@ -75,6 +87,68 @@ class PrayerNotificationUseCase(
                 )
             }
         }
+
+        // Also schedule next day's prayers from cached monthly data
+        scheduleNextDayPrayers(currentList, audioFile)
+    }
+
+    /**
+     * Looks in the DataStore monthly cache for tomorrow's prayer data
+     * and schedules notifications for those prayers too.
+     * This ensures notifications fire the next day even if the app isn't opened.
+     */
+    private suspend fun scheduleNextDayPrayers(
+        notifyList: List<PrayerNameEnum>,
+        audioFile: String
+    ) {
+        if (notifyList.isEmpty()) return
+
+        try {
+            val allPrefs = dataStore.data.first()
+            val tomorrowDate = getTomorrowDateFormatted()
+            val notificationService = getPrayerNotificationService()
+
+            // Search through all cache keys to find tomorrow's data
+            for ((key, value) in allPrefs.asMap()) {
+                if (key.name.startsWith(DataStoreKey.MONTHLY_PRAYER_INITIAL) && value is String) {
+                    try {
+                        val cachedList = Json.decodeFromString<List<PrayerTimeUiModel>>(value)
+                        val tomorrowData = cachedList.find { it.currentDateTime == tomorrowDate }
+                        if (tomorrowData != null) {
+                            // Schedule tomorrow's prayers with "NEXT_" prefix to avoid conflicts
+                            tomorrowData.intervals
+                                .filter { notifyList.contains(it.name) && it.startTimeInstant != null }
+                                .forEach { interval ->
+                                    interval.startTimeInstant?.let { instant ->
+                                        notificationService.scheduleNotification(
+                                            prayerName = "NEXT_${interval.name.name}",
+                                            scheduledTime = instant,
+                                            title = "🔔 Prayer Time",
+                                            message = "Time for ${interval.name.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                                            audioFile = audioFile
+                                        )
+                                    }
+                                }
+                            break // Found tomorrow's data, no need to search more
+                        }
+                    } catch (_: Exception) {
+                        // Not a valid prayer cache, skip
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun getTomorrowDateFormatted(): String {
+        val now = Clock.System.now()
+        val tz = TimeZone.currentSystemDefault()
+        val tomorrow = now.toLocalDateTime(tz).date.plus(1, DateTimeUnit.DAY)
+        val day = tomorrow.dayOfMonth.toString().padStart(2, '0')
+        val month = tomorrow.monthNumber.toString().padStart(2, '0')
+        val year = tomorrow.year.toString()
+        return "$day-$month-$year"
     }
 
     suspend fun testNotificationNow() {
