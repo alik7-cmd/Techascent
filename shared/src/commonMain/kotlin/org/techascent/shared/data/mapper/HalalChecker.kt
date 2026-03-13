@@ -1,12 +1,15 @@
 package org.techascent.shared.data.mapper
 
+import kotlinx.serialization.Serializable
 import org.techascent.shared.data.Product
 
 
+@Serializable
 data class HalalResult(
     val status: HalalStatus,
 )
 
+@Serializable
 enum class HalalStatus {
     HALAL_CERTIFIED,
     HALAL_POSSIBLE,

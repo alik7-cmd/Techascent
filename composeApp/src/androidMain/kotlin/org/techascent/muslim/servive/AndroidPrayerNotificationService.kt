@@ -188,13 +188,19 @@ class AndroidPrayerNotificationService(private val context: Context) : PrayerNot
     }
 
     override suspend fun cancelAllNotifications() {
-        // Cancel all prayer-related work
+        // Cancel all prayer-related work (today + next day)
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_FAJR")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_SALAT_UD_DUHA")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_DUHR")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_ASR")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_MAGHRIB")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_ISHA")
+        WorkManager.getInstance(context).cancelAllWorkByTag("prayer_NEXT_FAJR")
+        WorkManager.getInstance(context).cancelAllWorkByTag("prayer_NEXT_SALAT_UD_DUHA")
+        WorkManager.getInstance(context).cancelAllWorkByTag("prayer_NEXT_DUHR")
+        WorkManager.getInstance(context).cancelAllWorkByTag("prayer_NEXT_ASR")
+        WorkManager.getInstance(context).cancelAllWorkByTag("prayer_NEXT_MAGHRIB")
+        WorkManager.getInstance(context).cancelAllWorkByTag("prayer_NEXT_ISHA")
         WorkManager.getInstance(context).cancelAllWorkByTag("prayer_TEST")
         for (i in 1..5) {
             WorkManager.getInstance(context).cancelAllWorkByTag("prayer_TEST_REPEAT_$i")

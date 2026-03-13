@@ -170,6 +170,20 @@ class IOSPrayerNotificationService : PrayerNotificationService {
         stopAudio()
     }
 
+    /**
+     * Cancel both regular and NEXT_ prefixed notifications for all prayers
+     */
+    fun cancelAllPrayerNotifications() {
+        val ids = mutableListOf<String>()
+        val prayers = listOf("FAJR", "SALAT_UD_DUHA", "DUHR", "ASR", "MAGHRIB", "ISHA")
+        prayers.forEach { prayer ->
+            ids.add("prayer_$prayer")
+            ids.add("prayer_NEXT_$prayer")
+        }
+        UNUserNotificationCenter.currentNotificationCenter()
+            .removePendingNotificationRequestsWithIdentifiers(ids)
+    }
+
     private fun stopAudio() {
         audioPlayer?.let {
             if (it.isPlaying()) {
