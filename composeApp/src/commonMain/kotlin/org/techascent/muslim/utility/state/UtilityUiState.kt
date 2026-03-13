@@ -10,13 +10,17 @@ import apphub.composeapp.generated.resources.ic_quran
 import apphub.composeapp.generated.resources.ic_tasbeeh
 import apphub.composeapp.generated.resources.ic_zakat
 import apphub.composeapp.generated.resources.title_halal_scanner
+import apphub.composeapp.generated.resources.title_manual_halal_check
 import apphub.composeapp.generated.resources.title_nearby_mosque
 import apphub.composeapp.generated.resources.title_quibla
 import apphub.composeapp.generated.resources.title_quran
+import apphub.composeapp.generated.resources.title_scan_history
 import apphub.composeapp.generated.resources.title_tasbeeh
 import apphub.composeapp.generated.resources.title_zakat_calculator
 import apphub.composeapp.generated.resources.text_utility_desc_halal
+import apphub.composeapp.generated.resources.text_utility_desc_manual_halal
 import apphub.composeapp.generated.resources.text_utility_desc_quran
+import apphub.composeapp.generated.resources.text_utility_desc_scan_history
 import apphub.composeapp.generated.resources.text_utility_desc_tasbeeh
 import apphub.composeapp.generated.resources.text_utility_desc_qibla
 import apphub.composeapp.generated.resources.text_utility_desc_mosque
@@ -56,6 +60,20 @@ private val featureList = listOf(
         emoji = "📖",
         accentColor = Color(0xFF1565C0),
         isWide = true,
+    ),
+    FeatureItem(
+        titleRes = Res.string.title_manual_halal_check,
+        descriptionRes = Res.string.text_utility_desc_manual_halal,
+        imageRes = Res.drawable.ic_halal,
+        emoji = "✍️",
+        accentColor = Color(0xFF00897B),
+    ),
+    FeatureItem(
+        titleRes = Res.string.title_scan_history,
+        descriptionRes = Res.string.text_utility_desc_scan_history,
+        imageRes = Res.drawable.ic_halal,
+        emoji = "📋",
+        accentColor = Color(0xFF5E35B1),
     ),
     FeatureItem(
         titleRes = Res.string.title_tasbeeh,

@@ -49,9 +49,11 @@ import apphub.composeapp.generated.resources.text_permission_title
 import apphub.composeapp.generated.resources.text_utility_greeting
 import apphub.composeapp.generated.resources.text_utility_subtitle
 import apphub.composeapp.generated.resources.title_halal_scanner
+import apphub.composeapp.generated.resources.title_manual_halal_check
 import apphub.composeapp.generated.resources.title_nearby_mosque
 import apphub.composeapp.generated.resources.title_quibla
 import apphub.composeapp.generated.resources.title_quran
+import apphub.composeapp.generated.resources.title_scan_history
 import apphub.composeapp.generated.resources.title_tasbeeh
 import apphub.composeapp.generated.resources.title_zakat_calculator
 import dev.icerock.moko.permissions.DeniedAlwaysException
@@ -78,6 +80,8 @@ internal fun UtilityScreenV2(
     onNavigateToCompass: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
     onNavigateToQuran: () -> Unit,
+    onNavigateManualHalalCheck: () -> Unit,
+    onNavigateScanHistory: () -> Unit,
     viewModel: UtilityViewModel = koinViewModel<UtilityViewModel>(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -113,6 +117,8 @@ internal fun UtilityScreenV2(
                     onNavigateToTasbeeh = onNavigateToTasbeeh,
                     onNavigateHalalScanner = onNavigateHalalScanner,
                     onNavigateToQuran = onNavigateToQuran,
+                    onNavigateManualHalalCheck = onNavigateManualHalalCheck,
+                    onNavigateScanHistory = onNavigateScanHistory,
                 )
             }
 
@@ -132,6 +138,8 @@ internal fun UtilityScreenV2(
                                 onNavigateToTasbeeh = onNavigateToTasbeeh,
                                 onNavigateHalalScanner = onNavigateHalalScanner,
                                 onNavigateToQuran = onNavigateToQuran,
+                                onNavigateManualHalalCheck = onNavigateManualHalalCheck,
+                                onNavigateScanHistory = onNavigateScanHistory,
                             )
                         }
                     }
@@ -177,6 +185,8 @@ private fun FeatureCardWide(
     onNavigateToCompass: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
     onNavigateToQuran: () -> Unit,
+    onNavigateManualHalalCheck: () -> Unit,
+    onNavigateScanHistory: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -192,6 +202,8 @@ private fun FeatureCardWide(
         onNavigateToTasbeeh = onNavigateToTasbeeh,
         onNavigateHalalScanner = onNavigateHalalScanner,
         onNavigateToQuran = onNavigateToQuran,
+        onNavigateManualHalalCheck = onNavigateManualHalalCheck,
+        onNavigateScanHistory = onNavigateScanHistory,
     )
 
     Row(
@@ -265,6 +277,8 @@ private fun FeatureCardCompact(
     onNavigateToCompass: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
     onNavigateToQuran: () -> Unit,
+    onNavigateManualHalalCheck: () -> Unit,
+    onNavigateScanHistory: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -280,6 +294,8 @@ private fun FeatureCardCompact(
         onNavigateToTasbeeh = onNavigateToTasbeeh,
         onNavigateHalalScanner = onNavigateHalalScanner,
         onNavigateToQuran = onNavigateToQuran,
+        onNavigateManualHalalCheck = onNavigateManualHalalCheck,
+        onNavigateScanHistory = onNavigateScanHistory,
     )
 
     Column(
@@ -335,6 +351,8 @@ private fun rememberFeatureClickHandler(
     onNavigateToTasbeeh: () -> Unit,
     onNavigateHalalScanner: () -> Unit,
     onNavigateToQuran: () -> Unit,
+    onNavigateManualHalalCheck: () -> Unit,
+    onNavigateScanHistory: () -> Unit,
 ): () -> Unit {
     val coroutineScope = rememberCoroutineScope()
     val factory = rememberPermissionsControllerFactory()
@@ -352,6 +370,8 @@ private fun rememberFeatureClickHandler(
                 Res.string.title_quran -> onNavigateToQuran()
                 Res.string.title_tasbeeh -> onNavigateToTasbeeh()
                 Res.string.title_quibla -> onNavigateToCompass()
+                Res.string.title_manual_halal_check -> onNavigateManualHalalCheck()
+                Res.string.title_scan_history -> onNavigateScanHistory()
                 Res.string.title_halal_scanner -> {
                     coroutineScope.launch {
                         try {

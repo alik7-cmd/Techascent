@@ -10,6 +10,7 @@ object DataStoreKey {
     const val NOTIFICATION_PRAYER_LIST = "notify_prayers_list"
     const val LAST_SURAH_NUMBER = "last_surah_number"
     const val LAST_AYAH_INDEX = "last_ayah_index"
+    const val SCAN_HISTORY = "scan_history"
 
     val motivationHtml = """
     <h3>Why I Built This App</h3>

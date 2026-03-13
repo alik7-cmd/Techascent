@@ -58,7 +58,7 @@ private fun getIngredientsList(
     return parts.chunked(3).map { it.joinToString(",") }
 }
 
-private fun getTitleByStatus(
+internal fun getTitleByStatus(
     status: HalalStatus
 ): StringResource {
     return when (status) {
@@ -70,7 +70,7 @@ private fun getTitleByStatus(
     }
 }
 
-private fun getReasonByStatus(
+internal fun getReasonByStatus(
     status: HalalStatus
 ): StringResource {
     return when (status) {

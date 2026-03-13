@@ -12,6 +12,8 @@ import androidx.navigation.navArgument
 import org.techascent.muslim.calendar.CalendarView
 import org.techascent.muslim.compass.CompassViewV2
 import org.techascent.muslim.halalscanner.HalalScannerView
+import org.techascent.muslim.halalscanner.ManualHalalCheckView
+import org.techascent.muslim.halalscanner.ScanHistoryView
 import org.techascent.muslim.location.LocationPickerViewV2
 import org.techascent.muslim.prayer.PrayerView
 import org.techascent.muslim.quran.SurahDetailView
@@ -28,6 +30,8 @@ private const val SETTINGS_VIEW = "SETTINGS_VIEW"
 private const val TASBEEH_VIEW = "TASBEEH_VIEW"
 private const val COMPASS_VIEW = "COMPASS_VIEW"
 private const val HALAL_SCANNER_VIEW = "HALAL_SCANNER_VIEW"
+private const val MANUAL_HALAL_CHECK_VIEW = "MANUAL_HALAL_CHECK_VIEW"
+private const val SCAN_HISTORY_VIEW = "SCAN_HISTORY_VIEW"
 private const val UTILITY_VIEW = "UTILITY_VIEW"
 private const val METHOD_SELECTION_VIEW = "METHOD_SELECTION_VIEW"
 private const val SURAH_LIST_VIEW = "SURAH_LIST_VIEW"
@@ -42,6 +46,8 @@ sealed class Screen(val route: String) {
     data object TasbeehView : Screen(route = TASBEEH_VIEW)
     data object CompassView : Screen(route = COMPASS_VIEW)
     data object HalalScannerView : Screen(route = HALAL_SCANNER_VIEW)
+    data object ManualHalalCheckView : Screen(route = MANUAL_HALAL_CHECK_VIEW)
+    data object ScanHistoryView : Screen(route = SCAN_HISTORY_VIEW)
     data object UtilityView : Screen(route = UTILITY_VIEW)
     data object MethodSelectionView : Screen(route = METHOD_SELECTION_VIEW)
     data object SurahListView : Screen(route = SURAH_LIST_VIEW)
@@ -89,6 +95,18 @@ fun RootNavGraph(
             )
         }
 
+        composable(Screen.ManualHalalCheckView.route) {
+            ManualHalalCheckView(
+                onNavigateBack = { rootNavController.popBackStack() }
+            )
+        }
+
+        composable(Screen.ScanHistoryView.route) {
+            ScanHistoryView(
+                onNavigateBack = { rootNavController.popBackStack() }
+            )
+        }
+
         composable(Screen.SurahListView.route) {
             SurahListView(
                 onNavigateBack = { rootNavController.popBackStack() },
@@ -130,7 +148,9 @@ fun NavGraphBuilder.mainNavGraph(
                 onNavigateToCompass = { rootNavController.navigate(Screen.CompassView.route) },
                 onNavigateToTasbeeh = { rootNavController.navigate(Screen.TasbeehView.route) },
                 onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) },
-                onNavigateToQuran = { rootNavController.navigate(Screen.SurahListView.route) }
+                onNavigateToQuran = { rootNavController.navigate(Screen.SurahListView.route) },
+                onNavigateManualHalalCheck = { rootNavController.navigate(Screen.ManualHalalCheckView.route) },
+                onNavigateScanHistory = { rootNavController.navigate(Screen.ScanHistoryView.route) },
             )
         }
         composable(route = Screen.SettingsView.route) {

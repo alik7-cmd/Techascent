@@ -159,5 +159,24 @@ There isn’t enough reliable information about this product’s ingredients or 
     <string name="text_east">E</string>
     <string name="text_west">W</string>
 
+    <!-- Manual Halal Check -->
+    <string name="title_manual_halal_check">Manual Check</string>
+    <string name="text_utility_desc_manual_halal">Enter barcode or ingredients to check halal status</string>
+    <string name="text_manual_check_barcode_hint">Enter barcode number</string>
+    <string name="text_manual_check_ingredients_hint">Enter ingredients (comma separated)</string>
+    <string name="text_manual_check_barcode_title">Check by Barcode</string>
+    <string name="text_manual_check_ingredients_title">Check by Ingredients</string>
+    <string name="text_manual_check_button">Check Halal Status</string>
+    <string name="text_manual_check_or">OR</string>
+    <string name="text_manual_check_subtitle">Enter a barcode to look up from database, or paste ingredients to analyze halal status</string>
+
+    <!-- Scan History -->
+    <string name="title_scan_history">Scan History</string>
+    <string name="text_utility_desc_scan_history">View previously checked products</string>
+    <string name="text_scan_history_empty">No scan history yet</string>
+    <string name="text_scan_history_empty_subtitle">Scanned or manually checked products will appear here</string>
+    <string name="text_scan_history_clear">Clear History</string>
+    <string name="text_scan_history_clear_confirm">Are you sure you want to clear all scan history?</string>
+
 
 </resources>
