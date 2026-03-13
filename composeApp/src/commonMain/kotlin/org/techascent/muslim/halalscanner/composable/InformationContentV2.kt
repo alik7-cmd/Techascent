@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,14 +27,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
-import apphub.composeapp.generated.resources.ic_halal
 import apphub.composeapp.generated.resources.text_done
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.asyncimage.ComposeAsyncImage
 import org.techascent.composa.button.primary.ComposaButton
 import org.techascent.composa.common.ComposaSpacing
-import org.techascent.composa.common.DrawableData
-import org.techascent.composa.icon.ComposaIcon
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.halalscanner.state.ProductUiState
 import org.techascent.shared.data.mapper.HalalStatus
@@ -136,12 +132,9 @@ private fun StatusBanner(
                         .background(statusColor.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    ComposaIcon(
-                        modifier = Modifier.size(48.dp),
-                        icon = DrawableData(
-                            tint = statusColor,
-                            imageRes = Res.drawable.ic_halal,
-                        ),
+                    Text(
+                        text = statusEmoji(productUiState.halalUiState.status),
+                        fontSize = 44.sp,
                     )
                 }
             }
@@ -363,6 +356,16 @@ private fun statusColor(status: HalalStatus): Color {
         HalalStatus.HALAL_DOUBTFUL -> Color(0xFFEF6C00)    // amber
         HalalStatus.NOT_HALAL -> Color(0xFFC62828)         // red
         HalalStatus.UNKNOWN -> Color(0xFF757575)           // grey
+    }
+}
+
+private fun statusEmoji(status: HalalStatus): String {
+    return when (status) {
+        HalalStatus.HALAL_CERTIFIED -> "✅"
+        HalalStatus.HALAL_POSSIBLE -> "🟢"
+        HalalStatus.HALAL_DOUBTFUL -> "⚠️"
+        HalalStatus.NOT_HALAL -> "❌"
+        HalalStatus.UNKNOWN -> "❓"
     }
 }
 

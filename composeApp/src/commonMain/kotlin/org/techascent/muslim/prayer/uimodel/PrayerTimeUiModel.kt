@@ -3,11 +3,6 @@
 package org.techascent.muslim.prayer.uimodel
 
 import apphub.composeapp.generated.resources.Res
-import apphub.composeapp.generated.resources.img_asr
-import apphub.composeapp.generated.resources.img_dhuhr
-import apphub.composeapp.generated.resources.img_fajr
-import apphub.composeapp.generated.resources.img_isha
-import apphub.composeapp.generated.resources.img_maghrib
 import apphub.composeapp.generated.resources.text_asr
 import apphub.composeapp.generated.resources.text_dhuhr
 import apphub.composeapp.generated.resources.text_fajr
@@ -18,7 +13,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.techascent.muslim.common.toHourMinuteString
 import org.techascent.muslim.getPlaceName
@@ -169,16 +163,5 @@ fun PrayerNameEnum.toDisplayString(): StringResource {
         PrayerNameEnum.ASR -> Res.string.text_asr
         PrayerNameEnum.MAGHRIB -> Res.string.text_maghrib
         PrayerNameEnum.ISHA -> Res.string.text_isha
-    }
-}
-
-fun PrayerNameEnum.toDisplayImageRes(): DrawableResource {
-    return when (this) {
-        PrayerNameEnum.FAJR -> Res.drawable.img_fajr
-        PrayerNameEnum.DUHR -> Res.drawable.img_dhuhr
-        PrayerNameEnum.ASR -> Res.drawable.img_asr
-        PrayerNameEnum.MAGHRIB -> Res.drawable.img_maghrib
-        PrayerNameEnum.ISHA -> Res.drawable.img_isha
-        else -> Res.drawable.img_asr
     }
 }

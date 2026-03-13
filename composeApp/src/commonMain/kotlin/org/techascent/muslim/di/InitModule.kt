@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
-import org.techascent.muslim.calendar.CalendarViewModel
 import org.techascent.muslim.city.CityPickerViewModel
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.compass.CompassViewModel
@@ -28,7 +27,6 @@ val appModule = module {
     single { PrayerNotificationUseCase(dataStore = get()) }
     single<LocationService> { getPlatformLocationService() }
     viewModel { PrayerTimeViewModel(prayerTimeUseCase = get(), prayerNotificationUseCase = get()) }
-    viewModel { CalendarViewModel(repository = get(), locationService = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }
     viewModel { SettingsViewModel(dataStore = get()) }

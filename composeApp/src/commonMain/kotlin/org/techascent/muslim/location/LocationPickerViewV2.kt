@@ -45,14 +45,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import apphub.composeapp.generated.resources.Res
-import apphub.composeapp.generated.resources.ic_map_location
 import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
@@ -60,13 +56,8 @@ import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.button.primary.ComposaButton
 import org.techascent.composa.common.ComposaSpacing
-import org.techascent.composa.common.DrawableData
-import org.techascent.composa.icon.ComposaIcon
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.location.state.LocationPickerUiState
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 
 // ═════════════════════════════════════════════════════════════════════════════════
 //  LocationPickerViewV2 — Redesigned with modern visual hierarchy

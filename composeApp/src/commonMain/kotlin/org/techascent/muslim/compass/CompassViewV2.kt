@@ -44,8 +44,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
@@ -62,6 +64,8 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.appbar.TopAppBar
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.getScreenHeightPx
+import org.techascent.muslim.getScreenWidthPx
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -481,5 +485,16 @@ private fun TipCard() {
             textAlign = TextAlign.Start,
         )
     }
+}
+
+@Composable
+fun responsiveDp(fraction: Float = 0.2f): Dp {
+    val widthPx = getScreenWidthPx()
+    val heightPx = getScreenHeightPx()
+    val density = LocalDensity.current
+
+    val smallerPx = if (widthPx < heightPx) widthPx else heightPx
+
+    return with(density) { (smallerPx * fraction).toDp() }
 }
 
