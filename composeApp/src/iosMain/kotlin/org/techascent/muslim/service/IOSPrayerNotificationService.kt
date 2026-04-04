@@ -62,8 +62,14 @@ class IOSPrayerNotificationService : PrayerNotificationService {
         content.setTitle(title)
         content.setBody(message)
 
-        // Only play sound if audioFile is provided (adhan enabled)
+        // If adhan audio is enabled, use a custom notification sound (must be ≤30s, .caf/.aiff/.wav)
+        // The azan audio file should be bundled in the app as "azan.caf" for iOS notification sounds
         if (audioFile.isNotEmpty()) {
+            // Try to use custom azan sound bundled with the app
+            // iOS notification sounds must be in the app bundle and ≤30 seconds
+            val soundName = "azan.caf"
+            content.setSound(UNNotificationSound.soundNamed(soundName))
+        } else {
             content.setSound(UNNotificationSound.defaultSound())
         }
 
@@ -79,6 +85,8 @@ class IOSPrayerNotificationService : PrayerNotificationService {
                 NSCalendarUnitSecond
 
         val components = calendar.components(unitFlags, fromDate = nsDate)
+        // Ensure we fire at exact second 0 for clean timing
+        components.setSecond(0)
 
         val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
             components,
@@ -94,9 +102,9 @@ class IOSPrayerNotificationService : PrayerNotificationService {
         UNUserNotificationCenter.currentNotificationCenter()
             .addNotificationRequest(request) { error ->
                 if (error != null) {
-                    println("Failed to schedule notification: ${error.localizedDescription}")
+                    println("Failed to schedule notification for $prayerName: ${error.localizedDescription}")
                 } else {
-                    println("Scheduled notification for $prayerName")
+                    println("Exact notification scheduled for $prayerName at $nsDate")
                 }
             }
     }
