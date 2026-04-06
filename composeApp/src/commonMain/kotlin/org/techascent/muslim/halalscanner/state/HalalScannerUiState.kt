@@ -56,7 +56,7 @@ fun ProductDto.toUiState() = ProductUiState(
 
 private fun getIngredientsList(
     ingredientsText: String
-): List<String>? {
+): List<String> {
     val parts = ingredientsText.split(",")
     return parts.chunked(3).map { it.joinToString(",") }
 }

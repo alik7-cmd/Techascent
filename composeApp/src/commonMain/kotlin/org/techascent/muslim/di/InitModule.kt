@@ -33,7 +33,7 @@ val appModule = module {
     /*viewModel { LocationPickerViewModel(controller = get ()) }*/
     viewModel { CompassViewModel() }
     viewModel { CityPickerViewModel() }
-    viewModel { HalalScannerViewModel(repository = get(), dataStore = get()) }
+    viewModel { HalalScannerViewModel(repository = get()) }
     viewModel { UtilityViewModel() }
     viewModel { QuranViewModel(repository = get()) }
 }
