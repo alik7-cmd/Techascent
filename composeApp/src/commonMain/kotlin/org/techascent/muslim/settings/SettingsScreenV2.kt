@@ -72,6 +72,7 @@ internal fun SettingsScreenV2(
     onUpdateAdhanNotification: (Boolean) -> Unit,
     onUpdateHaptic: (Boolean) -> Unit,
     onHandleEvent: (SettingsEvent) -> Unit,
+    onNavigateAbout: () -> Unit,
     innerPadding: PaddingValues,
 ) {
     Scaffold(
@@ -174,6 +175,43 @@ internal fun SettingsScreenV2(
                     subtitle = null,
                     accentColor = Color(0xFF00838F),
                 ) {
+                    // About This App row
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onNavigateAbout)
+                            .padding(horizontal = ComposaSpacing.Medium, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(text = "💚", fontSize = 20.sp)
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "About This App",
+                                style = ComposaTheme.typography.subhead,
+                                color = ComposaTheme.color.textNeutral,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "Our mission, privacy & features",
+                                style = ComposaTheme.typography.caption,
+                                color = ComposaTheme.color.textNeutralSubtle,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(ComposaSpacing.Small))
+                        Text(
+                            text = "›",
+                            fontSize = 18.sp,
+                            color = ComposaTheme.color.textNeutralSubtle,
+                        )
+                    }
+
+                    ThinDivider()
+
                     uiState.links.listOfElements.forEachIndexed { index, item ->
                         LinkRow(
                             item = item,

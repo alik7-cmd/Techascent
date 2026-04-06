@@ -15,7 +15,8 @@ import org.techascent.muslim.settings.event.SettingsEvent
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 fun SettingsView(
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    onNavigateAbout: () -> Unit = {},
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
 
@@ -33,7 +34,8 @@ fun SettingsView(
         SettingsScreen(
             viewModel = viewModel,
             innerPadding = innerPadding,
-            onHandleEvent = viewModel::onHandleEvent
+            onHandleEvent = viewModel::onHandleEvent,
+            onNavigateAbout = onNavigateAbout,
         )
     }
 }
@@ -43,6 +45,7 @@ private fun SettingsScreen(
     viewModel: SettingsViewModel,
     innerPadding: PaddingValues,
     onHandleEvent: (SettingsEvent) -> Unit,
+    onNavigateAbout: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val schoolPreference by viewModel.schoolPreference.collectAsState()
@@ -58,6 +61,7 @@ private fun SettingsScreen(
         onUpdateHaptic = viewModel::onUpdateHaptic,
         onUpdateAdhanNotification = viewModel::onUpdateAdhanNotification,
         onHandleEvent = onHandleEvent,
+        onNavigateAbout = onNavigateAbout,
     )
 
 }
