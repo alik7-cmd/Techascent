@@ -4,7 +4,7 @@ import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.text_dhuhr
 import apphub.composeapp.generated.resources.text_fajr
 import kotlinx.datetime.LocalDateTime
-import org.techascent.muslim.common.toHourMinuteString
+import org.techascent.shared.data.common.toHourMinuteString
 import org.techascent.muslim.prayer.uimodel.toDisplayString
 import org.techascent.muslim.prayer.uimodel.toUiModel
 import org.techascent.shared.data.dto.IftarTimeDto

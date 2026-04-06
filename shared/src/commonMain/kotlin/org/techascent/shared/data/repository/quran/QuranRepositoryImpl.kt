@@ -3,6 +3,7 @@ package org.techascent.shared.data.repository.quran
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -12,6 +13,7 @@ import kotlinx.serialization.json.Json
 import org.techascent.shared.data.SurahDetailData
 import org.techascent.shared.data.SurahDetailResponse
 import org.techascent.shared.data.SurahInfo
+import org.techascent.shared.data.common.DataStoreKey
 import org.techascent.shared.data.datasource.quran.QuranDataSource
 import org.techascent.shared.network.ResultState
 
@@ -22,6 +24,8 @@ class QuranRepositoryImpl(
 
     companion object {
         private val SURAH_LIST_KEY = stringPreferencesKey("quran_surah_list_cache")
+        private val LAST_SURAH_KEY = intPreferencesKey(DataStoreKey.LAST_SURAH_NUMBER)
+        private val LAST_AYAH_KEY = intPreferencesKey(DataStoreKey.LAST_AYAH_INDEX)
         private fun surahAudioKey(surahNumber: Int) = stringPreferencesKey("quran_surah_audio_$surahNumber")
         private fun surahTranslationKey(surahNumber: Int, edition: String) =
             stringPreferencesKey("quran_surah_translation_${surahNumber}_$edition")
@@ -157,6 +161,35 @@ class QuranRepositoryImpl(
             }
         } catch (e: Exception) {
             // Cache write failure is non-fatal
+        }
+    }
+
+    // ---- Bookmark ----
+
+    override suspend fun getLastSurahNumber(): Int {
+        return try {
+            dataStore.data.first()[LAST_SURAH_KEY] ?: -1
+        } catch (e: Exception) {
+            -1
+        }
+    }
+
+    override suspend fun getLastAyahIndex(): Int {
+        return try {
+            dataStore.data.first()[LAST_AYAH_KEY] ?: 0
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    override suspend fun saveBookmark(surahNumber: Int, ayahIndex: Int) {
+        try {
+            dataStore.edit { prefs ->
+                prefs[LAST_SURAH_KEY] = surahNumber
+                prefs[LAST_AYAH_KEY] = ayahIndex
+            }
+        } catch (e: Exception) {
+            // non-fatal
         }
     }
 }

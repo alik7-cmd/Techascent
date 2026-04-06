@@ -19,7 +19,7 @@ import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.techascent.muslim.common.location.LocationService
-import org.techascent.muslim.prayer.uimodel.AddressInfo
+import org.techascent.shared.data.common.AddressInfo
 import java.io.File
 import java.util.Locale
 import kotlin.math.*

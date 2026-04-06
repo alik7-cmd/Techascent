@@ -1,28 +1,8 @@
 package org.techascent.muslim.halalscanner.state
 
-import kotlinx.serialization.Serializable
-import org.techascent.shared.data.mapper.HalalStatus
-
-@Serializable
-data class ScanHistoryItem(
-    val id: String, // UUID-like unique key
-    val barcode: String? = null,
-    val brands: String? = null,
-    val labels: String? = null,
-    val labelsTags: List<String>? = null,
-    val ingredientsText: String? = null,
-    val imageUrl: String? = null,
-    val halalStatus: HalalStatus,
-    val timestamp: Long, // epoch millis
-    val source: ScanSource = ScanSource.SCANNER,
-)
-
-@Serializable
-enum class ScanSource {
-    SCANNER,
-    MANUAL_BARCODE,
-    MANUAL_INGREDIENTS,
-}
+import org.techascent.shared.data.mapper.HalalChecker
+import org.techascent.shared.data.model.ScanHistoryItem
+import org.techascent.shared.data.model.ScanSource
 
 fun ProductUiState.toHistoryItem(
     barcode: String? = null,
@@ -37,6 +17,7 @@ fun ProductUiState.toHistoryItem(
         ingredientsText = ingredientsText?.joinToString(", "),
         imageUrl = imageUrl,
         halalStatus = halalUiState.status,
+        flaggedIngredients = flaggedIngredients,
         timestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds(),
         source = source,
     )
@@ -46,6 +27,10 @@ fun ScanHistoryItem.toProductUiState(): ProductUiState {
     val ingredientsList = ingredientsText?.let {
         val parts = it.split(",")
         parts.chunked(3).map { chunk -> chunk.joinToString(",") }
+    }
+    // Use stored flagged ingredients, or re-compute from raw text for backward compat
+    val resolved = flaggedIngredients.ifEmpty {
+        ingredientsText?.let { HalalChecker.flagIngredients(it) } ?: emptyList()
     }
     return ProductUiState(
         brands = brands,
@@ -57,6 +42,7 @@ fun ScanHistoryItem.toProductUiState(): ProductUiState {
             status = halalStatus,
             halalStatusRes = getTitleByStatus(halalStatus),
             reasonRes = getReasonByStatus(halalStatus),
-        )
+        ),
+        flaggedIngredients = resolved,
     )
 }

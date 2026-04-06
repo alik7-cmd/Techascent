@@ -36,6 +36,8 @@
     <string name="text_prayer_all_times">Today's Prayer Times</string>
     <string name="text_prayer_fasting">Fasting</string>
     <string name="text_prayer_announcement">Announcements</string>
+    <string name="text_prayer_data_announcement">We value your privacy.\n\nOur app does not collect, store, or process any personal data.\nAll information you use within the app remains entirely on your device and is never transmitted to us or any third parties.\n\nYou are in full control of your data at all times.
+</string>
     <string name="text_prayer_no_announcement">No announcements at this time.</string>
     <string name="text_prayer_next_fast">Next Fasting Time</string>
     <string name="text_prayer_sun_progress">Sun Progress</string>
@@ -85,6 +87,10 @@
     <string name="text_halal_doubtful">Halal Doubtful</string>
     <string name="text_not_halal">Not Halal</string>
     <string name="text_unknown_status">Unknown</string>
+    <string name="text_verdict">Verdict</string>
+    <string name="text_labels">Labels</string>
+    <string name="text_ingredients">Ingredients</string>
+
 
     <string name="text_halal_scanner_more">Halal Scanner &amp; More</string>
 

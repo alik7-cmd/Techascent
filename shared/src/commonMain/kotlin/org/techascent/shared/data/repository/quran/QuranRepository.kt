@@ -11,5 +11,11 @@ interface QuranRepository {
     fun getSurahWithAudio(surahNumber: Int): Flow<ResultState<SurahDetailResponse>>
 
     fun getSurahTranslation(surahNumber: Int, edition: String = "en.asad"): Flow<ResultState<SurahDetailResponse>>
+
+    suspend fun getLastSurahNumber(): Int
+
+    suspend fun getLastAyahIndex(): Int
+
+    suspend fun saveBookmark(surahNumber: Int, ayahIndex: Int)
 }
 

@@ -36,7 +36,7 @@ import org.techascent.composa.text.DecoratedText
 import org.techascent.composa.text.NormalText
 import org.techascent.composa.text.SpannableText
 import org.techascent.composa.theming.ComposaTheme
-import org.techascent.muslim.common.formatDuration
+import org.techascent.shared.data.common.formatDuration
 
 @Composable
 fun CountdownTimerWithProgress(

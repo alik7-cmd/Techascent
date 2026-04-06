@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_back
-import apphub.composeapp.generated.resources.text_done
 import apphub.composeapp.generated.resources.text_scan_history_clear
 import apphub.composeapp.generated.resources.text_scan_history_clear_confirm
 import apphub.composeapp.generated.resources.text_scan_history_empty
@@ -63,10 +62,10 @@ import org.techascent.composa.appbar.TrailingAction
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.halalscanner.composable.InformationContentV2
-import org.techascent.muslim.halalscanner.state.ScanHistoryItem
-import org.techascent.muslim.halalscanner.state.ScanSource
 import org.techascent.muslim.halalscanner.state.toProductUiState
 import org.techascent.shared.data.mapper.HalalStatus
+import org.techascent.shared.data.model.ScanHistoryItem
+import org.techascent.shared.data.model.ScanSource
 
 private enum class HistoryPhase {
     LIST,
@@ -282,7 +281,7 @@ private fun HistoryItemCard(
             // Barcode or ingredients snippet
             val subtitle = when {
                 !item.barcode.isNullOrBlank() -> "Barcode: ${item.barcode}"
-                !item.ingredientsText.isNullOrBlank() -> item.ingredientsText.take(50) + if (item.ingredientsText.length > 50) "..." else ""
+                !item.ingredientsText.isNullOrBlank() -> item.ingredientsText?.let { it.take(50) + if (it.length > 50) "..." else "" }.orEmpty()
                 else -> ""
             }
             if (subtitle.isNotBlank()) {

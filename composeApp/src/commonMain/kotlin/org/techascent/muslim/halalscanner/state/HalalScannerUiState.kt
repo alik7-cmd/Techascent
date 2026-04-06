@@ -13,6 +13,7 @@ import apphub.composeapp.generated.resources.text_unknown_status
 import apphub.composeapp.generated.resources.text_unknown_status_reason
 import org.jetbrains.compose.resources.StringResource
 import org.techascent.shared.data.dto.ProductDto
+import org.techascent.shared.data.mapper.FlaggedIngredient
 import org.techascent.shared.data.mapper.HalalStatus
 
 sealed interface HalalScannerUiState {
@@ -29,7 +30,8 @@ data class ProductUiState(
     val labelsTags: List<String>? = null,
     val ingredientsText: List<String>? = null,
     val imageUrl: String? = null,
-    val halalUiState: HalalUiState
+    val halalUiState: HalalUiState,
+    val flaggedIngredients: List<FlaggedIngredient> = emptyList(),
 )
 
 data class HalalUiState(
@@ -48,12 +50,13 @@ fun ProductDto.toUiState() = ProductUiState(
         status = halalResult.status,
         reasonRes = getReasonByStatus(status = halalResult.status),
         halalStatusRes = getTitleByStatus(status = halalResult.status),
-    )
+    ),
+    flaggedIngredients = halalResult.flaggedIngredients,
 )
 
 private fun getIngredientsList(
     ingredientsText: String
-): List<String>? {
+): List<String> {
     val parts = ingredientsText.split(",")
     return parts.chunked(3).map { it.joinToString(",") }
 }

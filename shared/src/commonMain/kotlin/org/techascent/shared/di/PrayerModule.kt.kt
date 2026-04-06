@@ -31,7 +31,7 @@ val prayerModule = module {
     single<PrayerTimeDataSource> { PrayerTimeDataSourceImpl(api = get()) }
 
     single<HalalScannerApi> { HalalScannerApiImpl(get()) }
-    single<HalalScannerRepository> { HalalScannerRepositoryImpl(dataSource = get()) }
+    single<HalalScannerRepository> { HalalScannerRepositoryImpl(dataSource = get(), dataStore = get()) }
     single<HalalScannerDataSource> { HalalScannerDataSourceImpl(api = get()) }
 
     single<QuranApi> { QuranApiImpl(get()) }

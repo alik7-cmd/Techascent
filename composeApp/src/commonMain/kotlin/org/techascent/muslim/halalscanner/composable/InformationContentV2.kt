@@ -28,6 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.text_done
+import apphub.composeapp.generated.resources.text_ingredients
+import apphub.composeapp.generated.resources.text_labels
+import apphub.composeapp.generated.resources.text_verdict
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.asyncimage.ComposeAsyncImage
 import org.techascent.composa.button.primary.ComposaButton
@@ -213,7 +216,7 @@ private fun VerdictCard(
                     .background(statusColor),
             )
             Text(
-                text = "Verdict",
+                text = stringResource(Res.string.text_verdict),
                 style = ComposaTheme.typography.bodyEmphasized,
                 color = ComposaTheme.color.textNeutral,
             )
@@ -239,7 +242,7 @@ private fun IngredientsSection(ingredients: List<String>) {
             .padding(horizontal = ComposaSpacing.Medium),
     ) {
         Text(
-            text = "Ingredients",
+            text = stringResource(Res.string.text_ingredients),
             style = ComposaTheme.typography.bodyEmphasized,
             color = ComposaTheme.color.textNeutral,
         )
@@ -295,7 +298,7 @@ private fun LabelsSection(labels: List<String>) {
             .padding(horizontal = ComposaSpacing.Medium),
     ) {
         Text(
-            text = "Labels",
+            text = stringResource(Res.string.text_labels),
             style = ComposaTheme.typography.bodyEmphasized,
             color = ComposaTheme.color.textNeutral,
         )

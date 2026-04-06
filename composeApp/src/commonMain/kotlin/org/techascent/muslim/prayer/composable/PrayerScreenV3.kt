@@ -61,6 +61,7 @@ import apphub.composeapp.generated.resources.text_permission_description
 import apphub.composeapp.generated.resources.text_permission_title
 import apphub.composeapp.generated.resources.text_prayer_all_times
 import apphub.composeapp.generated.resources.text_prayer_announcement
+import apphub.composeapp.generated.resources.text_prayer_data_announcement
 import apphub.composeapp.generated.resources.text_prayer_fasting
 import apphub.composeapp.generated.resources.text_prayer_no_announcement
 import apphub.composeapp.generated.resources.text_remaining_time
@@ -83,7 +84,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
-import org.techascent.muslim.common.formatDuration
+import org.techascent.shared.data.common.formatDuration
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.IftarTimeUiModel
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
@@ -983,7 +984,7 @@ private fun AnnouncementSection() {
             Text("📌", fontSize = 18.sp)
             Spacer(Modifier.width(12.dp))
             Text(
-                stringResource(Res.string.text_prayer_no_announcement),
+                stringResource(Res.string.text_prayer_data_announcement),
                 style = ComposaTheme.typography.footnote,
                 color = ComposaTheme.color.textNeutralSubtle,
                 textAlign = TextAlign.Start,
