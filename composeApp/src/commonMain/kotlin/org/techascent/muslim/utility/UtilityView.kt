@@ -12,6 +12,7 @@ fun UtilityView(
     onNavigateToQuran: () -> Unit,
     onNavigateManualHalalCheck: () -> Unit,
     onNavigateScanHistory: () -> Unit,
+    onNavigateToCalendar: () -> Unit,
 ) {
     ComposaTheme {
         UtilityScreenV2(
@@ -21,6 +22,7 @@ fun UtilityView(
             onNavigateToQuran = onNavigateToQuran,
             onNavigateManualHalalCheck = onNavigateManualHalalCheck,
             onNavigateScanHistory = onNavigateScanHistory,
+            onNavigateToCalendar = onNavigateToCalendar,
         )
     }
 }

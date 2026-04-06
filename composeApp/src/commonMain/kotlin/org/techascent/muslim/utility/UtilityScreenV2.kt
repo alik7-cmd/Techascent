@@ -51,6 +51,7 @@ import apphub.composeapp.generated.resources.text_utility_subtitle
 import apphub.composeapp.generated.resources.title_halal_scanner
 import apphub.composeapp.generated.resources.title_manual_halal_check
 import apphub.composeapp.generated.resources.title_nearby_mosque
+import apphub.composeapp.generated.resources.title_prayer_calendar
 import apphub.composeapp.generated.resources.title_quibla
 import apphub.composeapp.generated.resources.title_quran
 import apphub.composeapp.generated.resources.title_scan_history
@@ -82,6 +83,7 @@ internal fun UtilityScreenV2(
     onNavigateToQuran: () -> Unit,
     onNavigateManualHalalCheck: () -> Unit,
     onNavigateScanHistory: () -> Unit,
+    onNavigateToCalendar: () -> Unit,
     viewModel: UtilityViewModel = koinViewModel<UtilityViewModel>(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -119,6 +121,7 @@ internal fun UtilityScreenV2(
                     onNavigateToQuran = onNavigateToQuran,
                     onNavigateManualHalalCheck = onNavigateManualHalalCheck,
                     onNavigateScanHistory = onNavigateScanHistory,
+                    onNavigateToCalendar = onNavigateToCalendar,
                 )
             }
 
@@ -140,6 +143,7 @@ internal fun UtilityScreenV2(
                                 onNavigateToQuran = onNavigateToQuran,
                                 onNavigateManualHalalCheck = onNavigateManualHalalCheck,
                                 onNavigateScanHistory = onNavigateScanHistory,
+                                onNavigateToCalendar = onNavigateToCalendar,
                             )
                         }
                     }
@@ -187,6 +191,7 @@ private fun FeatureCardWide(
     onNavigateToQuran: () -> Unit,
     onNavigateManualHalalCheck: () -> Unit,
     onNavigateScanHistory: () -> Unit,
+    onNavigateToCalendar: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -204,6 +209,7 @@ private fun FeatureCardWide(
         onNavigateToQuran = onNavigateToQuran,
         onNavigateManualHalalCheck = onNavigateManualHalalCheck,
         onNavigateScanHistory = onNavigateScanHistory,
+        onNavigateToCalendar = onNavigateToCalendar,
     )
 
     Row(
@@ -279,6 +285,7 @@ private fun FeatureCardCompact(
     onNavigateToQuran: () -> Unit,
     onNavigateManualHalalCheck: () -> Unit,
     onNavigateScanHistory: () -> Unit,
+    onNavigateToCalendar: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -296,6 +303,7 @@ private fun FeatureCardCompact(
         onNavigateToQuran = onNavigateToQuran,
         onNavigateManualHalalCheck = onNavigateManualHalalCheck,
         onNavigateScanHistory = onNavigateScanHistory,
+        onNavigateToCalendar = onNavigateToCalendar,
     )
 
     Column(
@@ -353,6 +361,7 @@ private fun rememberFeatureClickHandler(
     onNavigateToQuran: () -> Unit,
     onNavigateManualHalalCheck: () -> Unit,
     onNavigateScanHistory: () -> Unit,
+    onNavigateToCalendar: () -> Unit,
 ): () -> Unit {
     val coroutineScope = rememberCoroutineScope()
     val factory = rememberPermissionsControllerFactory()
@@ -372,6 +381,7 @@ private fun rememberFeatureClickHandler(
                 Res.string.title_quibla -> onNavigateToCompass()
                 Res.string.title_manual_halal_check -> onNavigateManualHalalCheck()
                 Res.string.title_scan_history -> onNavigateScanHistory()
+                Res.string.title_prayer_calendar -> onNavigateToCalendar()
                 Res.string.title_halal_scanner -> {
                     coroutineScope.launch {
                         try {
