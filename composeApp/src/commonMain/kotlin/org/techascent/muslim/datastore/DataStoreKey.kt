@@ -1,17 +1,16 @@
+@file:Suppress("MatchingDeclarationName")
+
 package org.techascent.muslim.datastore
 
-object DataStoreKey {
-    const val TASBBEH_COUNTER = "tasbeeh_counter"
-    const val SET_COUNTER = "set_counter"
-    const val MONTHLY_PRAYER_INITIAL = "monthly_prayer_times_"
-    const val SCHOOL_PREFERENCE = "school_preference"
-    const val ADHAN_NOTIFICATION_PREFERENCE = "azan_preference"
-    const val HAPTIC_FEEDBACK = "haptic_feedback"
-    const val NOTIFICATION_PRAYER_LIST = "notify_prayers_list"
-    const val LAST_SURAH_NUMBER = "last_surah_number"
-    const val LAST_AYAH_INDEX = "last_ayah_index"
-    const val SCAN_HISTORY = "scan_history"
+/**
+ * Re-exports shared [org.techascent.shared.data.common.DataStoreKey] so
+ * existing composeApp imports keep working without changes.
+ * New code should import from [org.techascent.shared.data.common.DataStoreKey].
+ */
+typealias DataStoreKey = org.techascent.shared.data.common.DataStoreKey
 
+/** UI-only content that lives in composeApp, not shared. */
+object AppContent {
     val motivationHtml = """
     <h3>Why I Built This App</h3>
     <p>I created this app purely out of personal motivation and the hope of doing something meaningful. It wasn't made to earn money, and it remains completely free and free of ads. Every part of it was developed during my spare time alongside my regular work.</p>
@@ -20,8 +19,6 @@ object DataStoreKey {
     <p>My intention is simple: if even one person benefits from this app, I believe the reward from Allah will be greater than anything material. That belief alone has been my inspiration from start to finish.</p>
 
     <h3>Giving Back Through Technology</h3>
-    <p>This is my small contribution—using the skills I have to build something that can bring ease, peace, or consistency to someone’s daily routine.</p>
+    <p>This is my small contribution—using the skills I have to build something that can bring ease, peace, or consistency to someone's daily routine.</p>
 """.trimIndent()
 }
-
-

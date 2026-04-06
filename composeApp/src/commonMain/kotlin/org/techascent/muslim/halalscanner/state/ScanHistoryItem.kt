@@ -1,6 +1,8 @@
 package org.techascent.muslim.halalscanner.state
 
 import kotlinx.serialization.Serializable
+import org.techascent.shared.data.mapper.FlaggedIngredient
+import org.techascent.shared.data.mapper.HalalChecker
 import org.techascent.shared.data.mapper.HalalStatus
 
 @Serializable
@@ -13,6 +15,7 @@ data class ScanHistoryItem(
     val ingredientsText: String? = null,
     val imageUrl: String? = null,
     val halalStatus: HalalStatus,
+    val flaggedIngredients: List<FlaggedIngredient> = emptyList(),
     val timestamp: Long, // epoch millis
     val source: ScanSource = ScanSource.SCANNER,
 )
@@ -37,6 +40,7 @@ fun ProductUiState.toHistoryItem(
         ingredientsText = ingredientsText?.joinToString(", "),
         imageUrl = imageUrl,
         halalStatus = halalUiState.status,
+        flaggedIngredients = flaggedIngredients,
         timestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds(),
         source = source,
     )
@@ -46,6 +50,10 @@ fun ScanHistoryItem.toProductUiState(): ProductUiState {
     val ingredientsList = ingredientsText?.let {
         val parts = it.split(",")
         parts.chunked(3).map { chunk -> chunk.joinToString(",") }
+    }
+    // Use stored flagged ingredients, or re-compute from raw text for backward compat
+    val resolved = flaggedIngredients.ifEmpty {
+        ingredientsText?.let { HalalChecker.flagIngredients(it) } ?: emptyList()
     }
     return ProductUiState(
         brands = brands,
@@ -57,6 +65,7 @@ fun ScanHistoryItem.toProductUiState(): ProductUiState {
             status = halalStatus,
             halalStatusRes = getTitleByStatus(halalStatus),
             reasonRes = getReasonByStatus(halalStatus),
-        )
+        ),
+        flaggedIngredients = resolved,
     )
 }

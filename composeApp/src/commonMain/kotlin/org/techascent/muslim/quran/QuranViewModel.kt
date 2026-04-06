@@ -1,19 +1,12 @@
 package org.techascent.muslim.quran
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.techascent.muslim.datastore.DataStoreKey
-import org.techascent.muslim.quran.audio.QuranAudioPlayer
 import org.techascent.muslim.quran.audio.createQuranAudioPlayer
 import org.techascent.muslim.quran.state.AyahUiModel
 import org.techascent.muslim.quran.state.SurahDetailUiState
@@ -23,13 +16,7 @@ import org.techascent.shared.network.ResultState
 
 class QuranViewModel(
     private val repository: QuranRepository,
-    private val dataStore: DataStore<Preferences>,
 ) : ViewModel() {
-
-    companion object {
-        private val LAST_SURAH_KEY = intPreferencesKey(DataStoreKey.LAST_SURAH_NUMBER)
-        private val LAST_AYAH_KEY = intPreferencesKey(DataStoreKey.LAST_AYAH_INDEX)
-    }
 
     private val _surahListState = MutableStateFlow<SurahListUiState>(SurahListUiState.Loading)
     val surahListState: StateFlow<SurahListUiState> = _surahListState.asStateFlow()
@@ -77,7 +64,7 @@ class QuranViewModel(
 
     fun loadSurahList() {
         viewModelScope.launch {
-            val lastSurah = dataStore.data.first()[LAST_SURAH_KEY] ?: -1
+            val lastSurah = repository.getLastSurahNumber()
             repository.getSurahList().collect { result ->
                 _surahListState.value = when (result) {
                     is ResultState.Loading -> SurahListUiState.Loading
@@ -97,8 +84,8 @@ class QuranViewModel(
         viewModelScope.launch {
             _surahDetailState.value = SurahDetailUiState(isLoading = true)
 
-            val lastAyah = dataStore.data.first()[LAST_AYAH_KEY] ?: 0
-            val lastSurah = dataStore.data.first()[LAST_SURAH_KEY] ?: -1
+            val lastAyah = repository.getLastAyahIndex()
+            val lastSurah = repository.getLastSurahNumber()
             val savedAyahIndex = if (lastSurah == surahNumber) lastAyah else 0
 
             // Fetch audio edition and translation in parallel
@@ -203,10 +190,7 @@ class QuranViewModel(
 
     fun saveCurrentPosition(surahNumber: Int, ayahIndex: Int) {
         viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[LAST_SURAH_KEY] = surahNumber
-                preferences[LAST_AYAH_KEY] = ayahIndex
-            }
+            repository.saveBookmark(surahNumber, ayahIndex)
         }
     }
 
@@ -233,4 +217,3 @@ class QuranViewModel(
         audioPlayer.release()
     }
 }
-

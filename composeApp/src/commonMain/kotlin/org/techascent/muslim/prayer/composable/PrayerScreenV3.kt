@@ -84,7 +84,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
-import org.techascent.muslim.common.formatDuration
+import org.techascent.shared.data.common.formatDuration
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.IftarTimeUiModel
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum

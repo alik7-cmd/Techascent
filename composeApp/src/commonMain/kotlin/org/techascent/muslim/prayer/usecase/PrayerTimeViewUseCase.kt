@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
-import org.techascent.muslim.common.getCurrentDateFormatted
-import org.techascent.muslim.common.getCurrentYearAndMonth
+import org.techascent.shared.data.common.getCurrentDateFormatted
+import org.techascent.shared.data.common.getCurrentYearAndMonth
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPlaceName

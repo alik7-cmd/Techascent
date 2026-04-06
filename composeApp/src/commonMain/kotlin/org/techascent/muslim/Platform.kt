@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import org.techascent.muslim.common.location.LocationService
-import org.techascent.muslim.prayer.uimodel.AddressInfo
+import org.techascent.shared.data.common.AddressInfo
 
 expect fun playBeep()
 

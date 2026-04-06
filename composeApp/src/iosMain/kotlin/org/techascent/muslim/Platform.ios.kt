@@ -40,7 +40,7 @@ import kotlin.math.*
 import platform.CoreLocation.CLGeocoder
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLPlacemark
-import org.techascent.muslim.prayer.uimodel.AddressInfo
+import org.techascent.shared.data.common.AddressInfo
 import org.techascent.muslim.service.IOSLocationService
 import org.techascent.muslim.service.IOSPrayerNotificationService
 import platform.Foundation.stringWithContentsOfFile

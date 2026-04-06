@@ -35,7 +35,7 @@ val appModule = module {
     viewModel { CityPickerViewModel() }
     viewModel { HalalScannerViewModel(repository = get(), dataStore = get()) }
     viewModel { UtilityViewModel() }
-    viewModel { QuranViewModel(repository = get(), dataStore = get()) }
+    viewModel { QuranViewModel(repository = get()) }
 }
 
 fun initializeKoin() {

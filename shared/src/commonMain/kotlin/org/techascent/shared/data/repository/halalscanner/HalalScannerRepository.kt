@@ -6,4 +6,10 @@ import org.techascent.shared.network.ResultState
 
 interface HalalScannerRepository {
     fun fetchProductByBarcode(barcode: String): Flow<ResultState<ProductDto>>
+
+    /**
+     * Assess halal status of raw ingredients text.
+     * Returns a ProductDto with the halal result.
+     */
+    fun checkIngredients(ingredientsText: String): ProductDto
 }

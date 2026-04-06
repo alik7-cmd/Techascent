@@ -10,21 +10,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.halalscanner.state.HalalScannerUiState
-import org.techascent.muslim.halalscanner.state.HalalUiState
-import org.techascent.muslim.halalscanner.state.ProductUiState
 import org.techascent.muslim.halalscanner.state.ScanHistoryItem
 import org.techascent.muslim.halalscanner.state.ScanSource
-import org.techascent.muslim.halalscanner.state.getReasonByStatus
-import org.techascent.muslim.halalscanner.state.getTitleByStatus
 import org.techascent.muslim.halalscanner.state.toHistoryItem
 import org.techascent.muslim.halalscanner.state.toUiState
-import org.techascent.shared.data.Product
-import org.techascent.shared.data.mapper.HalalChecker
-import org.techascent.shared.data.mapper.HalalStatus
 import org.techascent.shared.data.repository.halalscanner.HalalScannerRepository
 import org.techascent.shared.network.ResultState
 
@@ -87,30 +79,8 @@ class HalalScannerViewModel(
     fun checkIngredients(ingredientsText: String) = viewModelScope.launch {
         _uiState.value = HalalScannerUiState.Loading
 
-        val product = Product(
-            productName = null,
-            brands = null,
-            labels = null,
-            labelsTags = null,
-            ingredients_text = ingredientsText,
-            image_url = null,
-            certificationTag = null,
-        )
-
-        val halalResult = HalalChecker.assessHalalStatus(product)
-
-        val productUiState = ProductUiState(
-            brands = null,
-            labels = null,
-            labelsTags = null,
-            ingredientsText = ingredientsText.split(",").map { it.trim() }.filter { it.isNotBlank() },
-            imageUrl = null,
-            halalUiState = HalalUiState(
-                status = halalResult.status,
-                reasonRes = getReasonByStatus(halalResult.status),
-                halalStatusRes = getTitleByStatus(halalResult.status),
-            )
-        )
+        val productDto = repository.checkIngredients(ingredientsText)
+        val productUiState = productDto.toUiState()
 
         _uiState.value = HalalScannerUiState.Success(productUiState)
         saveToHistory(productUiState.toHistoryItem(source = ScanSource.MANUAL_INGREDIENTS))

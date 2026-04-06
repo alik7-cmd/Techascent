@@ -14,14 +14,19 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
-import org.techascent.muslim.common.toHourMinuteString
 import org.techascent.muslim.getPlaceName
+import org.techascent.shared.data.common.toHourMinuteString
 import org.techascent.shared.data.dto.PrayerName
 import org.techascent.shared.data.dto.PrayerTimeDto
 import org.techascent.shared.data.dto.PrayerTimeInterval
 import org.techascent.shared.data.enum.School
-import kotlin.collections.map
 
+/**
+ * Re-export shared domain types so existing composeApp imports still work.
+ * New code should import directly from org.techascent.shared.data.common.
+ */
+typealias AddressInfo = org.techascent.shared.data.common.AddressInfo
+typealias PrayerNameEnum = org.techascent.shared.data.common.PrayerNameEnum
 
 private const val BASE =
     "https://raw.githubusercontent.com/fbehsaan/Images/main/"
@@ -61,24 +66,6 @@ data class IftarTimeUiModel(
     val sahriInstant: Instant? = null,
 )
 
-@Serializable
-data class AddressInfo(
-    val district: String?,
-    val city: String?,
-    val country: String?,
-    val address: String
-)
-
-@Serializable
-enum class PrayerNameEnum {
-    FAJR,
-    SALAT_UD_DUHA,
-    DUHR,
-    ASR,
-    MAGHRIB,
-    ISHA
-}
-
 internal suspend fun PrayerTimeDto.toUiModel(
     school: School
 ): PrayerTimeUiModel {
@@ -100,7 +87,6 @@ internal suspend fun PrayerTimeDto.toUiModel(
         addressInfo = getPlaceName(location.latitude, location.longitude),
         prayerImage = getImageByPrayer(currentPrayer?.name),
         school = school
-        //currentWaqtEnd = currentPrayer?.endTime?.toInstant(TimeZone.currentSystemDefault())
     )
 
 }
