@@ -17,6 +17,7 @@ import org.techascent.muslim.location.LocationPickerViewV2
 import org.techascent.muslim.prayer.PrayerView
 import org.techascent.muslim.quran.SurahDetailView
 import org.techascent.muslim.quran.SurahListView
+import org.techascent.muslim.settings.AboutScreen
 import org.techascent.muslim.settings.SettingsView
 import org.techascent.muslim.tasbeeh.TasbeehViewV2
 import org.techascent.muslim.utility.UtilityView
@@ -35,6 +36,7 @@ private const val UTILITY_VIEW = "UTILITY_VIEW"
 private const val METHOD_SELECTION_VIEW = "METHOD_SELECTION_VIEW"
 private const val SURAH_LIST_VIEW = "SURAH_LIST_VIEW"
 private const val SURAH_DETAIL_VIEW = "SURAH_DETAIL_VIEW/{surahNumber}"
+private const val ABOUT_VIEW = "ABOUT_VIEW"
 
 sealed class Screen(val route: String) {
     data object LocationPickerView : Screen(route = LOCATION_PICKER_VIEW)
@@ -53,6 +55,7 @@ sealed class Screen(val route: String) {
     data object SurahDetailView : Screen(route = SURAH_DETAIL_VIEW) {
         fun createRoute(surahNumber: Int) = "SURAH_DETAIL_VIEW/$surahNumber"
     }
+    data object AboutView : Screen(route = ABOUT_VIEW)
 }
 
 @Composable
@@ -125,6 +128,12 @@ fun RootNavGraph(
                 onNavigateBack = { rootNavController.popBackStack() }
             )
         }
+
+        composable(Screen.AboutView.route) {
+            AboutScreen(
+                onNavigateBack = { rootNavController.popBackStack() }
+            )
+        }
     }
 }
 
@@ -154,7 +163,8 @@ fun NavGraphBuilder.mainNavGraph(
         }
         composable(route = Screen.SettingsView.route) {
             SettingsView(
-                innerPadding = innerPadding
+                innerPadding = innerPadding,
+                onNavigateAbout = { rootNavController.navigate(Screen.AboutView.route) }
             )
         }
 
