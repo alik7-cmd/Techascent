@@ -29,7 +29,7 @@ val appModule = module {
     viewModel { PrayerTimeViewModel(prayerTimeUseCase = get(), prayerNotificationUseCase = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }
-    viewModel { SettingsViewModel(dataStore = get()) }
+    viewModel { SettingsViewModel(dataStore = get(), prayerTimeUseCase = get()) }
     /*viewModel { LocationPickerViewModel(controller = get ()) }*/
     viewModel { CompassViewModel() }
     viewModel { CityPickerViewModel() }
