@@ -356,4 +356,33 @@ class PrayerTimeViewUseCase(
             }
         } catch (_: Exception) { }
     }
+
+    /**
+     * Returns a flat map of "DD-MM-YYYY" → PrayerTimeUiModel for every day
+     * currently held in cache (memory + DataStore). Used by the calendar feature.
+     */
+    suspend fun getAllCachedPrayerData(): Map<String, PrayerTimeUiModel> {
+        val result = mutableMapOf<String, PrayerTimeUiModel>()
+
+        // 1. Anything already in memory
+        memoryCache.values.forEach { monthList ->
+            monthList.forEach { model -> result[model.currentDateTime] = model }
+        }
+
+        // 2. Scan DataStore for any monthly keys not yet in memory
+        try {
+            val prefs = dataStore.data.first()
+            for ((key, value) in prefs.asMap()) {
+                if (key.name.startsWith(PREFIX) && value is String && !memoryCache.containsKey(key.name)) {
+                    try {
+                        val list = json.decodeFromString<List<PrayerTimeUiModel>>(value)
+                        memoryCache[key.name] = list
+                        list.forEach { model -> result[model.currentDateTime] = model }
+                    } catch (_: Exception) { }
+                }
+            }
+        } catch (_: Exception) { }
+
+        return result
+    }
 }

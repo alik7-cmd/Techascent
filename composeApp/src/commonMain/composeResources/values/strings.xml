@@ -36,7 +36,7 @@
     <string name="text_prayer_all_times">Today's Prayer Times</string>
     <string name="text_prayer_fasting">Fasting</string>
     <string name="text_prayer_announcement">Announcements</string>
-    <string name="text_prayer_data_announcement">We value your privacy.\n\nOur app does not collect, store, or process any personal data.\nAll information you use within the app remains entirely on your device and is never transmitted to us or any third parties.\n\nYou are in full control of your data at all times.
+    <string name="text_prayer_data_announcement">🗓️ New! Prayer Calendar is now available.\nBrowse prayer times for the entire year from the Explore screen.\n\nWe value your privacy — this app does not collect, store, or process any personal data. All information remains entirely on your device.
 </string>
     <string name="text_prayer_no_announcement">No announcements at this time.</string>
     <string name="text_prayer_next_fast">Next Fasting Time</string>
@@ -179,6 +179,17 @@ There isn’t enough reliable information about this product’s ingredients or 
     <!-- Scan History -->
     <string name="title_scan_history">Scan History</string>
     <string name="text_utility_desc_scan_history">View previously checked products</string>
+    <string name="title_prayer_calendar">Prayer Calendar</string>
+    <string name="text_utility_desc_calendar">Browse prayer times for the entire year</string>
+    <string name="text_calendar_loading">Loading prayer data…</string>
+    <string name="text_calendar_empty_title">No prayer data cached yet</string>
+    <string name="text_calendar_empty_subtitle">Go to the Prayer screen first to load data</string>
+    <string name="text_calendar_no_data_for_date">No prayer data available for this date</string>
+    <string name="text_calendar_sahri">Sahri</string>
+    <string name="text_calendar_error">Something went wrong while loading calendar data</string>
+    <string name="text_calendar_prayer_times">Prayer Times</string>
+    <string name="text_calendar_fasting">Fasting</string>
+    <string name="text_calendar_sun">Sun</string>
     <string name="text_scan_history_empty">No scan history yet</string>
     <string name="text_scan_history_empty_subtitle">Scanned or manually checked products will appear here</string>
     <string name="text_scan_history_clear">Clear History</string>

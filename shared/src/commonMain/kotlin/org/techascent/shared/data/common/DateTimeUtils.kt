@@ -64,6 +64,18 @@ fun LocalDate.toDayMonthYearString(): String {
     return "$day-$month-$year"
 }
 
+/**
+ * Parses a "DD-MM-YYYY" string back into a [LocalDate], or null if invalid.
+ */
+fun parseDateKey(key: String): LocalDate? {
+    return try {
+        val parts = key.split("-")
+        LocalDate(parts[2].toInt(), parts[1].toInt(), parts[0].toInt())
+    } catch (_: Exception) {
+        null
+    }
+}
+
 fun Long.toReadableDate(): String {
     val instant = Instant.fromEpochMilliseconds(this)
     val date = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date

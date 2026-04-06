@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import org.techascent.muslim.calendar.PrayerCalendarView
 import org.techascent.muslim.compass.CompassViewV2
 import org.techascent.muslim.halalscanner.HalalScannerView
 import org.techascent.muslim.halalscanner.ManualHalalCheckView
@@ -134,6 +135,12 @@ fun RootNavGraph(
                 onNavigateBack = { rootNavController.popBackStack() }
             )
         }
+
+        composable(Screen.CalendarView.route) {
+            PrayerCalendarView(
+                onNavigateBack = { rootNavController.popBackStack() }
+            )
+        }
     }
 }
 
@@ -159,6 +166,7 @@ fun NavGraphBuilder.mainNavGraph(
                 onNavigateToQuran = { rootNavController.navigate(Screen.SurahListView.route) },
                 onNavigateManualHalalCheck = { rootNavController.navigate(Screen.ManualHalalCheckView.route) },
                 onNavigateScanHistory = { rootNavController.navigate(Screen.ScanHistoryView.route) },
+                onNavigateToCalendar = { rootNavController.navigate(Screen.CalendarView.route) },
             )
         }
         composable(route = Screen.SettingsView.route) {

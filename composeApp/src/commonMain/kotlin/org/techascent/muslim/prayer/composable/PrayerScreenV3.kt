@@ -220,6 +220,9 @@ private fun LazyListScope.prayerBodyV3(
     // 1 — Sun progress hero (compact)
     item { SunProgressCard(uiModel) }
 
+    // 1b — Sunrise & Sunset card
+    item { SunriseSunsetCard(uiModel) }
+
     // 2 — Waqt countdown + fasting countdown side by side
     item { CountdownRow(uiModel) }
 
@@ -539,32 +542,7 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
             drawCircle(trackColor, radius = 4f, center = Offset(arcPadding + arcWidth, horizonY))
         }
 
-        // ── Sunrise / Sunset labels ──────────────────────────────────
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = ComposaSpacing.Medium)
-                .padding(bottom = ComposaSpacing.Small),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("🌅", fontSize = 14.sp)
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    "${stringResource(Res.string.text_sunrise)} ${uiModel.sunrise}",
-                    style = ComposaTheme.typography.caption,
-                    color = subtleOnSky,
-                )
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(if (isNight || isDusk) "🌙" else "🌇", fontSize = 14.sp)
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    "${stringResource(Res.string.text_sunset)} ${uiModel.sunset}",
-                    style = ComposaTheme.typography.caption,
-                    color = subtleOnSky,
-                )
-            }
-        }
+        Spacer(Modifier.height(ComposaSpacing.Small))
     }
 }
 
@@ -577,6 +555,55 @@ private fun lerpColor(a: Color, b: Color, fraction: Float): Color {
         blue = a.blue + (b.blue - a.blue) * f,
         alpha = a.alpha + (b.alpha - a.alpha) * f,
     )
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+//  1b. SUNRISE / SUNSET CARD  — simple two-row card (no timer, no notification)
+// ═════════════════════════════════════════════════════════════════════════════════
+
+@Composable
+private fun SunriseSunsetCard(uiModel: PrayerTimeUiModel) {
+    val cardBg = ComposaTheme.color.prayer.cardBg
+    val accent = ComposaTheme.color.prayer.timerAccent
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = ComposaSpacing.Medium)
+            .clip(RoundedCornerShape(20.dp))
+            .background(cardBg),
+    ) {
+        // Sunrise row
+        SunriseSunsetRow("🌅", stringResource(Res.string.text_sunrise), uiModel.sunrise, accent)
+        HorizontalDivider(
+            Modifier.padding(horizontal = 12.dp), 0.5.dp,
+            ComposaTheme.color.strokeNeutralSubtle.copy(0.3f),
+        )
+        // Sunset row
+        SunriseSunsetRow("🌇", stringResource(Res.string.text_sunset), uiModel.sunset, accent)
+    }
+}
+
+@Composable
+private fun SunriseSunsetRow(emoji: String, label: String, time: String, accent: Color) {
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(emoji, fontSize = 16.sp)
+        Spacer(Modifier.width(6.dp))
+        Text(
+            label,
+            style = ComposaTheme.typography.footnote,
+            color = ComposaTheme.color.textNeutral,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            time,
+            style = ComposaTheme.typography.footnoteEmphasized,
+            color = accent,
+        )
+    }
 }
 
 // ═════════════════════════════════════════════════════════════════════════════════
