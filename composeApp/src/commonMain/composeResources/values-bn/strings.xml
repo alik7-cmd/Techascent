@@ -29,6 +29,8 @@
     <string name="text_iftar">ইফতার</string>
     <string name="text_suhur">সেহরি</string>
     <string name="text_remaining_time">অবশিষ্ট সময়</string>
+    <string name="text_am">পূর্বাহ্ন</string>
+    <string name="text_pm">অপরাহ্ন</string>
 
     <string name="warning_prayer_time">আপনার নামাজের সময় %1$s মাজহাব অনুযায়ী নির্ধারিত। আপনি সেটিংস থেকে যেকোনো সময় এটি পরিবর্তন করতে পারেন।</string>
 
@@ -120,6 +122,8 @@
     <string name="haptic_label">তাসবিহ গণনার সময় কম্পন দিন</string>
     <string name="text_language">ভাষা</string>
     <string name="text_language_desc">আপনার পছন্দের ভাষা নির্বাচন করুন</string>
+    <string name="text_24_hr">২৪-ঘণ্টা সময় ফরম্যাট ব্যবহার করুন</string>
+    <string name="text_24_hr_desc">সক্রিয় করলে নামাজের সময় ২৪-ঘণ্টা ফরম্যাটে দেখাবে। নিষ্ক্রিয় করলে ১২-ঘণ্টা (AM/PM) ফরম্যাট ব্যবহার করবে।</string>
 
     <string name="text_school_suggestion">হানাফি মাজহাব অনুসরণ করতে চালু রাখুন, শাফিঈ মাজহাবের জন্য বন্ধ করুন — আর কোনটি বেছে নেবেন বুঝতে না পারলে হানাফি রাখাই নিরাপদ।</string>
 

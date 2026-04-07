@@ -61,6 +61,16 @@ class SettingsViewModel(
             initialValue = true
         )
 
+    val is24HourFormat: StateFlow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[booleanPreferencesKey(DataStoreKey.IS_24_HOUR_FORMAT)] ?: false
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = false
+        )
+
     val languagePreference: StateFlow<String> = dataStore.data
         .map { preferences ->
             preferences[stringPreferencesKey(DataStoreKey.LANGUAGE_PREFERENCE)] ?: AppLang.English.code
@@ -104,6 +114,14 @@ class SettingsViewModel(
         }
     }
 
+    fun onUpdateTimePreference(isChecked: Boolean){
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[booleanPreferencesKey(DataStoreKey.IS_24_HOUR_FORMAT)] = isChecked
+            }
+        }
+    }
+
     fun onUpdateLanguage(langCode: String) {
         viewModelScope.launch {
             dataStore.edit { preferences ->
@@ -126,6 +144,4 @@ class SettingsViewModel(
             is SettingsEvent.OpenExternalLink -> _event.send(element = event)
         }
     }
-
-
 }

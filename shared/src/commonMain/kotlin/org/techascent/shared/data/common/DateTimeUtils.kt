@@ -8,6 +8,18 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 
+/**
+ * Formats this [Instant] as a time string (e.g. "14:30" or "2:30 PM").
+ * Uses the device's current [TimeZone] by default.
+ */
+fun Instant.toFormattedTimeString(
+    is24HourFormat: Boolean = true,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): String {
+    val ldt = this.toLocalDateTime(timeZone)
+    return ldt.toHourMinuteString(is24HourFormat)
+}
+
 data class DateEntity(
     val day: Int,
     val month: Int,

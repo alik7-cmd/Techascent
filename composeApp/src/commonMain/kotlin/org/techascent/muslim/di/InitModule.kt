@@ -27,7 +27,7 @@ val appModule = module {
     single { PrayerTimeViewUseCase(repository = get(), dataStore = get(), locationService = get()) }
     single { PrayerNotificationUseCase(dataStore = get()) }
     single<LocationService> { getPlatformLocationService() }
-    viewModel { PrayerTimeViewModel(prayerTimeUseCase = get(), prayerNotificationUseCase = get()) }
+    viewModel { PrayerTimeViewModel(prayerTimeUseCase = get(), prayerNotificationUseCase = get(), dataStore = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }
     viewModel { SettingsViewModel(dataStore = get(), prayerTimeUseCase = get()) }
@@ -37,7 +37,7 @@ val appModule = module {
     viewModel { HalalScannerViewModel(repository = get()) }
     viewModel { UtilityViewModel() }
     viewModel { QuranViewModel(repository = get()) }
-    viewModel { CalendarViewModel(prayerTimeUseCase = get()) }
+    viewModel { CalendarViewModel(prayerTimeUseCase = get(), dataStore = get()) }
 }
 
 private var koinStarted = false

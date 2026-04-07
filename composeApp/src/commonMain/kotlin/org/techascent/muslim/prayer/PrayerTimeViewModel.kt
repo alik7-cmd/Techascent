@@ -1,19 +1,26 @@
 package org.techascent.muslim.prayer
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
+import org.techascent.muslim.prayer.uimodel.formatForDisplay
 import org.techascent.muslim.prayer.usecase.PrayerNotificationUseCase
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
 import org.techascent.shared.network.ResultState
@@ -21,12 +28,31 @@ import kotlin.time.ExperimentalTime
 
 class PrayerTimeViewModel(
     private val prayerTimeUseCase: PrayerTimeViewUseCase,
-    private val prayerNotificationUseCase: PrayerNotificationUseCase
+    private val prayerNotificationUseCase: PrayerNotificationUseCase,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<PrayerTimeUiState> =
+    /** Raw prayer data — always stored in 24hr format (cache-friendly). */
+    private val _rawState: MutableStateFlow<PrayerTimeUiState> =
         MutableStateFlow(PrayerTimeUiState.Loading)
-    val uiState = _uiState.onStart {
+
+    /** Observe the user's 24hr format preference reactively. */
+    private val is24HourFormat: Flow<Boolean> = dataStore.data
+        .map { prefs -> prefs[booleanPreferencesKey(DataStoreKey.IS_24_HOUR_FORMAT)] ?: false }
+
+    /**
+     * Public UI state: combines raw prayer data with is24HourFormat
+     * so the UI updates instantly when the user toggles the setting,
+     * without re-fetching or clearing cache.
+     */
+    val uiState = combine(_rawState, is24HourFormat) { state, format ->
+        when (state) {
+            is PrayerTimeUiState.Success -> PrayerTimeUiState.Success(
+                data = state.data.formatForDisplay(format)
+            )
+            else -> state
+        }
+    }.onStart {
         getMonthlyPrayerTimes()
     }.stateIn(
         scope = viewModelScope,
@@ -43,18 +69,18 @@ class PrayerTimeViewModel(
             when (it) {
                 is ResultState.Success -> {
                     schedulePrayerNotifications(it.data)
-                    _uiState.emit(
+                    _rawState.emit(
                         value = PrayerTimeUiState.Success(data = it.data)
                     )
                 }
 
-                is ResultState.Error -> _uiState.emit(
+                is ResultState.Error -> _rawState.emit(
                     value = PrayerTimeUiState.Error(
                         message = it.message ?: ""
                     )
                 )
 
-                is ResultState.Loading -> _uiState.emit(value = PrayerTimeUiState.Loading)
+                is ResultState.Loading -> _rawState.emit(value = PrayerTimeUiState.Loading)
             }
         }
     }
@@ -71,7 +97,7 @@ class PrayerTimeViewModel(
                 prayerNotificationUseCase.removePrayerFromNotify(prayerName)
             }
 
-            val currentState = _uiState.value
+            val currentState = _rawState.value
             if (currentState is PrayerTimeUiState.Success) {
                 val currentData = currentState.data
                 // Update the shouldNotify flag in the UI model
@@ -84,8 +110,8 @@ class PrayerTimeViewModel(
                 }
                 val updatedData = currentData.copy(intervals = updatedIntervals)
 
-                // Update UI state first
-                _uiState.emit(PrayerTimeUiState.Success(data = updatedData))
+                // Update raw state (combine will re-apply formatting)
+                _rawState.emit(PrayerTimeUiState.Success(data = updatedData))
 
                 // Then reschedule notifications with updated intervals
                 prayerNotificationUseCase.schedulePrayerNotifications(updatedIntervals)
@@ -113,4 +139,3 @@ class PrayerTimeViewModel(
         prayerNotificationUseCase.stopRepeatingTestNotification()
     }
 }
-

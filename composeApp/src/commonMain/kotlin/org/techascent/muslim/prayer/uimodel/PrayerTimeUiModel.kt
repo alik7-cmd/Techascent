@@ -15,6 +15,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
 import org.techascent.muslim.getPlaceName
+import org.techascent.shared.data.common.toFormattedTimeString
 import org.techascent.shared.data.common.toHourMinuteString
 import org.techascent.shared.data.dto.PrayerName
 import org.techascent.shared.data.dto.PrayerTimeDto
@@ -67,20 +68,20 @@ data class IftarTimeUiModel(
 )
 
 internal suspend fun PrayerTimeDto.toUiModel(
-    school: School
+    school: School,
 ): PrayerTimeUiModel {
     return PrayerTimeUiModel(
         intervals = intervals.map { it.toUiModel() },
         currentPrayer = currentPrayer?.toUiModel(),
         hijriDate = hijriDate,
-        sunrise = sunrise.toHourMinuteString(false),
-        sunset = sunset.toHourMinuteString(false),
+        sunrise = sunrise.toHourMinuteString(is24HourFormat = true),
+        sunset = sunset.toHourMinuteString(is24HourFormat = true),
         sunriseInstant = sunrise.toInstant(TimeZone.currentSystemDefault()),
         sunsetInstant = sunset.toInstant(TimeZone.currentSystemDefault()),
         currentDateTime = currentDateTime,
         iftarTime = IftarTimeUiModel(
-            iftarStartTime = iftarTime?.startTime?.toHourMinuteString(false),
-            lastTimeOfSahri = iftarTime?.endTime?.toHourMinuteString(false),
+            iftarStartTime = iftarTime?.startTime?.toHourMinuteString(is24HourFormat = true),
+            lastTimeOfSahri = iftarTime?.endTime?.toHourMinuteString(is24HourFormat = true),
             iftarInstant = iftarTime?.startTime?.toInstant(TimeZone.currentSystemDefault()),
             sahriInstant = iftarTime?.endTime?.toInstant(TimeZone.currentSystemDefault()),
         ),
@@ -94,10 +95,44 @@ internal suspend fun PrayerTimeDto.toUiModel(
 private fun PrayerTimeInterval.toUiModel(): PrayerTimeIntervalModel {
     return PrayerTimeIntervalModel(
         name = name.toPrayerNameEnum(),
-        displayableStartTime = startTime.toHourMinuteString(false),
-        displayableEndTime = endTime.toHourMinuteString(false),
+        displayableStartTime = startTime.toHourMinuteString(is24HourFormat = true),
+        displayableEndTime = endTime.toHourMinuteString(is24HourFormat = true),
         startTimeInstant = startTime.toInstant(TimeZone.currentSystemDefault()),
         endTimeInstant = endTime.toInstant(TimeZone.currentSystemDefault())
+    )
+}
+
+// ── Format for display based on user's 24hr preference ──────────────────────────
+
+/**
+ * Re-formats all time display strings from the stored [Instant] fields
+ * based on the user's preferred time format.
+ * This allows caching time data in a format-agnostic way (always 24hr)
+ * and only formatting for display when rendering UI.
+ */
+fun PrayerTimeUiModel.formatForDisplay(is24HourFormat: Boolean): PrayerTimeUiModel {
+    return copy(
+        intervals = intervals.map { it.formatForDisplay(is24HourFormat) },
+        currentPrayer = currentPrayer?.formatForDisplay(is24HourFormat),
+        sunrise = sunriseInstant?.toFormattedTimeString(is24HourFormat) ?: sunrise,
+        sunset = sunsetInstant?.toFormattedTimeString(is24HourFormat) ?: sunset,
+        iftarTime = iftarTime?.formatForDisplay(is24HourFormat),
+    )
+}
+
+fun PrayerTimeIntervalModel.formatForDisplay(is24HourFormat: Boolean): PrayerTimeIntervalModel {
+    return copy(
+        displayableStartTime = startTimeInstant?.toFormattedTimeString(is24HourFormat)
+            ?: displayableStartTime,
+        displayableEndTime = endTimeInstant?.toFormattedTimeString(is24HourFormat)
+            ?: displayableEndTime,
+    )
+}
+
+fun IftarTimeUiModel.formatForDisplay(is24HourFormat: Boolean): IftarTimeUiModel {
+    return copy(
+        iftarStartTime = iftarInstant?.toFormattedTimeString(is24HourFormat) ?: iftarStartTime,
+        lastTimeOfSahri = sahriInstant?.toFormattedTimeString(is24HourFormat) ?: lastTimeOfSahri,
     )
 }
 

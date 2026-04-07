@@ -28,7 +28,9 @@
     <string name="text_isha">Isha</string>
     <string name="text_iftar">Iftar</string>
     <string name="text_suhur">Suhur</string>
-    <string name="text_remaining_time">Remaining time of</string>"
+    <string name="text_remaining_time">Remaining time of</string>
+    <string name="text_am">AM</string>
+    <string name="text_pm">PM</string>
 
     <string name="warning_prayer_time">Your prayer times are based on the %1$s school of thought. You can change this from the settings anytime.</string>
     <string name="text_scan_promotion_title">Scan to check Halal</string>
@@ -141,6 +143,8 @@ There isn’t enough reliable information about this product’s ingredients or 
     <string name="haptic_label">Provide vibration feedback during tasbih counting</string>
     <string name="text_language">Language</string>
     <string name="text_language_desc">Choose your preferred app language</string>
+    <string name="text_24_hr">Use 24-Hour Time Format</string>
+    <string name="text_24_hr_desc">Enable to display prayer times in 24-hour format. Disable to use 12-hour (AM/PM) format.</string>
 
     <string name="text_settings_prayer">Prayer</string>
     <string name="text_settings_prayer_desc">Configure your prayer calculation preferences</string>

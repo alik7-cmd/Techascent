@@ -86,6 +86,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.shared.data.common.formatDuration
 import org.techascent.muslim.common.localizeDigits
+import org.techascent.muslim.common.localizeTime
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.IftarTimeUiModel
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
@@ -410,7 +411,7 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "${it.displayableStartTime} – ${it.displayableEndTime}".localizeDigits(),
+                        "${it.displayableStartTime} – ${it.displayableEndTime}".localizeTime(),
                         style = ComposaTheme.typography.footnote,
                         color = subtleOnSky,
                         modifier = Modifier.padding(bottom = 2.dp),
@@ -575,13 +576,13 @@ private fun SunriseSunsetCard(uiModel: PrayerTimeUiModel) {
             .background(cardBg),
     ) {
         // Sunrise row
-        SunriseSunsetRow("🌅", stringResource(Res.string.text_sunrise), uiModel.sunrise.localizeDigits(), accent)
+        SunriseSunsetRow("🌅", stringResource(Res.string.text_sunrise), uiModel.sunrise.localizeTime(), accent)
         HorizontalDivider(
             Modifier.padding(horizontal = 12.dp), 0.5.dp,
             ComposaTheme.color.strokeNeutralSubtle.copy(0.3f),
         )
         // Sunset row
-        SunriseSunsetRow("🌇", stringResource(Res.string.text_sunset), uiModel.sunset.localizeDigits(), accent)
+        SunriseSunsetRow("🌇", stringResource(Res.string.text_sunset), uiModel.sunset.localizeTime(), accent)
     }
 }
 
@@ -837,12 +838,12 @@ private fun PrayerTimesCard(
 
         val visible = uiModel.intervals.filter { it.name.toDisplayString() != Res.string.text_salat_ud_duha }
         visible.forEachIndexed { idx, interval ->
-            val isCurrent = interval.displayableStartTime == uiModel.currentPrayer?.displayableStartTime
+            val isCurrent = interval.startTimeInstant == uiModel.currentPrayer?.startTimeInstant
             var notify by remember { mutableStateOf(interval.shouldNotify) }
 
             CompactPrayerRow(
                 name = stringResource(interval.name.toDisplayString()),
-                time = interval.displayableStartTime.localizeDigits(),
+                time = interval.displayableStartTime.localizeTime(),
                 isCurrent = isCurrent,
                 shouldNotify = notify,
                 emoji = interval.name.toEmoji(),
@@ -954,11 +955,11 @@ private fun FastingSideCard(iftar: IftarTimeUiModel) {
         HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.4f))
 
         // Iftar row
-        FastingCompactRow("🍽️", stringResource(Res.string.text_iftar), (iftar.iftarStartTime ?: "—").localizeDigits(), accent)
+        FastingCompactRow("🍽️", stringResource(Res.string.text_iftar), (iftar.iftarStartTime ?: "—").localizeTime(), accent)
         HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.3f))
 
         // Suhur row
-        FastingCompactRow("🥣", stringResource(Res.string.text_suhur), (iftar.lastTimeOfSahri ?: "—").localizeDigits(), accent)
+        FastingCompactRow("🥣", stringResource(Res.string.text_suhur), (iftar.lastTimeOfSahri ?: "—").localizeTime(), accent)
 
         // Mini countdown for closer event
         if (closerInstant != null && remaining > Duration.ZERO) {

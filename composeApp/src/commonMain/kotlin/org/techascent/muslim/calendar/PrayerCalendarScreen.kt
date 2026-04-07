@@ -67,6 +67,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.calendar.state.CalendarUiState
 import org.techascent.muslim.common.localizeDigits
+import org.techascent.muslim.common.localizeTime
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
@@ -618,7 +619,7 @@ private fun FastingTimeChip(
         )
         Spacer(Modifier.height(2.dp))
         Text(
-            text = value.localizeDigits(),
+            text = value.localizeTime(),
             style = ComposaTheme.typography.titleDemi,
             color = ComposaTheme.color.textNeutral,
         )
@@ -689,7 +690,7 @@ private fun SunTimeChip(emoji: String, label: String, value: String) {
         Spacer(Modifier.height(4.dp))
         Text(label, style = ComposaTheme.typography.caption, color = ComposaTheme.color.textNeutralSubtle)
         Spacer(Modifier.height(2.dp))
-        Text(value.localizeDigits(), style = ComposaTheme.typography.titleDemi, color = ComposaTheme.color.textNeutral)
+        Text(value.localizeTime(), style = ComposaTheme.typography.titleDemi, color = ComposaTheme.color.textNeutral)
     }
 }
 
@@ -721,7 +722,7 @@ private fun PrayerRow(interval: PrayerTimeIntervalModel) {
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = interval.displayableStartTime.localizeDigits(),
+            text = interval.displayableStartTime.localizeTime(),
             style = ComposaTheme.typography.subheadEmphasized,
             color = ComposaTheme.color.textNeutral,
         )
@@ -731,7 +732,7 @@ private fun PrayerRow(interval: PrayerTimeIntervalModel) {
             color = ComposaTheme.color.textNeutralSubtle,
         )
         Text(
-            text = interval.displayableEndTime.localizeDigits(),
+            text = interval.displayableEndTime.localizeTime(),
             style = ComposaTheme.typography.subheadEmphasized,
             color = ComposaTheme.color.textNeutralSubtle,
         )
