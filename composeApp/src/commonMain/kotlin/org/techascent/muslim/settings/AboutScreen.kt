@@ -24,15 +24,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.about_closing_note
+import apphub.composeapp.generated.resources.about_section_growing_body
+import apphub.composeapp.generated.resources.about_section_growing_title
+import apphub.composeapp.generated.resources.about_section_halal_body
+import apphub.composeapp.generated.resources.about_section_halal_title
+import apphub.composeapp.generated.resources.about_section_intention_body
+import apphub.composeapp.generated.resources.about_section_intention_title
+import apphub.composeapp.generated.resources.about_section_prayer_body
+import apphub.composeapp.generated.resources.about_section_prayer_title
+import apphub.composeapp.generated.resources.about_section_privacy_body
+import apphub.composeapp.generated.resources.about_section_privacy_title
+import apphub.composeapp.generated.resources.about_section_qibla_body
+import apphub.composeapp.generated.resources.about_section_qibla_title
+import apphub.composeapp.generated.resources.about_section_quran_body
+import apphub.composeapp.generated.resources.about_section_quran_title
+import apphub.composeapp.generated.resources.about_section_ramadan_body
+import apphub.composeapp.generated.resources.about_section_ramadan_title
+import apphub.composeapp.generated.resources.about_section_tools_body
+import apphub.composeapp.generated.resources.about_section_tools_title
 import apphub.composeapp.generated.resources.ic_back
 import apphub.composeapp.generated.resources.title_about_us
 import org.jetbrains.compose.resources.stringResource
@@ -70,102 +84,72 @@ fun AboutScreen(
             // ── Content sections ─────────────────────────────────────────
             AboutSectionCard(
                 emoji = "🤲",
-                title = "A Personal Intention",
-                body = "I built Muslim – Namaz & Halal Scanner quietly, in the spaces between my " +
-                        "responsibilities—outside of my regular professional work and family life. " +
-                        "This app is not the result of a company roadmap or a commercial strategy, " +
-                        "but of a personal intention: to create something beneficial, even if only " +
-                        "one person ever truly uses it. If this app helps even a single individual " +
-                        "stay connected to their faith, that alone would be enough for me. I see it " +
-                        "as a small contribution to the Muslim Ummah, and I hope it carries value " +
-                        "beyond this life.",
+                title = stringResource(Res.string.about_section_intention_title),
+                body = stringResource(Res.string.about_section_intention_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
             AboutSectionCard(
                 emoji = "🔒",
-                title = "Ad-Free & Privacy First",
-                body = "From the beginning, I made a conscious decision to keep the app completely " +
-                        "ad-free. There are no distractions, no hidden agendas, and no compromises " +
-                        "when it comes to user experience. Equally important is privacy—this app " +
-                        "does not collect, store, or process your personal data. Everything remains " +
-                        "on your device, under your control. In a time where data is often treated " +
-                        "as a commodity, I wanted to build something that respects trust and simplicity.",
+                title = stringResource(Res.string.about_section_privacy_title),
+                body = stringResource(Res.string.about_section_privacy_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
             AboutSectionCard(
                 emoji = "🕌",
-                title = "Prayer Times & Adhan",
-                body = "At its core, the app is designed to support daily Islamic practice in a " +
-                        "seamless and thoughtful way. It provides accurate prayer times for all five " +
-                        "daily Salah—Fajr, Dhuhr, Asr, Maghrib, and Isha—based on your location, " +
-                        "with the option to adjust settings manually. The Adhan serves as a gentle " +
-                        "reminder, helping you stay punctual in your prayers, wherever you are.",
+                title = stringResource(Res.string.about_section_prayer_title),
+                body = stringResource(Res.string.about_section_prayer_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
             AboutSectionCard(
                 emoji = "🧭",
-                title = "Qibla Compass",
-                body = "The Qibla compass allows you to instantly find the direction of the Kaaba, " +
-                        "whether you're at home or traveling in an unfamiliar place.",
+                title = stringResource(Res.string.about_section_qibla_title),
+                body = stringResource(Res.string.about_section_qibla_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
             AboutSectionCard(
                 emoji = "🌙",
-                title = "Ramadan Support",
-                body = "During Ramadan, the app becomes even more helpful, offering a clear timetable " +
-                        "for Suhoor and Iftar so you can plan your fasts with confidence.",
+                title = stringResource(Res.string.about_section_ramadan_title),
+                body = stringResource(Res.string.about_section_ramadan_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
             AboutSectionCard(
                 emoji = "📖",
-                title = "Quran Reader",
-                body = "One of the features I felt was especially important to include is the ability " +
-                        "to read the Quran directly within the app. It's designed with a clean, " +
-                        "distraction-free interface so you can reflect and engage with the words of " +
-                        "Allah anytime during your day.",
+                title = stringResource(Res.string.about_section_quran_title),
+                body = stringResource(Res.string.about_section_quran_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
             AboutSectionCard(
                 emoji = "🔍",
-                title = "Halal Scanner",
-                body = "Beyond prayer and reflection, the app also supports mindful living through " +
-                        "its Halal Scanner. By scanning product barcodes, you can quickly check " +
-                        "whether an item is halal, haram, or doubtful. The app uses publicly " +
-                        "available data from OpenFoodFacts to help you make more informed choices " +
-                        "about what you consume.",
+                title = stringResource(Res.string.about_section_halal_title),
+                body = stringResource(Res.string.about_section_halal_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
             AboutSectionCard(
                 emoji = "📿",
-                title = "Practical Tools",
-                body = "There are also small, practical tools built in—like a prayer countdown timer " +
-                        "to keep track of time between Salah, and a digital tasbeeh counter for " +
-                        "dhikr. Each feature is simple by design, meant to serve a clear purpose " +
-                        "without overwhelming the user.",
+                title = stringResource(Res.string.about_section_tools_title),
+                body = stringResource(Res.string.about_section_tools_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
 
             AboutSectionCard(
                 emoji = "💚",
-                title = "Always Growing",
-                body = "This app is still growing. I continue to improve it gradually, refining " +
-                        "features, fixing issues, and adding what feels genuinely useful. It may " +
-                        "never be perfect, but it is built with sincerity and care.",
+                title = stringResource(Res.string.about_section_growing_title),
+                body = stringResource(Res.string.about_section_growing_body),
             )
 
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
@@ -179,17 +163,7 @@ fun AboutScreen(
                     .padding(ComposaSpacing.Medium),
             ) {
                 Text(
-                    text = buildAnnotatedString {
-                        append("More than anything, ")
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
-                            append("Muslim – Namaz & Halal Scanner")
-                        }
-                        append(
-                            " is intended to be a quiet companion in your daily life—a tool that " +
-                                    "helps you stay consistent in prayer, conscious in your choices, " +
-                                    "and connected to your faith wherever you are."
-                        )
-                    },
+                    text = stringResource(Res.string.about_closing_note),
                     style = ComposaTheme.typography.subhead,
                     color = ComposaTheme.color.textNeutral,
                     textAlign = TextAlign.Center,

@@ -1,5 +1,7 @@
 package org.techascent.muslim
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -43,8 +45,12 @@ import platform.CoreLocation.CLPlacemark
 import org.techascent.shared.data.common.AddressInfo
 import org.techascent.muslim.service.IOSLocationService
 import org.techascent.muslim.service.IOSPrayerNotificationService
+import platform.Foundation.NSLocale
+import platform.Foundation.NSUserDefaults
+import platform.Foundation.currentLocale
+import platform.Foundation.languageCode
 import platform.Foundation.stringWithContentsOfFile
-
+import platform.UIKit.UIApplicationOpenSettingsURLString
 
 
 actual fun playBeep() {
@@ -223,6 +229,61 @@ actual fun createDataStore(producePath: () -> String): DataStore<Preferences> =
 
 actual fun getPrayerNotificationService(): PrayerNotificationService {
     return IOSPrayerNotificationService()
+}
+
+class IosAppLocaleManager : AppLocaleManager {
+    override fun getLocale(): String {
+        val nsLocale = NSLocale.currentLocale.languageCode
+        return nsLocale
+    }
+}
+
+@Composable
+actual fun rememberAppLocale(): AppLang {
+    val nsLocale = IosAppLocaleManager().getLocale()
+    return remember(nsLocale) {
+        when (nsLocale) {
+            "bn" -> AppLang.Bengali
+            else -> AppLang.English
+        }
+    }
+}
+
+actual fun changeAppLocale(langCode: String) {
+    NSUserDefaults.standardUserDefaults.setObject(listOf(langCode), forKey = "AppleLanguages")
+    NSUserDefaults.standardUserDefaults.synchronize()
+    // iOS requires the user to change per-app language from Settings.
+    // Open the app's settings page so the user can select the language.
+    val url = NSURL(string = UIApplicationOpenSettingsURLString)
+    if (UIApplication.sharedApplication.canOpenURL(url)) {
+        UIApplication.sharedApplication.openURL(url)
+    }
+}
+
+actual class UrlLauncher {
+    actual fun openAppSettings() {
+        val url = NSURL(string = UIApplicationOpenSettingsURLString)
+        if (UIApplication.sharedApplication.canOpenURL(url)) {
+            UIApplication.sharedApplication.openURL(url)
+        }
+    }
+
+    actual fun openLanguageSettings() {
+        // On iOS, per-app language is configured in the app's Settings page
+        val url = NSURL(string = UIApplicationOpenSettingsURLString)
+        if (UIApplication.sharedApplication.canOpenURL(url)) {
+            UIApplication.sharedApplication.openURL(url)
+        }
+    }
+}
+
+
+@Composable
+actual fun rememberUrlLauncher(): UrlLauncher {
+
+    return remember {
+        UrlLauncher()
+    }
 }
 
 

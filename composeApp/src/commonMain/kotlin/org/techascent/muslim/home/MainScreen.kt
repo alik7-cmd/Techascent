@@ -14,7 +14,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.common.ProvideAppLang
 import org.techascent.muslim.navigation.RootNavGraph
+import org.techascent.muslim.rememberAppLocale
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -51,23 +53,26 @@ fun MainScreen() {
             }
         }
     }
+    val appLang = rememberAppLocale()
     ComposaTheme {
-        MainScaffold(
-            rootNavController = rootNavController,
-            currentRoute = currentRoute,
-            isMediumExpandedWWSC = isMediumExpandedWWSC,
-            isBottomBarVisible = isBottomBarVisible,
-            isMainScreenVisible = isMainScreenVisible,
-            onItemClick = { currentNavigationItem ->
-                rootNavController.navigate(currentNavigationItem.route) {
-                    popUpTo(rootNavController.graph.startDestinationRoute ?: "") {
-                        saveState = true
+        ProvideAppLang(appLang) {
+            MainScaffold(
+                rootNavController = rootNavController,
+                currentRoute = currentRoute,
+                isMediumExpandedWWSC = isMediumExpandedWWSC,
+                isBottomBarVisible = isBottomBarVisible,
+                isMainScreenVisible = isMainScreenVisible,
+                onItemClick = { currentNavigationItem ->
+                    rootNavController.navigate(currentNavigationItem.route) {
+                        popUpTo(rootNavController.graph.startDestinationRoute ?: "") {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                    launchSingleTop = true
-                    restoreState = true
                 }
-            }
-        )
+            )
+        }
     }
 
 }

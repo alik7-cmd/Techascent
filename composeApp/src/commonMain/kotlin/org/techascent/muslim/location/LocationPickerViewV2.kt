@@ -53,6 +53,8 @@ import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.text_location_denied_permanently
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.button.primary.ComposaButton
 import org.techascent.composa.common.ComposaSpacing
@@ -212,7 +214,7 @@ private fun PermissionRequestScreen(
         if (isDeniedAlways) {
             Spacer(Modifier.height(ComposaSpacing.Small))
             Text(
-                text = "⚠️  Location permission was permanently denied.\nPlease enable it in your device settings.",
+                text = stringResource(Res.string.text_location_denied_permanently),
                 style = ComposaTheme.typography.caption,
                 color = ComposaTheme.color.textWarningBold,
                 textAlign = TextAlign.Center,

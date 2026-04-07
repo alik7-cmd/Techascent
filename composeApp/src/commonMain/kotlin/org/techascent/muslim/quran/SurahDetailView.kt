@@ -41,6 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_back
+import apphub.composeapp.generated.resources.text_loading
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.appbar.TopAppBar
@@ -48,6 +51,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.shimmer.shimmerEffect
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.composable.ErrorScreen
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.muslim.quran.state.AyahUiModel
 
 @Composable
@@ -92,7 +96,7 @@ private fun SurahDetailScreen(
             TopAppBar(
                 title = if (uiState.surahEnglishName.isNotEmpty())
                     "${uiState.surahEnglishName} - ${uiState.surahName}"
-                else "Loading...",
+                else stringResource(Res.string.text_loading),
                 navigationIcon = Res.drawable.ic_back,
                 onNavigationIconClicked = onNavigateBack,
             )
@@ -230,7 +234,7 @@ private fun AyahCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = ayah.numberInSurah.toString(),
+                        text = ayah.numberInSurah.toString().localizeDigits(),
                         style = ComposaTheme.typography.footnote,
                         color = ComposaTheme.color.textNeutral,
                     )

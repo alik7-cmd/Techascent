@@ -58,6 +58,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.performHapticFeedback
 import org.techascent.muslim.showNativeResetDialog
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.muslim.tasbeeh.state.TasbeehUiState
 
 @Composable
@@ -185,9 +186,9 @@ private fun StatsRow(uiState: TasbeehUiState) {
             .padding(horizontal = ComposaSpacing.Small),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        StatCard(label = "Sets", value = uiState.sets.toString())
-        StatCard(label = "Goal", value = uiState.goal.toString())
-        StatCard(label = "Total", value = totalCount.toString())
+        StatCard(label = "Sets", value = uiState.sets.toString().localizeDigits())
+        StatCard(label = "Goal", value = uiState.goal.toString().localizeDigits())
+        StatCard(label = "Total", value = totalCount.toString().localizeDigits())
     }
 }
 
@@ -305,7 +306,7 @@ private fun TapCircle(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = (count % goal).toString(),
+                    text = (count % goal).toString().localizeDigits(),
                     style = ComposaTheme.typography.titleLargeDemi.copy(
                         fontSize = 56.sp,
                         fontWeight = FontWeight.Bold,
@@ -313,7 +314,7 @@ private fun TapCircle(
                     color = ComposaTheme.color.textNeutral,
                 )
                 Text(
-                    text = "of $goal",
+                    text = "of $goal".localizeDigits(),
                     style = ComposaTheme.typography.footnote,
                     color = ComposaTheme.color.textNeutralSubtle,
                 )

@@ -1,5 +1,6 @@
 package org.techascent.muslim
 
+import androidx.compose.runtime.Composable
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
@@ -54,3 +55,21 @@ interface PrayerNotificationService {
 
     suspend fun cancelAllNotifications()
 }
+
+interface AppLocaleManager {
+    fun getLocale(): String
+}
+
+@Composable
+expect fun rememberAppLocale(): AppLang
+
+expect fun changeAppLocale(langCode: String)
+
+expect class UrlLauncher {
+    fun openAppSettings()
+    fun openLanguageSettings()
+}
+
+
+@Composable
+expect fun rememberUrlLauncher(): UrlLauncher

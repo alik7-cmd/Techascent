@@ -34,6 +34,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_back
+import apphub.composeapp.generated.resources.text_ayahs
+import apphub.composeapp.generated.resources.title_quran
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.appbar.TopAppBar
@@ -41,6 +44,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.shimmer.shimmerEffect
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.composable.ErrorScreen
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.muslim.quran.state.SurahListUiState
 import org.techascent.shared.data.SurahInfo
 
@@ -73,7 +77,7 @@ private fun SurahListScreen(
             .background(ComposaTheme.color.backgroundAppBackground),
         topBar = {
             TopAppBar(
-                title = "Al-Quran",
+                title = stringResource(Res.string.title_quran),
                 navigationIcon = Res.drawable.ic_back,
                 onNavigationIconClicked = onNavigateBack,
             )
@@ -159,7 +163,7 @@ private fun SurahItem(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = surah.number.toString(),
+                text = surah.number.toString().localizeDigits(),
                 style = ComposaTheme.typography.footnote,
                 color = ComposaTheme.color.textNeutral,
             )
@@ -175,7 +179,7 @@ private fun SurahItem(
                 color = ComposaTheme.color.textNeutral,
             )
             Text(
-                text = "${surah.englishNameTranslation} • ${surah.numberOfAyahs} Ayahs",
+                text = "${surah.englishNameTranslation} • ${surah.numberOfAyahs} ${stringResource(Res.string.text_ayahs)}".localizeDigits(),
                 style = ComposaTheme.typography.footnote,
                 color = ComposaTheme.color.textNeutral.copy(alpha = 0.6f),
             )

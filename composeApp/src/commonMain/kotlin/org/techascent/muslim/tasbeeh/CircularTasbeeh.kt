@@ -42,6 +42,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.messabebox.MessageBox
 import org.techascent.composa.messabebox.MessageType
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.performHapticFeedback
 import org.techascent.muslim.prayer.tags.PrayerTags
@@ -142,7 +143,7 @@ fun LazyListScope.parabolicTasbeeh(
                     )
                     Text(
                         // 3. Display the count within the goal (e.g., 32 instead of 65)
-                        text = "${uiState.count % uiState.goal}/${uiState.goal}", //(uiState.count % uiState.goal).toString()
+                        text = "${uiState.count % uiState.goal}/${uiState.goal}".localizeDigits(),
                         style = ComposaTheme.typography.titleLargeDemi,
                     )
                 }

@@ -85,6 +85,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.shared.data.common.formatDuration
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.IftarTimeUiModel
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
@@ -393,7 +394,7 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
                     append(uiModel.addressInfo.district?.plus(", ${uiModel.addressInfo.country}") ?: uiModel.addressInfo.address)
                     append("  •  ")
                     append(uiModel.hijriDate)
-                },
+                }.localizeDigits(),
                 style = ComposaTheme.typography.caption,
                 color = subtleOnSky,
                 maxLines = 1,
@@ -409,7 +410,7 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "${it.displayableStartTime} – ${it.displayableEndTime}",
+                        "${it.displayableStartTime} – ${it.displayableEndTime}".localizeDigits(),
                         style = ComposaTheme.typography.footnote,
                         color = subtleOnSky,
                         modifier = Modifier.padding(bottom = 2.dp),
@@ -574,13 +575,13 @@ private fun SunriseSunsetCard(uiModel: PrayerTimeUiModel) {
             .background(cardBg),
     ) {
         // Sunrise row
-        SunriseSunsetRow("🌅", stringResource(Res.string.text_sunrise), uiModel.sunrise, accent)
+        SunriseSunsetRow("🌅", stringResource(Res.string.text_sunrise), uiModel.sunrise.localizeDigits(), accent)
         HorizontalDivider(
             Modifier.padding(horizontal = 12.dp), 0.5.dp,
             ComposaTheme.color.strokeNeutralSubtle.copy(0.3f),
         )
         // Sunset row
-        SunriseSunsetRow("🌇", stringResource(Res.string.text_sunset), uiModel.sunset, accent)
+        SunriseSunsetRow("🌇", stringResource(Res.string.text_sunset), uiModel.sunset.localizeDigits(), accent)
     }
 }
 
@@ -675,7 +676,7 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
         }
         Spacer(Modifier.height(8.dp))
         Text(
-            remaining.formatDuration(),
+            remaining.formatDuration().localizeDigits(),
             style = ComposaTheme.typography.bodyEmphasized,
             color = accent,
         )
@@ -741,7 +742,7 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
         Spacer(Modifier.height(8.dp))
         if (targetInstant != null && remaining > Duration.ZERO) {
             Text(
-                remaining.formatDuration(),
+                remaining.formatDuration().localizeDigits(),
                 style = ComposaTheme.typography.bodyEmphasized,
                 color = accent,
             )
@@ -841,7 +842,7 @@ private fun PrayerTimesCard(
 
             CompactPrayerRow(
                 name = stringResource(interval.name.toDisplayString()),
-                time = interval.displayableStartTime,
+                time = interval.displayableStartTime.localizeDigits(),
                 isCurrent = isCurrent,
                 shouldNotify = notify,
                 emoji = interval.name.toEmoji(),
@@ -953,11 +954,11 @@ private fun FastingSideCard(iftar: IftarTimeUiModel) {
         HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.4f))
 
         // Iftar row
-        FastingCompactRow("🍽️", stringResource(Res.string.text_iftar), iftar.iftarStartTime ?: "—", accent)
+        FastingCompactRow("🍽️", stringResource(Res.string.text_iftar), (iftar.iftarStartTime ?: "—").localizeDigits(), accent)
         HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.3f))
 
         // Suhur row
-        FastingCompactRow("🥣", stringResource(Res.string.text_suhur), iftar.lastTimeOfSahri ?: "—", accent)
+        FastingCompactRow("🥣", stringResource(Res.string.text_suhur), (iftar.lastTimeOfSahri ?: "—").localizeDigits(), accent)
 
         // Mini countdown for closer event
         if (closerInstant != null && remaining > Duration.ZERO) {
@@ -973,7 +974,7 @@ private fun FastingSideCard(iftar: IftarTimeUiModel) {
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    remaining.formatDuration(),
+                    remaining.formatDuration().localizeDigits(),
                     style = ComposaTheme.typography.bodyEmphasized,
                     color = accent,
                 )

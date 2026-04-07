@@ -40,7 +40,11 @@ val appModule = module {
     viewModel { CalendarViewModel(prayerTimeUseCase = get()) }
 }
 
+private var koinStarted = false
+
 fun initializeKoin() {
+    if (koinStarted) return
+    koinStarted = true
     startKoin {
         modules(prayerModule)
         modules(appModule)

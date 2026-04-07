@@ -1,6 +1,7 @@
 package org.techascent.muslim
 
 import android.app.AlertDialog
+import android.app.LocaleManager
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -22,10 +23,18 @@ import org.techascent.muslim.common.location.LocationService
 import org.techascent.shared.data.common.AddressInfo
 import java.io.File
 import java.util.Locale
+import android.provider.Settings
 import kotlin.math.*
 import android.content.Intent
 import androidx.core.net.toUri
 import android.content.res.Resources
+import android.net.Uri
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.getSystemService
+import androidx.core.os.LocaleListCompat
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import okio.Path.Companion.toPath
 import org.techascent.muslim.servive.AndroidLocationService
@@ -202,6 +211,77 @@ actual fun createDataStore(producePath: () -> String): DataStore<Preferences> =
 
 actual fun getPrayerNotificationService(): PrayerNotificationService {
     return AndroidPrayerNotificationService(appContext!!)
+}
+
+class AndroidAppLocaleManager(
+    private val context: Context,
+) : AppLocaleManager {
+
+    private val localManager = context.getSystemService<LocaleManager>()
+
+    override fun getLocale(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val locales = localManager?.applicationLocales ?: return "en"
+            if (locales.isEmpty) "en" else
+                locales[0]?.toLanguageTag()?.split("-")?.firstOrNull() ?: "en"
+        } else {
+            AppCompatDelegate.getApplicationLocales()
+                .toLanguageTags().split("-")
+                .firstOrNull() ?: "en"
+        }
+    }
+}
+
+private fun String?.toApLang(
+): AppLang = when (this) {
+    "bn" -> AppLang.Bengali
+    else -> AppLang.English
+}
+
+
+@Composable
+actual fun rememberAppLocale(): AppLang {
+    val context = LocalContext.current
+    val locale = AndroidAppLocaleManager(context).getLocale()
+    return remember(locale) {
+        locale.toApLang()
+    }
+}
+
+actual fun changeAppLocale(langCode: String) {
+    val localeList = LocaleListCompat.forLanguageTags(langCode)
+    AppCompatDelegate.setApplicationLocales(localeList)
+}
+
+actual class UrlLauncher(private val context: Context) {
+    actual fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+        }
+        context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+
+    actual fun openLanguageSettings() {
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
+        }
+        context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+}
+
+
+@Composable
+actual fun rememberUrlLauncher(): UrlLauncher {
+    val context = LocalContext.current
+    return remember {
+        UrlLauncher(context)
+    }
 }
 
 

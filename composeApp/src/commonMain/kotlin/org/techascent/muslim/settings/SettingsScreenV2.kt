@@ -49,9 +49,14 @@ import apphub.composeapp.generated.resources.text_settings_prayer_desc
 import apphub.composeapp.generated.resources.title_settings
 import apphub.composeapp.generated.resources.haptic_title
 import apphub.composeapp.generated.resources.haptic_label
+import apphub.composeapp.generated.resources.text_language
+import apphub.composeapp.generated.resources.text_our_mission
+import apphub.composeapp.generated.resources.text_settings_about_this_app
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.AppLang
+import org.techascent.muslim.rememberUrlLauncher
 import org.techascent.muslim.common.toTextRes
 import org.techascent.muslim.common.toVisibility
 import org.techascent.muslim.settings.event.SettingsEvent
@@ -68,9 +73,11 @@ internal fun SettingsScreenV2(
     schoolPreference: Int,
     hapticPreference: Boolean,
     adhanPreference: Boolean,
+    languagePreference: String,
     onUpdateSchool: (Int) -> Unit,
     onUpdateAdhanNotification: (Boolean) -> Unit,
     onUpdateHaptic: (Boolean) -> Unit,
+    onUpdateLanguage: (String) -> Unit,
     onHandleEvent: (SettingsEvent) -> Unit,
     onNavigateAbout: () -> Unit,
     innerPadding: PaddingValues,
@@ -164,6 +171,14 @@ internal fun SettingsScreenV2(
                         checked = hapticPreference,
                         onCheckedChange = onUpdateHaptic,
                     )
+
+                    ThinDivider()
+
+                    val urlLauncher = rememberUrlLauncher()
+                    LanguagePickerRow(
+                        currentLangCode = languagePreference,
+                        onLanguageClicked = { urlLauncher.openLanguageSettings() },
+                    )
                 }
             }
 
@@ -187,7 +202,7 @@ internal fun SettingsScreenV2(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "About This App",
+                                text = stringResource(Res.string.text_settings_about_this_app),
                                 style = ComposaTheme.typography.subhead,
                                 color = ComposaTheme.color.textNeutral,
                                 maxLines = 1,
@@ -195,7 +210,7 @@ internal fun SettingsScreenV2(
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "Our mission, privacy & features",
+                                text = stringResource(Res.string.text_our_mission),
                                 style = ComposaTheme.typography.caption,
                                 color = ComposaTheme.color.textNeutralSubtle,
                                 maxLines = 1,
@@ -227,6 +242,8 @@ internal fun SettingsScreenV2(
                     }
                 }
             }
+
+            item { Spacer(modifier = Modifier.size(ComposaSpacing.Large)) }
         }
     }
 }
@@ -412,6 +429,55 @@ private fun LinkRow(
         // Chevron
         Text(
             text = if (isExternal) "↗" else "›",
+            fontSize = 18.sp,
+            color = ComposaTheme.color.textNeutralSubtle,
+        )
+    }
+}
+
+// ─── Language Picker Row ────────────────────────────────────────────────────────
+
+@Composable
+private fun LanguagePickerRow(
+    currentLangCode: String,
+    onLanguageClicked: () -> Unit,
+) {
+    val languages = AppLang.entries
+    val selectedLang = languages.find { it.code == currentLangCode } ?: AppLang.English
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onLanguageClicked)
+            .padding(horizontal = ComposaSpacing.Medium, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(text = "🌐", fontSize = 22.sp)
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(Res.string.text_language),
+                style = ComposaTheme.typography.subhead,
+                color = ComposaTheme.color.textNeutral,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = stringResource(selectedLang.stringRes),
+                style = ComposaTheme.typography.caption,
+                color = ComposaTheme.color.textNeutralSubtle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+
+        Spacer(modifier = Modifier.width(ComposaSpacing.Small))
+
+        Text(
+            text = "›",
             fontSize = 18.sp,
             color = ComposaTheme.color.textNeutralSubtle,
         )

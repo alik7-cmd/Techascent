@@ -48,6 +48,8 @@ import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_back
 import apphub.composeapp.generated.resources.text_cancel
+import apphub.composeapp.generated.resources.text_check_another
+import apphub.composeapp.generated.resources.text_check_result
 import apphub.composeapp.generated.resources.text_manual_check_barcode_hint
 import apphub.composeapp.generated.resources.text_manual_check_barcode_title
 import apphub.composeapp.generated.resources.text_manual_check_button
@@ -365,13 +367,13 @@ private fun ManualResultScreen(
             .background(ComposaTheme.color.backgroundAppBackground),
         topBar = {
             TopAppBar(
-                title = "Check Result",
+                title = stringResource(Res.string.text_check_result),
                 navigationIcon = Res.drawable.ic_back,
                 onNavigationIconClicked = onNavigateBack,
                 action = when (uiState) {
                     is HalalScannerUiState.Error,
                     is HalalScannerUiState.Success -> TrailingAction.TextButton(
-                        text = "Check Another",
+                        text = stringResource(Res.string.text_check_another),
                         onClick = onCheckAnother,
                     )
                     else -> null
