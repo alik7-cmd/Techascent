@@ -51,6 +51,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.shimmer.shimmerEffect
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.composable.ErrorScreen
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.muslim.quran.state.AyahUiModel
 
 @Composable
@@ -233,7 +234,7 @@ private fun AyahCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = ayah.numberInSurah.toString(),
+                        text = ayah.numberInSurah.toString().localizeDigits(),
                         style = ComposaTheme.typography.footnote,
                         color = ComposaTheme.color.textNeutral,
                     )

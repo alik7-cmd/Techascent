@@ -66,6 +66,7 @@ import org.techascent.composa.appbar.TopAppBar
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.calendar.state.CalendarUiState
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
@@ -267,7 +268,7 @@ private fun CalendarCard(
                 label = "monthTitle",
             ) { title ->
                 Text(
-                    text = title,
+                    text = title.localizeDigits(),
                     style = ComposaTheme.typography.titleDemi,
                     color = ComposaTheme.color.textNeutral,
                     textAlign = TextAlign.Center,
@@ -353,7 +354,7 @@ private fun CalendarCard(
                                 verticalArrangement = Arrangement.Center,
                             ) {
                                 Text(
-                                    text = day.toString(),
+                                    text = day.toString().localizeDigits(),
                                     fontSize = 14.sp,
                                     fontWeight = if (isToday || isSelected) FontWeight.Bold else FontWeight.Normal,
                                     color = textColor,
@@ -456,14 +457,14 @@ private fun DateHeaderCard(selectedDateKey: String?, hijriDate: String) {
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = selectedDateKey ?: "",
+                text = (selectedDateKey ?: "").localizeDigits(),
                 style = ComposaTheme.typography.titleDemi,
                 color = ComposaTheme.color.textNeutral,
             )
             hijriDate.takeIf { it.isNotBlank() }?.let {
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = it,
+                    text = it.localizeDigits(),
                     style = ComposaTheme.typography.footnote,
                     color = ComposaTheme.color.textNeutralSubtle,
                 )
@@ -617,7 +618,7 @@ private fun FastingTimeChip(
         )
         Spacer(Modifier.height(2.dp))
         Text(
-            text = value,
+            text = value.localizeDigits(),
             style = ComposaTheme.typography.titleDemi,
             color = ComposaTheme.color.textNeutral,
         )
@@ -688,7 +689,7 @@ private fun SunTimeChip(emoji: String, label: String, value: String) {
         Spacer(Modifier.height(4.dp))
         Text(label, style = ComposaTheme.typography.caption, color = ComposaTheme.color.textNeutralSubtle)
         Spacer(Modifier.height(2.dp))
-        Text(value, style = ComposaTheme.typography.titleDemi, color = ComposaTheme.color.textNeutral)
+        Text(value.localizeDigits(), style = ComposaTheme.typography.titleDemi, color = ComposaTheme.color.textNeutral)
     }
 }
 
@@ -720,7 +721,7 @@ private fun PrayerRow(interval: PrayerTimeIntervalModel) {
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = interval.displayableStartTime,
+            text = interval.displayableStartTime.localizeDigits(),
             style = ComposaTheme.typography.subheadEmphasized,
             color = ComposaTheme.color.textNeutral,
         )
@@ -730,7 +731,7 @@ private fun PrayerRow(interval: PrayerTimeIntervalModel) {
             color = ComposaTheme.color.textNeutralSubtle,
         )
         Text(
-            text = interval.displayableEndTime,
+            text = interval.displayableEndTime.localizeDigits(),
             style = ComposaTheme.typography.subheadEmphasized,
             color = ComposaTheme.color.textNeutralSubtle,
         )

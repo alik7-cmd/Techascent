@@ -44,6 +44,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.shimmer.shimmerEffect
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.composable.ErrorScreen
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.muslim.quran.state.SurahListUiState
 import org.techascent.shared.data.SurahInfo
 
@@ -162,7 +163,7 @@ private fun SurahItem(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = surah.number.toString(),
+                text = surah.number.toString().localizeDigits(),
                 style = ComposaTheme.typography.footnote,
                 color = ComposaTheme.color.textNeutral,
             )
@@ -178,7 +179,7 @@ private fun SurahItem(
                 color = ComposaTheme.color.textNeutral,
             )
             Text(
-                text = "${surah.englishNameTranslation} • ${surah.numberOfAyahs} ${stringResource(Res.string.text_ayahs)}",
+                text = "${surah.englishNameTranslation} • ${surah.numberOfAyahs} ${stringResource(Res.string.text_ayahs)}".localizeDigits(),
                 style = ComposaTheme.typography.footnote,
                 color = ComposaTheme.color.textNeutral.copy(alpha = 0.6f),
             )

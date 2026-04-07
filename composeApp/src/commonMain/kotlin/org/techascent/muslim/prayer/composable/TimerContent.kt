@@ -36,6 +36,7 @@ import org.techascent.composa.text.DecoratedText
 import org.techascent.composa.text.NormalText
 import org.techascent.composa.text.SpannableText
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.muslim.common.localizeDigits
 import org.techascent.shared.data.common.formatDuration
 
 @Composable
@@ -127,7 +128,7 @@ fun CountdownTimerWithProgress(
 
                 // Timer text
                 Text(
-                    text = formattedRemainingTime,
+                    text = formattedRemainingTime.localizeDigits(),
                     style = ComposaTheme.typography.bodyEmphasized
                 )
             }
