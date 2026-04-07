@@ -27,6 +27,7 @@ dokka = "2.1.0"
 klint = "13.1.0"
 mlkitBarcodeScanning-android = "17.3.0"
 androidx-camera = "1.5.1"
+appcompat = "1.7.1"
 
 [libraries]
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
@@ -63,6 +64,7 @@ androidx-camera-core = { group = "androidx.camera", name = "camera-core", versio
 androidx-camera-extensions = { group = "androidx.camera", name = "camera-extensions", version.ref = "androidx-camera" }
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "androidx-camera" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "androidx-camera" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [bundles]
 camera = ["androidx-camera-core", "androidx-camera-lifecycle", "androidx-camera-camera2", "androidx-camera-view", "androidx-camera-extensions"]

@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -16,6 +17,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.techascent.muslim.AppLang
+import org.techascent.muslim.changeAppLocale
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
 import org.techascent.muslim.settings.event.SettingsEvent
@@ -58,6 +61,16 @@ class SettingsViewModel(
             initialValue = true
         )
 
+    val languagePreference: StateFlow<String> = dataStore.data
+        .map { preferences ->
+            preferences[stringPreferencesKey(DataStoreKey.LANGUAGE_PREFERENCE)] ?: AppLang.English.code
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = AppLang.English.code
+        )
+
     private val _uiState = MutableStateFlow(getSettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState
 
@@ -87,6 +100,23 @@ class SettingsViewModel(
         viewModelScope.launch {
             dataStore.edit { preferences ->
                 preferences[booleanPreferencesKey(DataStoreKey.ADHAN_NOTIFICATION_PREFERENCE)] = isChecked
+            }
+        }
+    }
+
+    fun onUpdateLanguage(langCode: String) {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[stringPreferencesKey(DataStoreKey.LANGUAGE_PREFERENCE)] = langCode
+            }
+            changeAppLocale(langCode)
+        }
+    }
+
+    fun syncLocaleFromSystem(currentLangCode: String) {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[stringPreferencesKey(DataStoreKey.LANGUAGE_PREFERENCE)] = currentLangCode
             }
         }
     }

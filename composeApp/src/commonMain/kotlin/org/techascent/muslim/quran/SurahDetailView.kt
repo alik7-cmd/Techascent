@@ -41,6 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_back
+import apphub.composeapp.generated.resources.text_loading
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.appbar.TopAppBar
@@ -92,7 +95,7 @@ private fun SurahDetailScreen(
             TopAppBar(
                 title = if (uiState.surahEnglishName.isNotEmpty())
                     "${uiState.surahEnglishName} - ${uiState.surahName}"
-                else "Loading...",
+                else stringResource(Res.string.text_loading),
                 navigationIcon = Res.drawable.ic_back,
                 onNavigationIconClicked = onNavigateBack,
             )

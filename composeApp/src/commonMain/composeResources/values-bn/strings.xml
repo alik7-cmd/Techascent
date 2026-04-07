@@ -1,0 +1,239 @@
+<resources>
+    <string name="app_name">মুসলিম – নামাজ ও হালাল স্ক্যানার</string>
+
+    <string name="en">English</string>
+    <string name="bn">বাংলা</string>
+
+    <string name="title_home">নামাজের সময়</string>
+    <string name="title_calendar">ক্যালেন্ডার</string>
+    <string name="title_settings">সেটিংস</string>
+
+    <!-- Bottom tab labels -->
+    <string name="tab_prayer">নামাজ</string>
+    <string name="tab_explore">এক্সপ্লোর</string>
+    <string name="tab_settings">সেটিংস</string>
+    <string name="text_try_again">আবার চেষ্টা করুন</string>
+
+    <string name="title_error">ওহ! একটি সমস্যা হয়েছে</string>
+    <string name="message_error">আপনার অনুরোধ প্রক্রিয়াকরণের সময় একটি সমস্যা হয়েছে। আমরা বিষয়টি ঠিক করার চেষ্টা করছি। এর মধ্যে আপনার ইন্টারনেট সংযোগ ঠিক আছে কিনা নিশ্চিত করে আবার চেষ্টা করুন।</string>
+    <string name="button_text_error">পুনরায় চেষ্টা করুন</string>
+
+    <string name="text_sunset">সূর্যাস্ত</string>
+    <string name="text_sunrise">সূর্যোদয়</string>
+    <string name="text_fajr">ফজর</string>
+    <string name="text_salat_ud_duha">সালাতুদ দুহা</string>
+    <string name="text_dhuhr">যোহর</string>
+    <string name="text_asr">আসর</string>
+    <string name="text_maghrib">মাগরিব</string>
+    <string name="text_isha">ইশা</string>
+    <string name="text_iftar">ইফতার</string>
+    <string name="text_suhur">সেহরি</string>
+    <string name="text_remaining_time">অবশিষ্ট সময়</string>
+
+    <string name="warning_prayer_time">আপনার নামাজের সময় %1$s মাজহাব অনুযায়ী নির্ধারিত। আপনি সেটিংস থেকে যেকোনো সময় এটি পরিবর্তন করতে পারেন।</string>
+
+    <string name="text_scan_promotion_title">হালাল যাচাই করতে স্ক্যান করুন</string>
+    <string name="text_halal_promotion">নিশ্চিন্তে কেনাকাটা করুন।\nপণ্যের বারকোড স্ক্যান করে সাথে সাথে জানুন এটি হালাল কিনা—সহজ, পরিষ্কার এবং নির্ভরযোগ্য।</string>
+    <string name="text_halal_scan_action">বারকোড স্ক্যান করুন</string>
+    <string name="text_halal_quick_desc">পণ্যটি হালাল কিনা যাচাই করুন</string>
+
+    <string name="text_prayer_current_waqt">বর্তমান ওয়াক্ত</string>
+    <string name="text_prayer_all_times">আজকের নামাজের সময়সূচি</string>
+    <string name="text_prayer_fasting">রোজা</string>
+    <string name="text_prayer_announcement">ঘোষণা</string>
+
+    <string name="text_prayer_data_announcement">🗓️ নতুন! এখন প্রেয়ার ক্যালেন্ডার উপলব্ধ।\nএক্সপ্লোর স্ক্রিন থেকে সারা বছরের নামাজের সময় দেখুন।\n\nআমরা আপনার গোপনীয়তাকে গুরুত্ব দিই — এই অ্যাপ কোনো ব্যক্তিগত তথ্য সংগ্রহ, সংরক্ষণ বা প্রক্রিয়া করে না। সব তথ্য আপনার ডিভাইসেই থাকে।</string>
+
+    <string name="text_prayer_no_announcement">এই মুহূর্তে কোনো ঘোষণা নেই।</string>
+    <string name="text_prayer_next_fast">পরবর্তী রোজার সময়</string>
+    <string name="text_prayer_sun_progress">সূর্যের অগ্রগতি</string>
+
+    <string name="title_location_picker">লোকেশন অনুমতি কেন প্রয়োজন</string>
+    <string name="message_location_picker">নামাজের সময় সূর্যের অবস্থানের উপর নির্ভর করে, যা আপনার অবস্থান অনুযায়ী পরিবর্তিত হয়। আপনার লোকেশন ব্যবহার করলে অ্যাপটি আপনার সময় অঞ্চল, অক্ষাংশ এবং দ্রাঘিমাংশ অনুযায়ী ফজর, যোহর, আসর, মাগরিব ও ইশার সঠিক সময় নির্ধারণ করতে পারবে।</string>
+    <string name="button_text_location_picker">লোকেশন অনুমতি দিন</string>
+    <string name="button_open_settings">সেটিংস খুলুন</string>
+
+    <string name="text_compass_suggestion">সঠিক কিবলা দিক নির্ধারণের জন্য আপনার লোকেশন সার্ভিস চালু রাখুন। ফোনটি সমতলভাবে ধরে স্ক্রিনের তীর চিহ্ন অনুসরণ করুন, যা মক্কার কাবার দিকে নির্দেশ করবে।\n\nসঠিক ফলাফলের জন্য ধাতব বস্তু থেকে দূরে থাকুন এবং প্রয়োজনে ফোনটিকে আট (৮) আকৃতিতে নাড়িয়ে কম্পাস ক্যালিব্রেট করুন।</string>
+
+    <string name="title_tasbeeh">তাসবিহ</string>
+    <string name="title_tasbeeh_instruction">স্ক্রিনে যেকোনো স্থানে বাম থেকে ডানে সোয়াইপ করলে গণনা বাড়বে।</string>
+
+    <string name="text_tasbeeh_set_complete">সেট %1$d সম্পন্ন। মোট সংখ্যা: %2$d</string>
+    <string name="message_tasbeeh">রাসূলুল্লাহ ﷺ ডান হাতে তাসবিহ গণনা করতেন এবং আমাদেরও তা করতে উৎসাহিত করেছেন। তিনি বলেছেন, তোমরা আঙুলে গণনা করো, কারণ এগুলো জিজ্ঞাসিত হবে এবং কথা বলবে। (আবু দাউদ)</string>
+
+    <string name="reset_warning_title">রিসেট সতর্কতা</string>
+    <string name="reset_warning_message">এটি সমস্ত তথ্য মুছে ফেলবে। আপনি কি চালিয়ে যেতে চান?</string>
+    <string name="reset_warning_confirm_text">চালিয়ে যান</string>
+    <string name="reset_warning_cancel_text">বাতিল</string>
+
+    <string name="text_okay">ঠিক আছে</string>
+    <string name="text_reset_counter">কাউন্টার রিসেট করুন</string>
+    <string name="text_reset">রিসেট</string>
+
+    <string name="title_quibla">কিবলা</string>
+    <string name="title_halal_scanner">হালাল স্ক্যানার</string>
+    <string name="title_nearby_mosque">নিকটস্থ মসজিদ</string>
+    <string name="title_zakat_calculator">যাকাত হিসাব করুন</string>
+
+    <string name="text_permission_title">অনুমতি প্রয়োজন</string>
+    <string name="text_permission_description">হালাল স্ক্যানার ব্যবহারের জন্য ক্যামেরা অনুমতি প্রয়োজন। দয়া করে সেটিংস থেকে এটি চালু করুন।</string>
+
+    <string name="text_notification_permission_description">নামাজের সময় সঠিকভাবে জানার জন্য নোটিফিকেশন চালু করুন। অনুমতি দিলে আমরা সময়মতো আপনাকে জানাব।</string>
+
+    <string name="title_appearance">অ্যাপের চেহারা</string>
+    <string name="title_widgets">উইজেট</string>
+    <string name="sub_title_widgets">ডিভাইস সেটিংসে নিয়ে যাবে</string>
+    <string name="title_language">ভাষা</string>
+    <string name="title_about_us">আমাদের সম্পর্কে</string>
+
+    <string name="title_rate_us">রেটিং দিন</string>
+    <string name="sub_title_rate_us">আপনার মতামত আমাদের উন্নত হতে সাহায্য করে</string>
+
+    <string name="text_halal_certified">হালাল সার্টিফায়েড</string>
+    <string name="text_halal_possible">সম্ভবত হালাল</string>
+    <string name="text_halal_doubtful">সন্দেহজনক</string>
+    <string name="text_not_halal">হারাম</string>
+    <string name="text_unknown_status">অজানা</string>
+
+    <string name="text_verdict">রায়</string>
+    <string name="text_labels">লেবেল</string>
+    <string name="text_ingredients">উপাদান</string>
+
+    <string name="text_cancel">বাতিল</string>
+    <string name="text_scan_again">আবার স্ক্যান করুন</string>
+    <string name="text_done">সম্পন্ন</string>
+
+    <string name="text_product_not_found">আমরা এই পণ্যটি খুঁজে পাইনি বা এর হালাল তথ্য আনতে পারিনি। দয়া করে আবার চেষ্টা করুন।</string>
+
+    <string name="text_information">তথ্য</string>
+    <string name="text_see_api_title">আমরা কোথা থেকে নামাজের সময় পাই</string>
+    <string name="text_see_api_sub_title">aladhan.com</string>
+
+    <string name="text_school_of">মাজহাব</string>
+    <string name="text_hanafi">হানাফি</string>
+    <string name="text_shafi">শাফিঈ</string>
+
+    <string name="text_adhan_notification">নামাজের সময় আজান চালান</string>
+    <string name="text_adhan_notification_desc">চালু থাকলে আজান বাজবে, বন্ধ থাকলে শুধু নোটিফিকেশন আসবে।</string>
+
+    <string name="haptic_title">হ্যাপটিক ফিডব্যাক</string>
+    <string name="haptic_label">তাসবিহ গণনার সময় কম্পন দিন</string>
+    <string name="text_language">ভাষা</string>
+    <string name="text_language_desc">আপনার পছন্দের ভাষা নির্বাচন করুন</string>
+
+    <string name="text_school_suggestion">হানাফি মাজহাব অনুসরণ করতে চালু রাখুন, শাফিঈ মাজহাবের জন্য বন্ধ করুন — আর কোনটি বেছে নেবেন বুঝতে না পারলে হানাফি রাখাই নিরাপদ।</string>
+
+    <string name="text_settings_prayer">নামাজ</string>
+    <string name="text_settings_prayer_desc">নামাজের হিসাবের পছন্দসই সেটিংস নির্ধারণ করুন</string>
+    <string name="text_settings_experience">অভিজ্ঞতা</string>
+    <string name="text_settings_experience_desc">অ্যাপটি আপনার মতো করে সাজান</string>
+    <string name="text_settings_about">সম্পর্কে</string>
+    <string name="text_settings_about_this_app">এই অ্যাপ সম্পর্কে</string>
+    <string name="text_our_mission">আমাদের মিশন, গোপনীয়তা ও বৈশিষ্ট্যসমূহ</string>
+
+    <string name="text_rate_us_title">রেটিং দিন</string>
+
+    <string name="title_quran">আল-কুরআন</string>
+
+    <string name="text_utility_desc_halal">যেকোনো পণ্যের বারকোড স্ক্যান করে হালাল যাচাই করুন</string>
+    <string name="text_utility_desc_quran">পবিত্র কুরআন পড়ুন, শুনুন এবং অন্বেষণ করুন</string>
+    <string name="text_utility_desc_tasbeeh">প্রতিদিনের যিকরের জন্য ডিজিটাল কাউন্টার</string>
+    <string name="text_utility_desc_qibla">কাবার দিক নির্ণয় করুন</string>
+    <string name="text_utility_desc_mosque">আপনার কাছাকাছি মসজিদ খুঁজুন</string>
+    <string name="text_utility_desc_zakat">আপনার যাকাত হিসাব করুন</string>
+    <string name="text_utility_greeting">আসসালামু আলাইকুম</string>
+    <string name="text_utility_subtitle">আপনার ইবাদতকে সমৃদ্ধ করতে টুলসমূহ অন্বেষণ করুন</string>
+
+    <string name="text_qibla_direction">কিবলার দিক</string>
+    <string name="text_qibla_subtitle">মক্কার কাবার দিকে মুখ করুন</string>
+    <string name="text_qibla_degree">%1$.0f°</string>
+    <string name="text_qibla_aligned">আপনি কিবলার দিকে মুখ করে আছেন</string>
+    <string name="text_qibla_tip_title">ব্যবহারের নিয়ম</string>
+    <string name="text_qibla_tip">ফোনটি সমতলভাবে ধরুন এবং তীর চিহ্ন কাবার দিকে নির্দেশ না করা পর্যন্ত ঘোরান। সঠিক ফলাফলের জন্য ফোনটিকে আট (৮) আকৃতিতে নাড়িয়ে ক্যালিব্রেট করুন।</string>
+    <string name="text_north">উ</string>
+    <string name="text_south">দ</string>
+    <string name="text_east">পূ</string>
+    <string name="text_west">প</string>
+
+    <string name="text_halal_scanner_more">হালাল স্ক্যানার ও আরও</string>
+
+    <string name="text_halal_certified_reason">এই পণ্যটি একটি স্বীকৃত কর্তৃপক্ষ বা সংস্থার দ্বারা আনুষ্ঠানিকভাবে হালাল সার্টিফায়েড বা লেবেলযুক্ত। এর উপাদান ও উৎপাদন প্রক্রিয়া হালাল মানদণ্ড মেনে চলে।</string>
+
+    <string name="text_halal_possible_reason">এই পণ্যে কোনো হারাম বা সন্দেহজনক উপাদান পাওয়া যায়নি। তবে এটিতে কোনো আনুষ্ঠানিক হালাল সার্টিফিকেশন লেবেল নেই, তাই এর হালাল মর্যাদা সম্পূর্ণরূপে নিশ্চিত করা যায় না।</string>
+
+    <string name="text_halal_doubtful_reason">এই পণ্যে এক বা একাধিক উপাদান বা সংযোজন রয়েছে যা প্রাণীজ উৎস থেকে আসতে পারে, যেমন E471 বা E472। এই উপাদানের সঠিক উৎস অস্পষ্ট হওয়ায় হালাল মর্যাদা অনিশ্চিত।</string>
+
+    <string name="text_not_halal_reason">এই পণ্যে স্পষ্টভাবে হারাম উপাদান রয়েছে, যেমন শূকরের মাংস, অ্যালকোহল বা তাদের ডেরিভেটিভ। হালাল খাদ্য অনুসরণকারীদের এটি এড়িয়ে চলা উচিত।</string>
+
+    <string name="text_unknown_status_reason">এই পণ্যের উপাদান বা উৎপাদন প্রক্রিয়া সম্পর্কে পর্যাপ্ত নির্ভরযোগ্য তথ্য নেই হালাল মর্যাদা নির্ধারণ করার জন্য। অতিরিক্ত তথ্য বা যাচাই প্রয়োজন হতে পারে।</string>
+
+    <!-- Manual Halal Check -->
+    <string name="title_manual_halal_check">ম্যানুয়াল চেক</string>
+    <string name="text_utility_desc_manual_halal">বারকোড বা উপাদান দিয়ে হালাল যাচাই করুন</string>
+    <string name="text_manual_check_barcode_hint">বারকোড নম্বর লিখুন</string>
+    <string name="text_manual_check_ingredients_hint">উপাদান লিখুন (কমা দিয়ে আলাদা করুন)</string>
+    <string name="text_manual_check_barcode_title">বারকোড দিয়ে যাচাই</string>
+    <string name="text_manual_check_ingredients_title">উপাদান দিয়ে যাচাই</string>
+    <string name="text_manual_check_button">হালাল স্ট্যাটাস যাচাই করুন</string>
+    <string name="text_manual_check_or">অথবা</string>
+    <string name="text_manual_check_subtitle">ডাটাবেস থেকে খুঁজতে বারকোড লিখুন, অথবা হালাল স্ট্যাটাস বিশ্লেষণ করতে উপাদান পেস্ট করুন</string>
+
+    <!-- Scan History -->
+    <string name="title_scan_history">স্ক্যান ইতিহাস</string>
+    <string name="text_utility_desc_scan_history">আগে যাচাইকৃত পণ্য দেখুন</string>
+    <string name="text_scan_history_empty">এখনো কোনো স্ক্যান ইতিহাস নেই</string>
+    <string name="text_scan_history_empty_subtitle">স্ক্যান করা বা ম্যানুয়ালি যাচাই করা পণ্য এখানে দেখা যাবে</string>
+    <string name="text_scan_history_clear">ইতিহাস মুছুন</string>
+    <string name="text_scan_history_clear_confirm">আপনি কি নিশ্চিত যে সমস্ত স্ক্যান ইতিহাস মুছে ফেলতে চান?</string>
+
+    <!-- Prayer Calendar -->
+    <string name="title_prayer_calendar">নামাজের ক্যালেন্ডার</string>
+    <string name="text_utility_desc_calendar">সারা বছরের নামাজের সময় দেখুন</string>
+    <string name="text_calendar_loading">নামাজের তথ্য লোড হচ্ছে…</string>
+    <string name="text_calendar_empty_title">এখনো কোনো নামাজের তথ্য ক্যাশে হয়নি</string>
+    <string name="text_calendar_empty_subtitle">প্রথমে প্রেয়ার স্ক্রিনে গিয়ে তথ্য লোড করুন</string>
+    <string name="text_calendar_no_data_for_date">এই তারিখের জন্য নামাজের তথ্য পাওয়া যায়নি</string>
+    <string name="text_calendar_sahri">সেহরি</string>
+    <string name="text_calendar_error">ক্যালেন্ডার তথ্য লোড করতে সমস্যা হয়েছে</string>
+    <string name="text_calendar_prayer_times">নামাজের সময়</string>
+    <string name="text_calendar_fasting">রোজা</string>
+    <string name="text_calendar_sun">সূর্য</string>
+
+    <!-- Surah List -->
+    <string name="text_ayahs">আয়াত</string>
+
+    <!-- Surah Details -->
+    <string name="text_loading">লোড হচ্ছে...</string>
+
+    <!-- Qibla -->
+    <string name="text_qibla_degrees_to">%1$d° কিবলার দিকে</string>
+
+    <!-- Location Permission -->
+    <string name="text_location_denied_permanently">⚠️  লোকেশন অনুমতি স্থায়ীভাবে অস্বীকার করা হয়েছে।\nদয়া করে আপনার ডিভাইস সেটিংস থেকে এটি চালু করুন।</string>
+
+    <!-- Manual Halal Check Result -->
+    <string name="text_check_result">যাচাইয়ের ফলাফল</string>
+    <string name="text_check_another">আরেকটি যাচাই করুন</string>
+
+    <!-- About Screen -->
+    <string name="about_section_intention_title">একটি ব্যক্তিগত নিয়ত</string>
+    <string name="about_section_intention_body">আমি মুসলিম – নামাজ ও হালাল স্ক্যানার নিরবে তৈরি করেছি, আমার পেশাগত কাজ ও পারিবারিক জীবনের ফাঁকে ফাঁকে। এই অ্যাপ কোনো কোম্পানির পরিকল্পনা বা বাণিজ্যিক কৌশলের ফসল নয়, বরং একটি ব্যক্তিগত নিয়তের ফল: কিছু উপকারী তৈরি করা, যদি শুধু একজন মানুষও এটি ব্যবহার করে। যদি এই অ্যাপ একজন মানুষকেও তার ঈমানের সাথে সংযুক্ত রাখতে সাহায্য করে, তাহলে সেটাই আমার জন্য যথেষ্ট। আমি এটিকে মুসলিম উম্মাহর জন্য একটি ছোট অবদান হিসেবে দেখি।</string>
+    <string name="about_section_privacy_title">বিজ্ঞাপনমুক্ত ও গোপনীয়তা প্রথম</string>
+    <string name="about_section_privacy_body">শুরু থেকেই আমি অ্যাপটি সম্পূর্ণ বিজ্ঞাপনমুক্ত রাখার সিদ্ধান্ত নিয়েছি। কোনো বিভ্রান্তি নেই, কোনো লুকানো উদ্দেশ্য নেই। সমানভাবে গুরুত্বপূর্ণ হলো গোপনীয়তা—এই অ্যাপ আপনার কোনো ব্যক্তিগত তথ্য সংগ্রহ, সংরক্ষণ বা প্রক্রিয়া করে না। সবকিছু আপনার ডিভাইসে থাকে, আপনার নিয়ন্ত্রণে।</string>
+    <string name="about_section_prayer_title">নামাজের সময় ও আজান</string>
+    <string name="about_section_prayer_body">এই অ্যাপটি দৈনিক ইসলামী অনুশীলনকে সহজ ও চিন্তাশীলভাবে সমর্থন করার জন্য তৈরি। এটি আপনার অবস্থানের ভিত্তিতে পাঁচ ওয়াক্ত নামাজের সঠিক সময় প্রদান করে—ফজর, যোহর, আসর, মাগরিব এবং ইশা। আজান একটি মৃদু অনুস্মারক হিসেবে কাজ করে, আপনি যেখানেই থাকুন।</string>
+    <string name="about_section_qibla_title">কিবলা কম্পাস</string>
+    <string name="about_section_qibla_body">কিবলা কম্পাস আপনাকে তাৎক্ষণিকভাবে কাবার দিক খুঁজে পেতে সাহায্য করে, আপনি ঘরে থাকুন বা অপরিচিত কোনো স্থানে ভ্রমণ করছেন।</string>
+    <string name="about_section_ramadan_title">রমজান সহায়তা</string>
+    <string name="about_section_ramadan_body">রমজানে অ্যাপটি আরও সহায়ক হয়ে ওঠে, সেহরি ও ইফতারের স্পষ্ট সময়সূচি প্রদান করে যাতে আপনি আত্মবিশ্বাসের সাথে রোজা পালন করতে পারেন।</string>
+    <string name="about_section_quran_title">কুরআন রিডার</string>
+    <string name="about_section_quran_body">অ্যাপের মধ্যেই সরাসরি কুরআন পড়ার সুবিধা অন্তর্ভুক্ত করা হয়েছে। এটি একটি পরিষ্কার, বিভ্রান্তিমুক্ত ইন্টারফেসে তৈরি যাতে আপনি দিনের যেকোনো সময় আল্লাহর বাণী নিয়ে চিন্তা করতে পারেন।</string>
+    <string name="about_section_halal_title">হালাল স্ক্যানার</string>
+    <string name="about_section_halal_body">নামাজ ও চিন্তার বাইরেও, অ্যাপটি হালাল স্ক্যানারের মাধ্যমে সচেতন জীবনযাপনকে সমর্থন করে। পণ্যের বারকোড স্ক্যান করে আপনি দ্রুত জানতে পারবেন কোনো পণ্য হালাল, হারাম নাকি সন্দেহজনক। অ্যাপটি OpenFoodFacts-এর সর্বজনীন তথ্য ব্যবহার করে।</string>
+    <string name="about_section_tools_title">ব্যবহারিক টুলস</string>
+    <string name="about_section_tools_body">নামাজের মধ্যবর্তী সময় ট্র্যাক করার জন্য কাউন্টডাউন টাইমার এবং যিকরের জন্য ডিজিটাল তাসবিহ কাউন্টারসহ ছোট ছোট ব্যবহারিক টুলস রয়েছে। প্রতিটি বৈশিষ্ট্য সহজভাবে তৈরি, একটি স্পষ্ট উদ্দেশ্য পূরণ করতে।</string>
+    <string name="about_section_growing_title">সবসময় উন্নত হচ্ছে</string>
+    <string name="about_section_growing_body">এই অ্যাপ এখনও বাড়ছে। আমি ধীরে ধীরে এটি উন্নত করে চলেছি, বৈশিষ্ট্য পরিমার্জন করছি, সমস্যা সমাধান করছি। এটি হয়তো কখনো নিখুঁত হবে না, তবে এটি আন্তরিকতা ও যত্ন দিয়ে তৈরি।</string>
+    <string name="about_closing_note">সর্বোপরি, মুসলিম – নামাজ ও হালাল স্ক্যানার আপনার দৈনন্দিন জীবনে একটি নীরব সঙ্গী হতে চায়—একটি টুল যা আপনাকে নামাজে নিয়মিত, পছন্দে সচেতন এবং যেখানেই থাকুন ঈমানের সাথে সংযুক্ত রাখতে সাহায্য করে।</string>
+
+</resources>

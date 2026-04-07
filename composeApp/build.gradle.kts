@@ -71,6 +71,7 @@ kotlin {
 
             // Coroutine support for WorkManager
             implementation("androidx.work:work-runtime:2.8.1")
+            implementation(libs.androidx.appcompat)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -137,6 +138,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    androidResources {
+        generateLocaleConfig = true
     }
 }
 

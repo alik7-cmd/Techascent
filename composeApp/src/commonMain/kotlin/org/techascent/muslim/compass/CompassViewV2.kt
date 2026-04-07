@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_back
 import apphub.composeapp.generated.resources.text_qibla_aligned
+import apphub.composeapp.generated.resources.text_qibla_degrees_to
 import apphub.composeapp.generated.resources.text_qibla_subtitle
 import apphub.composeapp.generated.resources.text_qibla_tip
 import apphub.composeapp.generated.resources.text_qibla_tip_title
@@ -449,7 +450,7 @@ private fun AlignmentIndicator(isAligned: Boolean, degrees: Float) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "${degrees.toInt()}° to Qibla",
+                text = stringResource(Res.string.text_qibla_degrees_to, degrees.toInt()),
                 style = ComposaTheme.typography.subheadEmphasized,
                 color = textColor,
             )
