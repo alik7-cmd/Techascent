@@ -34,34 +34,120 @@ enum class HalalStatus {
 object HalalChecker {
 
     private val nonHalalIndicators = listOf(
-        // English
-        "pork", "gelatin", "lard", "bacon", "ham", "wine", "rum", "beer", "alcohol",
-        "ethanol", "pepsin", "rennet", "carmine", "cochineal", "shellac", "lard oil",
-        "pig fat", "pork fat", "swine", "blood", "plasma",
-        // Arabic
-        "خنزير", "لحم خنزير", "شحم خنزير", "جيلاتين", "كحول", "نبيذ", "بيرة",
-        "دم", "لاردو", "كارمين",
-        // Turkish
-        "domuz", "domuz yağı", "domuz jelatini", "jelatin", "alkol", "şarap", "bira",
-        "kan", "domuz eti",
-        // Malay / Indonesian
-        "babi", "khinzir", "lemak babi", "gelatin babi", "arak", "alkohol", "bir",
+
+        // ===== ENGLISH =====
+        "pork", "porcine", "swine", "hog",
+        "gelatin", "gelatine", "animal gelatin", "porcine gelatin",
+        "lard", "lard oil", "pork fat", "pig fat", "animal fat",
+        "bacon", "ham", "prosciutto", "salami", "pepperoni",
+        "blood", "blood plasma", "plasma", "hemoglobin",
+        "meat extract", "animal extract", "animal shortening",
+        "rennet", "animal rennet", "pepsin", "trypsin",
+        "enzymes", "animal enzymes",
+        "collagen",
+        "carmine", "cochineal", "carminic acid",
+        "shellac", "resinous glaze",
+        "wine", "beer", "rum", "vodka", "whiskey", "brandy",
+        "alcohol", "ethanol", "ethyl alcohol", "spirit",
+        "marshmallow", // often gelatin-based
+        "mono- and diglycerides", "emulsifier",
+        "glycerin", "glycerol", "fatty acids",
+        "shortening",
+
+        // ===== ARABIC =====
+        "خنزير", "لحم خنزير", "دهن خنزير", "شحم خنزير",
+        "جيلاتين", "جيلاتين حيواني",
+        "كحول", "إيثانول", "نبيذ", "بيرة",
+        "دم", "بلازما",
+        "إنزيمات", "منفحة",
+
+        // ===== TURKISH =====
+        "domuz", "domuz eti", "domuz yağı",
+        "jelatin", "hayvansal jelatin",
+        "alkol", "etanol", "şarap", "bira",
+        "kan", "plazma",
+        "enzim", "rennet",
+
+        // ===== MALAY / INDONESIAN =====
+        "babi", "khinzir", "lemak babi",
+        "gelatin", "gelatin babi",
+        "alkohol", "etanol", "arak", "bir",
         "darah",
-        // French
-        "porc", "gélatine", "saindoux", "jambon", "vin", "bière", "alcool",
-        "graisse de porc", "sang",
-        // German
-        "schwein", "schweinefleisch", "schweinefett", "gelatine", "speck",
-        "schinken", "wein", "bier", "alkohol", "blut",
-        // Spanish
-        "cerdo", "grasa de cerdo", "gelatina", "tocino", "jamón", "vino",
-        "cerveza", "sangre",
-        // Urdu
-        "سور", "خنزیر", "شراب", "الکحل", "جلیٹن",
-        // Bengali
-        "শূকর", "শূকরের মাংস", "মদ", "জেলাটিন",
-        // Hindi
-        "सूअर", "शराब", "जिलेटिन",
+        "enzim", "rennet",
+
+        // ===== FRENCH =====
+        "porc", "graisse de porc", "saindoux",
+        "gélatine", "gélatine animale",
+        "alcool", "éthanol", "vin", "bière",
+        "sang", "plasma",
+        "enzymes", "présure",
+
+        // ===== GERMAN =====
+        "schwein", "schweinefleisch", "schweinefett",
+        "gelatine", "tierische gelatine",
+        "alkohol", "ethanol", "wein", "bier",
+        "blut", "plasma",
+        "enzyme", "lab",
+
+        // ===== SPANISH =====
+        "cerdo", "grasa de cerdo",
+        "gelatina", "gelatina animal",
+        "alcohol", "etanol", "vino", "cerveza",
+        "sangre", "plasma",
+        "enzimas", "cuajo",
+
+        // ===== URDU =====
+        "سور", "خنزیر", "سور کا گوشت",
+        "جیلیٹن", "جلیٹن",
+        "شراب", "الکحل",
+        "خون",
+
+        // ===== BENGALI =====
+        "শূকর", "শূকরের মাংস", "শূকরের চর্বি",
+        "জেলাটিন", "প্রাণিজ জেলাটিন",
+        "অ্যালকোহল", "ইথানল", "মদ",
+        "রক্ত",
+
+        // ===== HINDI =====
+        "सूअर", "सूअर का मांस",
+        "जिलेटिन", "पशु जिलेटिन",
+        "अल्कोहल", "एथेनॉल", "शराब",
+        "खून",
+
+        // ===== NORWEGIAN (BOKMÅL + COMMON LABEL TERMS) =====
+        "svin", "svinekjøtt", "svinefett", "svineflesk",
+        "gris", "grisekjøtt", "grisefett",
+        "bacon", "skinke", "spekeskinke", "salami", "pepperoni",
+        "ister", "smult", // lard equivalents
+        "animalsk fett", "animalsk olje", "animalsk forkortning",
+        "gelatin", "gelatine", "animalsk gelatin", "svinegelatin",
+        "kollagen",
+        "blod", "blodplasma", "plasma",
+        "enzym", "enzymer", "animalske enzymer",
+        "løpe", "animalsk løpe", // rennet
+        "pepsin", "trypsin",
+        "karmin", "kochenille", "karminsyrer",
+        "skjellakk", "shellac",
+        "alkohol", "etanol", "etylalkohol", "sprit",
+        "vin", "øl", "brennevin", "rom", "vodka", "whisky",
+        "emulgator", "mono- og diglyserider",
+        "glyserol", "glyserin",
+        "fettsyrer",
+        "smaksstoff", "aroma", "naturlig aroma", // often doubtful
+        "stabilisator", "fortykningsmiddel",
+        "animalsk protein", "animalsk ekstrakt",
+        "kjøttekstrakt",
+        "myseprotein", "kasein", // dairy but sometimes mixed processing
+        "marshmallow", // often gelatin-based
+
+        // ===== GENERIC / SCIENTIFIC FLAGS =====
+        "e120", "e441", "e904",
+        "e471", "e472", "e473", "e474", "e475", "e476",
+        "e477", "e481", "e482", "e491", "e492",
+        "e493", "e494", "e495",
+        "e542", "e570", "e572",
+        "e631", "e635",
+        "e920"
     )
 
     private val doubtfulENumbers = listOf(
