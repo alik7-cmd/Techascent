@@ -105,7 +105,7 @@ class PrayerTimeViewUseCase(
             longitude = location.longitude,
             school = school,
             city = city,
-            currentDate = currentDate
+            currentDate = currentDate,
         )
     }
 

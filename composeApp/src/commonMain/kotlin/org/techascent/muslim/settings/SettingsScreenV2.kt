@@ -49,6 +49,8 @@ import apphub.composeapp.generated.resources.text_settings_prayer_desc
 import apphub.composeapp.generated.resources.title_settings
 import apphub.composeapp.generated.resources.haptic_title
 import apphub.composeapp.generated.resources.haptic_label
+import apphub.composeapp.generated.resources.text_24_hr
+import apphub.composeapp.generated.resources.text_24_hr_desc
 import apphub.composeapp.generated.resources.text_language
 import apphub.composeapp.generated.resources.text_our_mission
 import apphub.composeapp.generated.resources.text_settings_about_this_app
@@ -73,9 +75,11 @@ internal fun SettingsScreenV2(
     schoolPreference: Int,
     hapticPreference: Boolean,
     adhanPreference: Boolean,
+    is24HourFormat: Boolean,
     languagePreference: String,
     onUpdateSchool: (Int) -> Unit,
     onUpdateAdhanNotification: (Boolean) -> Unit,
+    onUpdateTimePreference: (Boolean) -> Unit,
     onUpdateHaptic: (Boolean) -> Unit,
     onUpdateLanguage: (String) -> Unit,
     onHandleEvent: (SettingsEvent) -> Unit,
@@ -117,6 +121,14 @@ internal fun SettingsScreenV2(
                         description = stringResource(Res.string.text_adhan_notification_desc),
                         checked = adhanPreference,
                         onCheckedChange = onUpdateAdhanNotification,
+                    )
+                    ThinDivider()
+                    SettingsToggleRow(
+                        emoji = "🕑",
+                        title = stringResource(Res.string.text_24_hr),
+                        description = stringResource(Res.string.text_24_hr_desc),
+                        checked = is24HourFormat,
+                        onCheckedChange = onUpdateTimePreference,
                     )
 
                     ThinDivider()

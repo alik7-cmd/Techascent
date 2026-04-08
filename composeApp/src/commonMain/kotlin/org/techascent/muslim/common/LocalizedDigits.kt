@@ -3,6 +3,10 @@ package org.techascent.muslim.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import apphub.composeapp.generated.resources.Res
+import apphub.composeapp.generated.resources.text_am
+import apphub.composeapp.generated.resources.text_pm
+import org.jetbrains.compose.resources.stringResource
 import org.techascent.muslim.AppLang
 
 /**
@@ -34,6 +38,25 @@ fun String.localizeDigits(lang: AppLang): String = when (lang) {
  */
 @Composable
 fun String.localizeDigits(): String = localizeDigits(LocalAppLang.current)
+
+/**
+ * Replaces English "AM" / "PM" markers with their localized equivalents
+ * (e.g. Bengali পূর্বাহ্ন / অপরাহ্ন). Call **before** [localizeDigits] so
+ * that digit replacement doesn't interfere with the AM/PM text.
+ */
+@Composable
+fun String.localizeAmPm(): String {
+    val localizedAm = stringResource(Res.string.text_am)
+    val localizedPm = stringResource(Res.string.text_pm)
+    return this.replace("AM", localizedAm).replace("PM", localizedPm)
+}
+
+/**
+ * Convenience: localizes both AM/PM and digits in one call.
+ * Use this on any time string to get fully localized output.
+ */
+@Composable
+fun String.localizeTime(): String = localizeAmPm().localizeDigits()
 
 /**
  * Convenience: wraps children with [LocalAppLang] provided.

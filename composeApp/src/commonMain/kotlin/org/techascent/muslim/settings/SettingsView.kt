@@ -58,6 +58,7 @@ private fun SettingsScreen(
     val schoolPreference by viewModel.schoolPreference.collectAsState()
     val hapticPreference by viewModel.hapticPreference.collectAsState()
     val adhanPreference by viewModel.adhanPreference.collectAsState()
+    val is24HourFormat by viewModel.is24HourFormat.collectAsState()
     val languagePreference by viewModel.languagePreference.collectAsState()
     SettingsScreenV2(
         uiState = uiState,
@@ -66,9 +67,11 @@ private fun SettingsScreen(
         adhanPreference = adhanPreference,
         languagePreference = languagePreference,
         innerPadding = innerPadding,
+        is24HourFormat = is24HourFormat,
         onUpdateSchool = viewModel::updateSchoolPreference,
         onUpdateHaptic = viewModel::onUpdateHaptic,
         onUpdateAdhanNotification = viewModel::onUpdateAdhanNotification,
+        onUpdateTimePreference = viewModel::onUpdateTimePreference,
         onUpdateLanguage = viewModel::onUpdateLanguage,
         onHandleEvent = onHandleEvent,
         onNavigateAbout = onNavigateAbout,

@@ -10,6 +10,7 @@ object DataStoreKey {
     const val MONTHLY_PRAYER_INITIAL = "monthly_prayer_times_"
     const val SCHOOL_PREFERENCE = "school_preference"
     const val ADHAN_NOTIFICATION_PREFERENCE = "azan_preference"
+    const val IS_24_HOUR_FORMAT = "is_24_hour_format"
     const val HAPTIC_FEEDBACK = "haptic_feedback"
     const val NOTIFICATION_PRAYER_LIST = "notify_prayers_list"
     const val LAST_SURAH_NUMBER = "last_surah_number"
