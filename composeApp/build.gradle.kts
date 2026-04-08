@@ -116,8 +116,8 @@ android {
         applicationId = "org.techascent.muslim"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 24
-        versionName = "2.4.0"
+        versionCode = 26
+        versionName = "2.5.1"
     }
     packaging {
         resources {
