@@ -255,25 +255,19 @@ actual fun changeAppLocale(langCode: String) {
     // iOS requires the user to change per-app language from Settings.
     // Open the app's settings page so the user can select the language.
     val url = NSURL(string = UIApplicationOpenSettingsURLString)
-    if (UIApplication.sharedApplication.canOpenURL(url)) {
-        UIApplication.sharedApplication.openURL(url)
-    }
+    UIApplication.sharedApplication.openURL(url, options = emptyMap<Any?, Any>()) { _ -> }
 }
 
 actual class UrlLauncher {
     actual fun openAppSettings() {
         val url = NSURL(string = UIApplicationOpenSettingsURLString)
-        if (UIApplication.sharedApplication.canOpenURL(url)) {
-            UIApplication.sharedApplication.openURL(url)
-        }
+        UIApplication.sharedApplication.openURL(url, options = emptyMap<Any?, Any>()) { _ -> }
     }
 
     actual fun openLanguageSettings() {
         // On iOS, per-app language is configured in the app's Settings page
         val url = NSURL(string = UIApplicationOpenSettingsURLString)
-        if (UIApplication.sharedApplication.canOpenURL(url)) {
-            UIApplication.sharedApplication.openURL(url)
-        }
+        UIApplication.sharedApplication.openURL(url, options = emptyMap<Any?, Any>()) { _ -> }
     }
 }
 
