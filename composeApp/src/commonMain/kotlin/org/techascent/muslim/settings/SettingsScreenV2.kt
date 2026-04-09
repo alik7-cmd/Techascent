@@ -254,8 +254,6 @@ internal fun SettingsScreenV2(
                     }
                 }
             }
-
-            item { Spacer(modifier = Modifier.size(ComposaSpacing.Large)) }
         }
     }
 }

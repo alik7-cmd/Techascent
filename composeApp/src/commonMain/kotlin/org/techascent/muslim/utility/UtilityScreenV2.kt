@@ -153,8 +153,6 @@ internal fun UtilityScreenV2(
                     }
                 }
             }
-
-            item { Spacer(modifier = Modifier.size(ComposaSpacing.Large)) }
         }
     }
 }

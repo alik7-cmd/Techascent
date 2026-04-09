@@ -247,8 +247,6 @@ private fun LazyListScope.prayerBodyV3(
 
     // 5 — Announcement
     item { AnnouncementSection() }
-
-    item { Spacer(Modifier.height(ComposaSpacing.Small)) }
 }
 
 // ═════════════════════════════════════════════════════════════════════════════════
