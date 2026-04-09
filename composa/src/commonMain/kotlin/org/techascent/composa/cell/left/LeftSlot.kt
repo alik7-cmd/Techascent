@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,12 +18,17 @@ import org.techascent.composa.common.BackgroundShape
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
 import org.techascent.composa.common.orDefaultTint
+import org.techascent.composa.theming.ComposaTheme
 
 sealed interface LeftSlot {
     data object None : LeftSlot
     data class Icon(
         val icon: DrawableData,
         val background: BackgroundShape = BackgroundShape.None
+    ) : LeftSlot
+
+    data class Emoji(
+        val text: String,
     ) : LeftSlot
 
     data class Space(val size: Dp = ComposaSpacing.Large) : LeftSlot
@@ -39,8 +45,15 @@ internal fun RowScope.LeftSlot(
             modifier = modifier
         )
 
-        is LeftSlot.None -> {}
         is LeftSlot.Space -> Space(modifier = modifier)
+        is LeftSlot.Emoji -> Text(
+            modifier = modifier,
+            text = leftSlot.text,
+            style = ComposaTheme.typography.body,
+            color = ComposaTheme.color.textNeutral
+        )
+
+        is LeftSlot.None -> {}
     }
 }
 
