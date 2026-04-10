@@ -44,7 +44,7 @@
     <string name="text_prayer_fasting">রোজা</string>
     <string name="text_prayer_announcement">ঘোষণা</string>
 
-    <string name="text_prayer_data_announcement">🗓️ নতুন! এখন প্রেয়ার ক্যালেন্ডার উপলব্ধ।\nএক্সপ্লোর স্ক্রিন থেকে সারা বছরের নামাজের সময় দেখুন।\n\nআমরা আপনার গোপনীয়তাকে গুরুত্ব দিই — এই অ্যাপ কোনো ব্যক্তিগত তথ্য সংগ্রহ, সংরক্ষণ বা প্রক্রিয়া করে না। সব তথ্য আপনার ডিভাইসেই থাকে।</string>
+    <string name="text_prayer_data_announcement">আমরা আপনার গোপনীয়তাকে গুরুত্ব দিই — এই অ্যাপ কোনো ব্যক্তিগত তথ্য সংগ্রহ, সংরক্ষণ বা প্রক্রিয়া করে না। সব তথ্য আপনার ডিভাইসেই থাকে।</string>
 
     <string name="text_prayer_no_announcement">এই মুহূর্তে কোনো ঘোষণা নেই।</string>
     <string name="text_prayer_next_fast">পরবর্তী রোজার সময়</string>

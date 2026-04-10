@@ -41,6 +41,7 @@ fun SunProgressCard(
     config: SunProgressConfig,
     modifier: Modifier = Modifier,
     headerContent: @Composable (() -> Unit)? = null,
+    footerContent: @Composable (() -> Unit)? = null,
 ) {
     val isNight = config.isNight
     val isDusk = config.isDusk
@@ -201,6 +202,9 @@ fun SunProgressCard(
             drawCircle(config.arcTrackColor, radius = 4f, center = Offset(arcPadding, horizonY))
             drawCircle(config.arcTrackColor, radius = 4f, center = Offset(arcPadding + arcWidth, horizonY))
         }
+
+        // ── Optional footer slot (e.g. sunrise / sunset labels) ─────
+        footerContent?.invoke()
 
         Spacer(Modifier.height(ComposaSpacing.Small))
     }
