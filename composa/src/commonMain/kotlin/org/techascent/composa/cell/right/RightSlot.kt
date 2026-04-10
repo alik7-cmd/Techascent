@@ -10,6 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import org.techascent.composa.checkbox.ComposaCheckbox
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
@@ -44,6 +47,25 @@ sealed interface RightSlot {
     data class TextEmphasized(
         val text: String
     ) : RightSlot
+
+    /**
+     * A navigation indicator text (e.g. "›" for internal, "↗" for external).
+     * Rendered in a muted style at the trailing edge.
+     */
+    data class Chevron(
+        val text: String = "›",
+        val fontSize: Int = 18,
+    ) : RightSlot
+
+    /**
+     * Plain text with a configurable [TextStyle] and [Color].
+     * Unlike [TextEmphasized] this has no background — just the text.
+     */
+    data class StyledText(
+        val text: String,
+        val style: TextStyle? = null,
+        val color: Color = Color.Unspecified,
+    ) : RightSlot
 }
 
 @Composable
@@ -67,6 +89,16 @@ internal fun RowScope.RightSlot(rightSlot: RightSlot, modifier: Modifier = Modif
         )
 
         is RightSlot.TitleWithLabel -> CellTitleWithLabel(
+            rightSlot = rightSlot,
+            modifier = modifier
+        )
+
+        is RightSlot.Chevron -> CellChevron(
+            rightSlot = rightSlot,
+            modifier = modifier
+        )
+
+        is RightSlot.StyledText -> CellStyledText(
             rightSlot = rightSlot,
             modifier = modifier
         )
@@ -155,3 +187,31 @@ internal fun CellEmphasizedText(
 
     }
 }
+
+@Composable
+internal fun CellChevron(
+    rightSlot: RightSlot.Chevron,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        modifier = modifier,
+        text = rightSlot.text,
+        fontSize = rightSlot.fontSize.sp,
+        color = ComposaTheme.color.textNeutralSubtle,
+    )
+}
+
+@Composable
+internal fun CellStyledText(
+    rightSlot: RightSlot.StyledText,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        modifier = modifier,
+        text = rightSlot.text,
+        style = rightSlot.style ?: ComposaTheme.typography.subheadEmphasized,
+        color = if (rightSlot.color != Color.Unspecified) rightSlot.color
+                else ComposaTheme.color.textNeutral,
+    )
+}
+

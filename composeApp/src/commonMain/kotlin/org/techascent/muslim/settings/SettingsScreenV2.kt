@@ -55,6 +55,10 @@ import apphub.composeapp.generated.resources.text_language
 import apphub.composeapp.generated.resources.text_our_mission
 import apphub.composeapp.generated.resources.text_settings_about_this_app
 import org.jetbrains.compose.resources.stringResource
+import org.techascent.composa.cell.Cell
+import org.techascent.composa.cell.center.CenterSlot
+import org.techascent.composa.cell.left.LeftSlot
+import org.techascent.composa.cell.right.RightSlot
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.AppLang
@@ -63,7 +67,6 @@ import org.techascent.muslim.common.toTextRes
 import org.techascent.muslim.common.toVisibility
 import org.techascent.muslim.settings.event.SettingsEvent
 import org.techascent.muslim.settings.state.NavigationType
-import org.techascent.muslim.settings.state.SettingsItem
 import org.techascent.muslim.settings.state.SettingsUiState
 import org.techascent.shared.data.enum.School
 
@@ -115,35 +118,50 @@ internal fun SettingsScreenV2(
                     subtitle = stringResource(Res.string.text_settings_prayer_desc),
                     accentColor = Color(0xFF1565C0),
                 ) {
-                    SettingsToggleRow(
-                        emoji = "🔊",
-                        title = stringResource(Res.string.text_adhan_notification),
-                        description = stringResource(Res.string.text_adhan_notification_desc),
-                        checked = adhanPreference,
-                        onCheckedChange = onUpdateAdhanNotification,
-                    )
-                    ThinDivider()
-                    SettingsToggleRow(
-                        emoji = "🕑",
-                        title = stringResource(Res.string.text_24_hr),
-                        description = stringResource(Res.string.text_24_hr_desc),
-                        checked = is24HourFormat,
-                        onCheckedChange = onUpdateTimePreference,
-                    )
-
-                    ThinDivider()
-
-                    SettingsToggleRow(
-                        emoji = "📐",
-                        title = stringResource(Res.string.text_school_of),
-                        description = stringResource(
-                            School.fromCode(schoolPreference).toTextRes()
+                    Cell(
+                        leftSlot = LeftSlot.Emoji(emoji = "🔊"),
+                        centerSlot = CenterSlot.TitleWithLabel(
+                            title = stringResource(Res.string.text_adhan_notification),
+                            label = stringResource(Res.string.text_adhan_notification_desc),
                         ),
-                        checked = School.fromCode(schoolPreference).toVisibility(),
-                        onCheckedChange = { isChecked ->
-                            val code = if (isChecked) School.HANAFI.code else School.SHAFI.code
-                            onUpdateSchool(code)
-                        },
+                        rightSlot = RightSlot.Switch(
+                            checked = adhanPreference,
+                            onCheckedChange = onUpdateAdhanNotification,
+                        ),
+                        backgroundColor = Color.Transparent,
+                    )
+                    ThinDivider()
+                    Cell(
+                        leftSlot = LeftSlot.Emoji(emoji = "🕑"),
+                        centerSlot = CenterSlot.TitleWithLabel(
+                            title = stringResource(Res.string.text_24_hr),
+                            label = stringResource(Res.string.text_24_hr_desc),
+                        ),
+                        rightSlot = RightSlot.Switch(
+                            checked = is24HourFormat,
+                            onCheckedChange = onUpdateTimePreference,
+                        ),
+                        backgroundColor = Color.Transparent,
+                    )
+
+                    ThinDivider()
+
+                    Cell(
+                        leftSlot = LeftSlot.Emoji(emoji = "📐"),
+                        centerSlot = CenterSlot.TitleWithLabel(
+                            title = stringResource(Res.string.text_school_of),
+                            label = stringResource(
+                                School.fromCode(schoolPreference).toTextRes()
+                            ),
+                        ),
+                        rightSlot = RightSlot.Switch(
+                            checked = School.fromCode(schoolPreference).toVisibility(),
+                            onCheckedChange = { isChecked ->
+                                val code = if (isChecked) School.HANAFI.code else School.SHAFI.code
+                                onUpdateSchool(code)
+                            },
+                        ),
+                        backgroundColor = Color.Transparent,
                     )
 
                     // Hint box
@@ -176,20 +194,34 @@ internal fun SettingsScreenV2(
                     subtitle = stringResource(Res.string.text_settings_experience_desc),
                     accentColor = Color(0xFF7B1FA2),
                 ) {
-                    SettingsToggleRow(
-                        emoji = "📳",
-                        title = stringResource(Res.string.haptic_title),
-                        description = stringResource(Res.string.haptic_label),
-                        checked = hapticPreference,
-                        onCheckedChange = onUpdateHaptic,
+                    Cell(
+                        leftSlot = LeftSlot.Emoji(emoji = "📳"),
+                        centerSlot = CenterSlot.TitleWithLabel(
+                            title = stringResource(Res.string.haptic_title),
+                            label = stringResource(Res.string.haptic_label),
+                        ),
+                        rightSlot = RightSlot.Switch(
+                            checked = hapticPreference,
+                            onCheckedChange = onUpdateHaptic,
+                        ),
+                        backgroundColor = Color.Transparent,
                     )
 
                     ThinDivider()
 
                     val urlLauncher = rememberUrlLauncher()
-                    LanguagePickerRow(
-                        currentLangCode = languagePreference,
-                        onLanguageClicked = { urlLauncher.openLanguageSettings() },
+                    val languages = AppLang.entries
+                    val selectedLang = languages.find { it.code == languagePreference } ?: AppLang.English
+
+                    Cell(
+                        leftSlot = LeftSlot.Emoji(emoji = "🌐"),
+                        centerSlot = CenterSlot.TitleWithLabel(
+                            title = stringResource(Res.string.text_language),
+                            label = stringResource(selectedLang.stringRes),
+                        ),
+                        rightSlot = RightSlot.Chevron(),
+                        backgroundColor = Color.Transparent,
+                        onClick = { urlLauncher.openLanguageSettings() },
                     )
                 }
             }
@@ -203,45 +235,39 @@ internal fun SettingsScreenV2(
                     accentColor = Color(0xFF00838F),
                 ) {
                     // About This App row
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(onClick = onNavigateAbout)
-                            .padding(horizontal = ComposaSpacing.Medium, vertical = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(text = "💚", fontSize = 20.sp)
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(Res.string.text_settings_about_this_app),
-                                style = ComposaTheme.typography.subhead,
-                                color = ComposaTheme.color.textNeutral,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = stringResource(Res.string.text_our_mission),
-                                style = ComposaTheme.typography.caption,
-                                color = ComposaTheme.color.textNeutralSubtle,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(ComposaSpacing.Small))
-                        Text(
-                            text = "›",
-                            fontSize = 18.sp,
-                            color = ComposaTheme.color.textNeutralSubtle,
-                        )
-                    }
+                    Cell(
+                        leftSlot = LeftSlot.Emoji(emoji = "💚"),
+                        centerSlot = CenterSlot.TitleWithLabel(
+                            title = stringResource(Res.string.text_settings_about_this_app),
+                            label = stringResource(Res.string.text_our_mission),
+                        ),
+                        rightSlot = RightSlot.Chevron(),
+                        backgroundColor = Color.Transparent,
+                        onClick = onNavigateAbout,
+                    )
 
                     ThinDivider()
 
                     uiState.links.listOfElements.forEachIndexed { index, item ->
-                        LinkRow(
-                            item = item,
+                        val isExternal = item.navigationType == NavigationType.EXTERNAL
+                        Cell(
+                            leftSlot = LeftSlot.Emoji(
+                                emoji = if (isExternal) "🔗" else "📄",
+                            ),
+                            centerSlot = if (item.subtitle != null) {
+                                CenterSlot.TitleWithLabel(
+                                    title = stringResource(item.title),
+                                    label = stringResource(item.subtitle!!),
+                                )
+                            } else {
+                                CenterSlot.Title(
+                                    title = stringResource(item.title),
+                                )
+                            },
+                            rightSlot = RightSlot.Chevron(
+                                text = if (isExternal) "↗" else "›",
+                            ),
+                            backgroundColor = Color.Transparent,
                             onClick = {
                                 onHandleEvent(
                                     SettingsEvent.OpenExternalLink(url = "https://aladhan.com")
@@ -334,165 +360,6 @@ private fun SectionCard(
     }
 }
 
-// ─── Toggle Row ─────────────────────────────────────────────────────────────────
-
-@Composable
-private fun SettingsToggleRow(
-    emoji: String,
-    title: String,
-    description: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    val trackColor by animateColorAsState(
-        targetValue = if (checked)
-            ComposaTheme.color.backgroundAction
-        else
-            ComposaTheme.color.strokeNeutralSubtle,
-        animationSpec = tween(250),
-        label = "switchTrack",
-    )
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
-            .padding(horizontal = ComposaSpacing.Medium, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(text = emoji, fontSize = 22.sp)
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = ComposaTheme.typography.subhead,
-                color = ComposaTheme.color.textNeutral,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = description,
-                style = ComposaTheme.typography.caption,
-                color = ComposaTheme.color.textNeutralSubtle,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-
-        Spacer(modifier = Modifier.width(ComposaSpacing.Small))
-
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(
-                checkedTrackColor = trackColor,
-                uncheckedTrackColor = trackColor,
-            ),
-        )
-    }
-}
-
-// ─── Link Row ───────────────────────────────────────────────────────────────────
-
-@Composable
-private fun LinkRow(
-    item: SettingsItem,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = ComposaSpacing.Medium, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        val isExternal = item.navigationType == NavigationType.EXTERNAL
-        Text(text = if (isExternal) "🔗" else "📄", fontSize = 20.sp)
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(item.title),
-                style = ComposaTheme.typography.subhead,
-                color = ComposaTheme.color.textNeutral,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            item.subtitle?.let { subtitleRes ->
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = stringResource(subtitleRes),
-                    style = ComposaTheme.typography.caption,
-                    color = ComposaTheme.color.textNeutralSubtle,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(ComposaSpacing.Small))
-
-        // Chevron
-        Text(
-            text = if (isExternal) "↗" else "›",
-            fontSize = 18.sp,
-            color = ComposaTheme.color.textNeutralSubtle,
-        )
-    }
-}
-
-// ─── Language Picker Row ────────────────────────────────────────────────────────
-
-@Composable
-private fun LanguagePickerRow(
-    currentLangCode: String,
-    onLanguageClicked: () -> Unit,
-) {
-    val languages = AppLang.entries
-    val selectedLang = languages.find { it.code == currentLangCode } ?: AppLang.English
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onLanguageClicked)
-            .padding(horizontal = ComposaSpacing.Medium, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(text = "🌐", fontSize = 22.sp)
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(Res.string.text_language),
-                style = ComposaTheme.typography.subhead,
-                color = ComposaTheme.color.textNeutral,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = stringResource(selectedLang.stringRes),
-                style = ComposaTheme.typography.caption,
-                color = ComposaTheme.color.textNeutralSubtle,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-
-        Spacer(modifier = Modifier.width(ComposaSpacing.Small))
-
-        Text(
-            text = "›",
-            fontSize = 18.sp,
-            color = ComposaTheme.color.textNeutralSubtle,
-        )
-    }
-}
 
 // ─── Thin Divider ───────────────────────────────────────────────────────────────
 
