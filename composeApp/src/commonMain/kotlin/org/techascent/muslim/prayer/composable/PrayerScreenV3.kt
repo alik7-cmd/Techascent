@@ -495,12 +495,12 @@ private fun CountdownRow(uiModel: PrayerTimeUiModel) {
     ) {
         if (hasWaqt) {
             Box(modifier = Modifier.weight(1f)) {
-                WaqtCountdown(uiModel.currentPrayer!!)
+                WaqtCountdown(uiModel.currentPrayer)
             }
         }
         if (hasFasting) {
             Box(modifier = Modifier.weight(1f)) {
-                FastingCountdown(uiModel.iftarTime!!)
+                FastingCountdown(uiModel.iftarTime)
             }
         }
     }
@@ -580,36 +580,43 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
 
 @Composable
 private fun FastingCountdown(iftar: IftarTimeUiModel) {
-    val now = Clock.System.now()
     val accent = ComposaTheme.color.prayer.fastingAccent
 
-    // Determine which is closer: iftar or suhur
     val iftarInstant = iftar.iftarInstant
     val sahriInstant = iftar.sahriInstant
 
-    val targetInstant: Instant?
-    val targetLabel: String
-    val targetEmoji: String
+    val iftarLabel = stringResource(Res.string.text_iftar)
+    val sahriLabel = stringResource(Res.string.text_suhur)
 
-    if (iftarInstant != null && iftarInstant > now) {
-        targetInstant = iftarInstant
-        targetLabel = stringResource(Res.string.text_iftar)
-        targetEmoji = "🍽️"
-    } else if (sahriInstant != null && sahriInstant > now) {
-        targetInstant = sahriInstant
-        targetLabel = stringResource(Res.string.text_suhur)
-        targetEmoji = "🥣"
-    } else {
-        targetInstant = null
-        targetLabel = stringResource(Res.string.text_iftar)
-        targetEmoji = "🍽️"
+    // ── Live target that auto-transitions iftar → sahri ───────────────
+    data class Target(val instant: Instant?, val label: String, val emoji: String)
+
+    fun resolveTarget(now: Instant): Target {
+        return when {
+            iftarInstant != null && iftarInstant > now ->
+                Target(iftarInstant, iftarLabel, "🍽️")
+            sahriInstant != null && sahriInstant > now ->
+                Target(sahriInstant, sahriLabel, "🥣")
+            else ->
+                Target(null, iftarLabel, "🍽️")
+        }
     }
 
+    var target by remember { mutableStateOf(resolveTarget(Clock.System.now())) }
     var remaining by remember { mutableStateOf(Duration.ZERO) }
-    LaunchedEffect(targetInstant) {
-        if (targetInstant == null) return@LaunchedEffect
+
+    LaunchedEffect(iftarInstant, sahriInstant) {
         while (true) {
-            val d = targetInstant - Clock.System.now()
+            val now = Clock.System.now()
+            val resolved = resolveTarget(now)
+            target = resolved
+
+            if (resolved.instant == null) {
+                remaining = Duration.ZERO
+                break // nothing left to count down
+            }
+
+            val d = resolved.instant - now
             remaining = if (d.isPositive()) d else Duration.ZERO
             delay(1000)
         }
@@ -626,9 +633,9 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
         Box(
             Modifier.size(64.dp).clip(CircleShape).background(accent.copy(alpha = 0.12f)),
             contentAlignment = Alignment.Center,
-        ) { Text(targetEmoji, fontSize = 24.sp) }
+        ) { Text(target.emoji, fontSize = 24.sp) }
         Spacer(Modifier.height(8.dp))
-        if (targetInstant != null && remaining > Duration.ZERO) {
+        if (target.instant != null && remaining > Duration.ZERO) {
             Text(
                 remaining.formatDuration().localizeDigits(),
                 style = ComposaTheme.typography.bodyEmphasized,
@@ -639,7 +646,7 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
         }
         Spacer(Modifier.height(2.dp))
         Text(
-            targetLabel,
+            target.label,
             style = ComposaTheme.typography.caption,
             color = ComposaTheme.color.textNeutralSubtle,
             textAlign = TextAlign.Center,
@@ -707,7 +714,7 @@ private fun PrayerTimesCard(
                 time = interval.displayableStartTime.localizeTime(),
                 isCurrent = isCurrent,
                 shouldNotify = notify,
-                emoji = interval.name.toEmoji(),
+                emoji = interval.emoji,
                 currentWaqtBg = currentWaqtBg,
                 currentWaqtText = currentWaqtText,
                 onClick = {
@@ -919,12 +926,4 @@ private fun SectionCard(
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
-private fun PrayerNameEnum.toEmoji(): String = when (this) {
-    PrayerNameEnum.FAJR -> "🌅"
-    PrayerNameEnum.SALAT_UD_DUHA -> "☀️"
-    PrayerNameEnum.DUHR -> "🌤️"
-    PrayerNameEnum.ASR -> "⛅"
-    PrayerNameEnum.MAGHRIB -> "🌇"
-    PrayerNameEnum.ISHA -> "🌙"
-}
 

@@ -512,7 +512,7 @@ private fun PrayerTimesCard(intervals: List<PrayerTimeIntervalModel>) {
         // Prayer rows
         intervals.forEachIndexed { index, interval ->
             Cell(
-                leftSlot = LeftSlot.Emoji(emoji = prayerEmoji(interval.name), fontSize = 18),
+                leftSlot = LeftSlot.Emoji(emoji = interval.emoji, fontSize = 18),
                 centerSlot = CenterSlot.Title(
                     title = stringResource(interval.name.toDisplayString()),
                 ),
@@ -702,13 +702,5 @@ private fun SunTimeChip(emoji: String, label: String, value: String) {
 
 // ─── Prayer Row ─────────────────────────────────────────────────────────────────
 
-private fun prayerEmoji(name: PrayerNameEnum): String = when (name) {
-    PrayerNameEnum.FAJR -> "🌙"
-    PrayerNameEnum.SALAT_UD_DUHA -> "☀️"
-    PrayerNameEnum.DUHR -> "🌤️"
-    PrayerNameEnum.ASR -> "⛅"
-    PrayerNameEnum.MAGHRIB -> "🌅"
-    PrayerNameEnum.ISHA -> "🌑"
-}
 
 
