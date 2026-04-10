@@ -63,6 +63,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.appbar.TopAppBar
+import org.techascent.composa.cell.Cell
+import org.techascent.composa.cell.center.CenterSlot
+import org.techascent.composa.cell.left.LeftSlot
+import org.techascent.composa.cell.right.RightSlot
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.calendar.state.CalendarUiState
@@ -485,28 +489,19 @@ private fun PrayerTimesCard(intervals: List<PrayerTimeIntervalModel>) {
             .background(ComposaTheme.color.strokeNeutralSubtle.copy(alpha = 0.10f)),
     ) {
         // Section header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = ComposaSpacing.Medium, end = ComposaSpacing.Medium, top = ComposaSpacing.Medium, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1565C0).copy(alpha = 0.12f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("🕋", fontSize = 16.sp)
-            }
-            Spacer(Modifier.width(10.dp))
-            Text(
-                text = stringResource(Res.string.text_calendar_prayer_times),
-                style = ComposaTheme.typography.subheadEmphasized,
-                color = ComposaTheme.color.textNeutral,
-            )
-        }
+        Cell(
+            leftSlot = LeftSlot.Emoji(
+                emoji = "🕋",
+                accentColor = Color(0xFF1565C0),
+                size = 32.dp,
+                fontSize = 16,
+            ),
+            centerSlot = CenterSlot.Title(
+                title = stringResource(Res.string.text_calendar_prayer_times),
+            ),
+            rightSlot = RightSlot.None,
+            backgroundColor = Color.Transparent,
+        )
 
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
@@ -516,7 +511,18 @@ private fun PrayerTimesCard(intervals: List<PrayerTimeIntervalModel>) {
 
         // Prayer rows
         intervals.forEachIndexed { index, interval ->
-            PrayerRow(interval)
+            Cell(
+                leftSlot = LeftSlot.Emoji(emoji = interval.emoji, fontSize = 18),
+                centerSlot = CenterSlot.Title(
+                    title = stringResource(interval.name.toDisplayString()),
+                ),
+                rightSlot = RightSlot.StyledText(
+                    text = "${interval.displayableStartTime.localizeTime()}  –  ${interval.displayableEndTime.localizeTime()}",
+                    style = ComposaTheme.typography.subheadEmphasized,
+                    color = ComposaTheme.color.textNeutral,
+                ),
+                backgroundColor = Color.Transparent,
+            )
             if (index < intervals.lastIndex) {
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
@@ -696,46 +702,5 @@ private fun SunTimeChip(emoji: String, label: String, value: String) {
 
 // ─── Prayer Row ─────────────────────────────────────────────────────────────────
 
-private fun prayerEmoji(name: PrayerNameEnum): String = when (name) {
-    PrayerNameEnum.FAJR -> "🌙"
-    PrayerNameEnum.SALAT_UD_DUHA -> "☀️"
-    PrayerNameEnum.DUHR -> "🌤️"
-    PrayerNameEnum.ASR -> "⛅"
-    PrayerNameEnum.MAGHRIB -> "🌅"
-    PrayerNameEnum.ISHA -> "🌑"
-}
 
-@Composable
-private fun PrayerRow(interval: PrayerTimeIntervalModel) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = ComposaSpacing.Medium, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(text = prayerEmoji(interval.name), fontSize = 18.sp)
-        Spacer(Modifier.width(10.dp))
-        Text(
-            text = stringResource(interval.name.toDisplayString()),
-            style = ComposaTheme.typography.subhead,
-            color = ComposaTheme.color.textNeutral,
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            text = interval.displayableStartTime.localizeTime(),
-            style = ComposaTheme.typography.subheadEmphasized,
-            color = ComposaTheme.color.textNeutral,
-        )
-        Text(
-            text = "  –  ",
-            style = ComposaTheme.typography.caption,
-            color = ComposaTheme.color.textNeutralSubtle,
-        )
-        Text(
-            text = interval.displayableEndTime.localizeTime(),
-            style = ComposaTheme.typography.subheadEmphasized,
-            color = ComposaTheme.color.textNeutralSubtle,
-        )
-    }
-}
 

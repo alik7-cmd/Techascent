@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import org.techascent.composa.common.BackgroundShape
 import org.techascent.composa.common.ComposaSpacing
@@ -26,6 +30,13 @@ sealed interface LeftSlot {
     ) : LeftSlot
 
     data class Space(val size: Dp = ComposaSpacing.Large) : LeftSlot
+
+    data class Emoji(
+        val emoji: String,
+        val accentColor: Color = Color.Unspecified,
+        val size: Dp = 40.dp,
+        val fontSize: Int = 20,
+    ) : LeftSlot
 }
 
 @Composable
@@ -41,6 +52,34 @@ internal fun RowScope.LeftSlot(
 
         is LeftSlot.None -> {}
         is LeftSlot.Space -> Space(modifier = modifier)
+        is LeftSlot.Emoji -> LeftEmoji(
+            leftSlot = leftSlot,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun LeftEmoji(
+    leftSlot: LeftSlot.Emoji,
+    modifier: Modifier = Modifier
+) {
+    if (leftSlot.accentColor != Color.Unspecified) {
+        Box(
+            modifier = modifier
+                .size(leftSlot.size)
+                .clip(CircleShape)
+                .background(leftSlot.accentColor.copy(alpha = 0.12f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = leftSlot.emoji, fontSize = leftSlot.fontSize.sp)
+        }
+    } else {
+        Text(
+            text = leftSlot.emoji,
+            fontSize = leftSlot.fontSize.sp,
+            modifier = modifier,
+        )
     }
 }
 

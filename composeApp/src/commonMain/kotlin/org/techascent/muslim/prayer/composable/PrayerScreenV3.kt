@@ -1,8 +1,10 @@
 package org.techascent.muslim.prayer.composable
 
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +27,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,11 +42,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -63,7 +63,6 @@ import apphub.composeapp.generated.resources.text_prayer_all_times
 import apphub.composeapp.generated.resources.text_prayer_announcement
 import apphub.composeapp.generated.resources.text_prayer_data_announcement
 import apphub.composeapp.generated.resources.text_prayer_fasting
-import apphub.composeapp.generated.resources.text_prayer_no_announcement
 import apphub.composeapp.generated.resources.text_remaining_time
 import apphub.composeapp.generated.resources.text_salat_ud_duha
 import apphub.composeapp.generated.resources.text_suhur
@@ -80,9 +79,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.techascent.composa.cell.Cell
+import org.techascent.composa.cell.center.CenterSlot
+import org.techascent.composa.cell.left.LeftSlot
+import org.techascent.composa.cell.right.RightSlot
 import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.common.DrawableData
+import org.techascent.composa.sunprogress.SunProgressCard
+import org.techascent.composa.sunprogress.SunProgressConfig
+import org.techascent.composa.sunprogress.lerpColor
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.shared.data.common.formatDuration
 import org.techascent.muslim.common.localizeDigits
@@ -94,9 +100,6 @@ import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toDisplayString
 import org.techascent.muslim.showNativeResetDialog as showPermissionRationalDialog
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 import kotlin.time.Duration
 
 // ═════════════════════════════════════════════════════════════════════════════════
@@ -130,9 +133,9 @@ internal fun PrayerContentV3(
                 is PrayerTimeUiState.Loading -> loadingContent()
                 is PrayerTimeUiState.Success -> prayerBodyV3(
                     uiModel = uiState.data,
-                    onNavigateHalalScanner = onNavigateHalalScanner,
                     onUpdateNotification = onUpdateNotification,
                 )
+
                 is PrayerTimeUiState.Error -> errorContent(onRetry = onFetchPrayers)
             }
         }
@@ -189,9 +192,13 @@ private fun HalalPill(onClick: () -> Unit) {
             .background(subtle)
             .clickable(interactionSource = src, indication = null) {
                 scope.launch {
-                    try { ctrl.providePermission(Permission.CAMERA); onClick() }
-                    catch (_: DeniedException) { showPermissionRationalDialog(pT, pM, pO, pC, { ctrl.openAppSettings() }) }
-                    catch (_: DeniedAlwaysException) { showPermissionRationalDialog(pT, pM, pO, pC, { ctrl.openAppSettings() }) }
+                    try {
+                        ctrl.providePermission(Permission.CAMERA); onClick()
+                    } catch (_: DeniedException) {
+                        showPermissionRationalDialog(pT, pM, pO, pC, { ctrl.openAppSettings() })
+                    } catch (_: DeniedAlwaysException) {
+                        showPermissionRationalDialog(pT, pM, pO, pC, { ctrl.openAppSettings() })
+                    }
                 }
             }
             .padding(horizontal = 14.dp, vertical = 10.dp),
@@ -216,41 +223,35 @@ private fun HalalPill(onClick: () -> Unit) {
 
 private fun LazyListScope.prayerBodyV3(
     uiModel: PrayerTimeUiModel,
-    onNavigateHalalScanner: () -> Unit,
     onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
 ) {
     // 1 — Sun progress hero (compact)
     item { SunProgressCard(uiModel) }
 
-    // 1b — Sunrise & Sunset card
-    item { SunriseSunsetCard(uiModel) }
-
     // 2 — Waqt countdown + fasting countdown side by side
     item { CountdownRow(uiModel) }
 
-    // 3 — Prayer times + Fasting side by side
+    // 3 — Prayer times card (full width)
     item {
-        PrayerAndFastingRow(
+        PrayerTimesCard(
             uiModel = uiModel,
             onUpdateNotification = onUpdateNotification,
         )
     }
 
-    // 4 — School info
-    /*item {
-        MessageBox(
-            modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
-            messageType = MessageType.Info,
-            message = stringResource(Res.string.warning_prayer_time, stringResource(uiModel.school.toTextRes())),
-        )
-    }*/
+    // 4 — Fasting card (Sahri / Iftar)
+    uiModel.iftarTime?.let { iftar ->
+        if (iftar.lastTimeOfSahri != null || iftar.iftarStartTime != null) {
+            item { FastingInfoCard(sahri = iftar.lastTimeOfSahri, iftar = iftar.iftarStartTime) }
+        }
+    }
 
     // 5 — Announcement
     item { AnnouncementSection() }
 }
 
 // ═════════════════════════════════════════════════════════════════════════════════
-//  1. SUN / MOON PROGRESS HERO — dynamic day/night with sky dimming
+//  1. SUN / MOON PROGRESS HERO — delegates to reusable SunProgressCard
 // ═════════════════════════════════════════════════════════════════════════════════
 
 /**
@@ -270,22 +271,20 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
 
     val sunriseInstant = uiModel.sunriseInstant
     val sunsetInstant = uiModel.sunsetInstant
-    val fajrStart = uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.FAJR }?.startTimeInstant
-    val ishaStart = uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.startTimeInstant
+    val fajrStart =
+        uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.FAJR }?.startTimeInstant
+    val ishaStart =
+        uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.startTimeInstant
     val ishaEnd = uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.endTimeInstant
 
     // ── Determine phase ──────────────────────────────────────────────
-    // DAWN  = Fajr start → Sunrise         (pre-dawn twilight)
-    // DAY   = Sunrise → Sunset             (sun visible)
-    // DUSK  = Sunset → Isha start          (twilight after sunset, Maghrib time)
-    // NIGHT = Isha start → next Fajr       (full night, Isha time and beyond)
     val phase = remember(now, sunriseInstant, sunsetInstant, fajrStart, ishaStart) {
         when {
             sunriseInstant == null || sunsetInstant == null -> DayPhase.DAY
             fajrStart != null && now >= fajrStart && now < sunriseInstant -> DayPhase.DAWN
             now >= sunriseInstant && now < sunsetInstant -> DayPhase.DAY
             ishaStart != null && now >= sunsetInstant && now < ishaStart -> DayPhase.DUSK
-            else -> DayPhase.NIGHT   // Isha time and beyond = night
+            else -> DayPhase.NIGHT
         }
     }
 
@@ -296,53 +295,49 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
     // ── Dynamic sky gradient ─────────────────────────────────────────
     val skyGradient = when (phase) {
         DayPhase.DAY -> {
-            // Dim towards sunset: lerp from full-day to twilight
             if (sunriseInstant != null && sunsetInstant != null) {
                 val totalDay = (sunsetInstant - sunriseInstant).inWholeMilliseconds.toFloat()
                 val elapsed = (now - sunriseInstant).inWholeMilliseconds.toFloat()
                 val t = (elapsed / totalDay).coerceIn(0f, 1f)
-                // After 80 % of the day, start dimming
                 val dimFactor = if (t > 0.8f) ((t - 0.8f) / 0.2f).coerceIn(0f, 1f) else 0f
                 val s = lerpColor(prayerColors.skyStart, prayerColors.twilightSkyStart, dimFactor)
                 val e = lerpColor(prayerColors.skyEnd, prayerColors.twilightSkyEnd, dimFactor)
                 listOf(s, e)
             } else listOf(prayerColors.skyStart, prayerColors.skyEnd)
         }
+
         DayPhase.DAWN -> listOf(prayerColors.dawnSkyStart, prayerColors.dawnSkyEnd)
         DayPhase.DUSK -> listOf(prayerColors.twilightSkyStart, prayerColors.twilightSkyEnd)
         DayPhase.NIGHT -> listOf(prayerColors.nightSkyStart, prayerColors.nightSkyEnd)
     }
 
     // ── Progress along the arc (phase-aware) ─────────────────────────
-    // Each phase uses its own time window so the celestial body moves
-    // correctly across the arc for that specific period.
     val dayProgress = when (phase) {
         DayPhase.DAWN -> {
-            // Fajr start → Sunrise
             if (fajrStart != null && sunriseInstant != null && sunriseInstant > fajrStart) {
                 val total = (sunriseInstant - fajrStart).inWholeMilliseconds.toFloat()
                 val elapsed = (now - fajrStart).inWholeMilliseconds.toFloat()
                 (elapsed / total).coerceIn(0f, 1f)
             } else 0.5f
         }
+
         DayPhase.DAY -> {
-            // Sunrise → Sunset
             if (sunriseInstant != null && sunsetInstant != null && sunsetInstant > sunriseInstant) {
                 val total = (sunsetInstant - sunriseInstant).inWholeMilliseconds.toFloat()
                 val elapsed = (now - sunriseInstant).inWholeMilliseconds.toFloat()
                 (elapsed / total).coerceIn(0f, 1f)
             } else 0.5f
         }
+
         DayPhase.DUSK -> {
-            // Sunset → Isha start
             if (sunsetInstant != null && ishaStart != null && ishaStart > sunsetInstant) {
                 val total = (ishaStart - sunsetInstant).inWholeMilliseconds.toFloat()
                 val elapsed = (now - sunsetInstant).inWholeMilliseconds.toFloat()
                 (elapsed / total).coerceIn(0f, 1f)
             } else 0.5f
         }
+
         DayPhase.NIGHT -> {
-            // Isha start → Isha end (moon drifts slowly)
             if (ishaStart != null && ishaEnd != null && ishaEnd > ishaStart) {
                 val total = (ishaEnd - ishaStart).inWholeMilliseconds.toFloat()
                 val elapsed = (now - ishaStart).inWholeMilliseconds.toFloat()
@@ -351,260 +346,133 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
         }
     }
 
-    // ── Resolve colours per phase ────────────────────────────────────
-    val bodyColor = if (isNight || isDusk) prayerColors.moonBody else prayerColors.sunBody
-    val glowColor = if (isNight || isDusk) prayerColors.moonGlow else prayerColors.sunGlow
-    val horizonColor = prayerColors.horizon
-    val accentColor = prayerColors.timerAccent
-    val trackColor = prayerColors.timerTrack
-    val starColor = prayerColors.starColor
-    val craterColor = prayerColors.moonCrater
+    // ── Build config for the reusable SunProgressCard ────────────────
+    val config = SunProgressConfig(
+        skyGradient = skyGradient,
+        dayProgress = dayProgress,
+        isNight = isNight,
+        isDusk = isDusk,
+        isDawn = isDawn,
+        bodyColor = if (isNight || isDusk) prayerColors.moonBody else prayerColors.sunBody,
+        glowColor = if (isNight || isDusk) prayerColors.moonGlow else prayerColors.sunGlow,
+        horizonColor = prayerColors.horizon,
+        arcAccentColor = prayerColors.timerAccent,
+        arcTrackColor = prayerColors.timerTrack,
+        starColor = prayerColors.starColor,
+        craterColor = prayerColors.moonCrater,
+        nightSkyStartColor = prayerColors.nightSkyStart,
+        twilightSkyStartColor = prayerColors.twilightSkyStart,
+    )
 
     // Text colour adapts: light text on dark bg
-    val textOnSky = if (isNight || isDusk || isDawn) Color.White.copy(alpha = 0.9f) else ComposaTheme.color.textNeutral
-    val subtleOnSky = if (isNight || isDusk || isDawn) Color.White.copy(alpha = 0.6f) else ComposaTheme.color.textNeutralSubtle
+    val textOnSky =
+        if (isNight || isDusk || isDawn) Color.White.copy(alpha = 0.9f) else ComposaTheme.color.textNeutral
+    val subtleOnSky =
+        if (isNight || isDusk || isDawn) Color.White.copy(alpha = 0.6f) else ComposaTheme.color.textNeutralSubtle
 
-    // ── Pseudo-random stars (stable per session) ─────────────────────
-    val stars = remember {
-        List(28) {
-            Triple(
-                (it * 37 + 13) % 100 / 100f,        // x ratio
-                (it * 53 + 7) % 100 / 100f,         // y ratio
-                1f + (it % 3) * 0.6f                 // radius
-            )
-        }
+    // ── Animated visibility for sunrise / sunset labels ───────────────
+    var showSunTimes by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(400) // brief pause after card appears
+        showSunTimes = true
     }
+    val sunTimesAlpha by animateFloatAsState(
+        targetValue = if (showSunTimes) 1f else 0f,
+        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
+        label = "sunTimesAlpha",
+    )
+    val sunTimesOffset by animateFloatAsState(
+        targetValue = if (showSunTimes) 0f else 8f,
+        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
+        label = "sunTimesOffset",
+    )
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = ComposaSpacing.Medium)
-            .clip(RoundedCornerShape(20.dp))
-            .background(Brush.verticalGradient(skyGradient)),
-    ) {
-        // ── Header: location + prayer info ───────────────────────────
-        Column(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = ComposaSpacing.Medium)
-                .padding(top = ComposaSpacing.Small),
-        ) {
-            Text(
-                buildString {
-                    append(uiModel.addressInfo.district?.plus(", ${uiModel.addressInfo.country}") ?: uiModel.addressInfo.address)
-                    append("  •  ")
-                    append(uiModel.hijriDate)
-                }.localizeDigits(),
-                style = ComposaTheme.typography.caption,
-                color = subtleOnSky,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(Modifier.height(2.dp))
-            prayer?.let {
-                Row(verticalAlignment = Alignment.Bottom) {
+    // ── Delegate to reusable composa SunProgressCard ─────────────────
+    SunProgressCard(
+        config = config,
+        headerContent = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = ComposaSpacing.Medium)
+                    .padding(top = ComposaSpacing.Small),
+            ) {
+                Text(
+                    buildString {
+                        append(
+                            uiModel.addressInfo.district?.plus(", ${uiModel.addressInfo.country}")
+                                ?: uiModel.addressInfo.address
+                        )
+                        append("  •  ")
+                        append(uiModel.hijriDate)
+                    }.localizeDigits(),
+                    style = ComposaTheme.typography.caption,
+                    color = subtleOnSky,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(Modifier.height(2.dp))
+                prayer?.let {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            stringResource(it.name.toDisplayString()),
+                            style = ComposaTheme.typography.titleEmphasized,
+                            color = textOnSky,
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "${it.displayableStartTime} – ${it.displayableEndTime}".localizeTime(),
+                            style = ComposaTheme.typography.footnote,
+                            color = subtleOnSky,
+                            modifier = Modifier.padding(bottom = 2.dp),
+                        )
+                    }
+                }
+            }
+        },
+        footerContent = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ComposaSpacing.Medium)
+                    .graphicsLayer {
+                        alpha = sunTimesAlpha
+                        translationY = sunTimesOffset
+                    },
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                // Sunrise — left-aligned (matches left endpoint)
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        stringResource(it.name.toDisplayString()),
-                        style = ComposaTheme.typography.titleEmphasized,
-                        color = textOnSky,
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        "${it.displayableStartTime} – ${it.displayableEndTime}".localizeTime(),
+                        "🌅 ${stringResource(Res.string.text_sunrise)}",
                         style = ComposaTheme.typography.footnote,
                         color = subtleOnSky,
-                        modifier = Modifier.padding(bottom = 2.dp),
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        uiModel.sunrise.localizeTime(),
+                        style = ComposaTheme.typography.footnote,
+                        color = subtleOnSky,
+                    )
+                }
+                // Sunset — right-aligned (matches right endpoint)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "🌇 ${stringResource(Res.string.text_sunset)}",
+                        style = ComposaTheme.typography.footnote,
+                        color = subtleOnSky,
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        uiModel.sunset.localizeTime(),
+                        style = ComposaTheme.typography.footnote,
+                        color = subtleOnSky,
                     )
                 }
             }
-        }
-
-        // ── Canvas — arc + celestial body ────────────────────────────
-        Canvas(modifier = Modifier.fillMaxWidth().height(120.dp)) {
-            val w = size.width
-            val h = size.height
-            val horizonY = h * 0.85f
-            val arcPadding = w * 0.08f
-            val arcWidth = w - 2 * arcPadding
-            val arcHeight = h * 0.72f
-
-            // ─ Stars (only during night / dusk / dawn) ───────────────
-            if (isNight || isDusk || isDawn) {
-                val starAlpha = when (phase) {
-                    DayPhase.NIGHT -> 0.85f
-                    DayPhase.DUSK -> 0.5f
-                    DayPhase.DAWN -> 0.35f
-                    else -> 0f
-                }
-                stars.forEach { (xr, yr, r) ->
-                    // Restrict stars above the horizon
-                    val sy = yr * horizonY * 0.9f
-                    val sx = xr * w
-                    drawCircle(
-                        starColor.copy(alpha = starAlpha * (0.5f + r / 3f)),
-                        radius = r,
-                        center = Offset(sx, sy),
-                    )
-                }
-            }
-
-            // ─ Horizon line ──────────────────────────────────────────
-            val horizonAlpha = if (isNight) 0.3f else 1f
-            drawLine(horizonColor.copy(alpha = horizonAlpha), Offset(0f, horizonY), Offset(w, horizonY), strokeWidth = 1.5f)
-
-            // ─ Arc track ─────────────────────────────────────────────
-            val arcPath = Path()
-            val steps = 120
-            for (i in 0..steps) {
-                val t = i.toFloat() / steps
-                val angle = PI * (1 - t)
-                val x = arcPadding + arcWidth * t
-                val y = horizonY - arcHeight * sin(angle).toFloat()
-                if (i == 0) arcPath.moveTo(x, y) else arcPath.lineTo(x, y)
-            }
-            drawPath(arcPath, trackColor.copy(alpha = if (isNight) 0.15f else 0.3f), style = Stroke(width = 2f, cap = StrokeCap.Round))
-
-            // ─ Traveled arc ──────────────────────────────────────────
-            val traveledPath = Path()
-            val travelSteps = (dayProgress * steps).toInt()
-            for (i in 0..travelSteps) {
-                val t = i.toFloat() / steps
-                val angle = PI * (1 - t)
-                val x = arcPadding + arcWidth * t
-                val y = horizonY - arcHeight * sin(angle).toFloat()
-                if (i == 0) traveledPath.moveTo(x, y) else traveledPath.lineTo(x, y)
-            }
-            drawPath(traveledPath, accentColor, style = Stroke(width = 3f, cap = StrokeCap.Round))
-
-            // ─ Celestial body position ───────────────────────────────
-            val bodyAngle = PI * (1 - dayProgress)
-            val bodyX = arcPadding + arcWidth * dayProgress
-            val bodyY = horizonY - arcHeight * sin(bodyAngle).toFloat()
-
-            if (isNight || isDusk) {
-                // ═══ MOON ════════════════════════════════════════════
-                // Outer glow
-                drawCircle(glowColor.copy(alpha = 0.10f), radius = 44f, center = Offset(bodyX, bodyY))
-                drawCircle(glowColor.copy(alpha = 0.18f), radius = 32f, center = Offset(bodyX, bodyY))
-                drawCircle(glowColor.copy(alpha = 0.28f), radius = 22f, center = Offset(bodyX, bodyY))
-
-                // Moon body
-                drawCircle(bodyColor, radius = 16f, center = Offset(bodyX, bodyY))
-
-                // Crescent shadow (makes it look like a crescent moon)
-                drawCircle(
-                    color = if (isNight) prayerColors.nightSkyStart.copy(alpha = 0.7f)
-                    else prayerColors.twilightSkyStart.copy(alpha = 0.6f),
-                    radius = 13f,
-                    center = Offset(bodyX + 7f, bodyY - 4f),
-                )
-
-                // Craters
-                drawCircle(craterColor, radius = 2.5f, center = Offset(bodyX - 5f, bodyY + 2f))
-                drawCircle(craterColor, radius = 1.8f, center = Offset(bodyX - 2f, bodyY - 6f))
-                drawCircle(craterColor, radius = 1.5f, center = Offset(bodyX + 1f, bodyY + 5f))
-
-                // Highlight
-                drawCircle(Color.White.copy(alpha = 0.18f), radius = 5f, center = Offset(bodyX - 6f, bodyY - 5f))
-            } else {
-                // ═══ SUN ═════════════════════════════════════════════
-                // Glow rings
-                val glowAlpha = if (isDawn) 0.5f else 1f
-                drawCircle(glowColor.copy(alpha = 0.08f * glowAlpha), radius = 44f, center = Offset(bodyX, bodyY))
-                drawCircle(glowColor.copy(alpha = 0.15f * glowAlpha), radius = 32f, center = Offset(bodyX, bodyY))
-                drawCircle(glowColor.copy(alpha = 0.30f * glowAlpha), radius = 22f, center = Offset(bodyX, bodyY))
-
-                // Rays
-                val rayAlpha = if (isDawn) 0.3f else 0.6f
-                val rayCount = 12
-                val innerR = 16f
-                val outerR = 28f
-                for (r in 0 until rayCount) {
-                    val rayAngle = 2.0 * PI * r / rayCount
-                    val x1 = bodyX + innerR * cos(rayAngle).toFloat()
-                    val y1 = bodyY + innerR * sin(rayAngle).toFloat()
-                    val x2 = bodyX + outerR * cos(rayAngle).toFloat()
-                    val y2 = bodyY + outerR * sin(rayAngle).toFloat()
-                    drawLine(
-                        bodyColor.copy(alpha = rayAlpha),
-                        Offset(x1, y1), Offset(x2, y2),
-                        strokeWidth = 2f, cap = StrokeCap.Round,
-                    )
-                }
-
-                // Sun body
-                drawCircle(bodyColor, radius = 14f, center = Offset(bodyX, bodyY))
-                // Highlight
-                drawCircle(Color.White.copy(alpha = 0.35f), radius = 6f, center = Offset(bodyX - 3f, bodyY - 3f))
-            }
-
-            // Endpoint dots
-            drawCircle(trackColor, radius = 4f, center = Offset(arcPadding, horizonY))
-            drawCircle(trackColor, radius = 4f, center = Offset(arcPadding + arcWidth, horizonY))
-        }
-
-        Spacer(Modifier.height(ComposaSpacing.Small))
-    }
-}
-
-/** Linearly interpolate between two colours by [fraction] (0→a, 1→b). */
-private fun lerpColor(a: Color, b: Color, fraction: Float): Color {
-    val f = fraction.coerceIn(0f, 1f)
-    return Color(
-        red = a.red + (b.red - a.red) * f,
-        green = a.green + (b.green - a.green) * f,
-        blue = a.blue + (b.blue - a.blue) * f,
-        alpha = a.alpha + (b.alpha - a.alpha) * f,
+        },
     )
 }
 
-// ═════════════════════════════════════════════════════════════════════════════════
-//  1b. SUNRISE / SUNSET CARD  — simple two-row card (no timer, no notification)
-// ═════════════════════════════════════════════════════════════════════════════════
-
-@Composable
-private fun SunriseSunsetCard(uiModel: PrayerTimeUiModel) {
-    val cardBg = ComposaTheme.color.prayer.cardBg
-    val accent = ComposaTheme.color.prayer.timerAccent
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = ComposaSpacing.Medium)
-            .clip(RoundedCornerShape(20.dp))
-            .background(cardBg),
-    ) {
-        // Sunrise row
-        SunriseSunsetRow("🌅", stringResource(Res.string.text_sunrise), uiModel.sunrise.localizeTime(), accent)
-        HorizontalDivider(
-            Modifier.padding(horizontal = 12.dp), 0.5.dp,
-            ComposaTheme.color.strokeNeutralSubtle.copy(0.3f),
-        )
-        // Sunset row
-        SunriseSunsetRow("🌇", stringResource(Res.string.text_sunset), uiModel.sunset.localizeTime(), accent)
-    }
-}
-
-@Composable
-private fun SunriseSunsetRow(emoji: String, label: String, time: String, accent: Color) {
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 11.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(emoji, fontSize = 16.sp)
-        Spacer(Modifier.width(6.dp))
-        Text(
-            label,
-            style = ComposaTheme.typography.footnote,
-            color = ComposaTheme.color.textNeutral,
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            time,
-            style = ComposaTheme.typography.footnoteEmphasized,
-            color = accent,
-        )
-    }
-}
 
 // ═════════════════════════════════════════════════════════════════════════════════
 //  2. COUNTDOWN ROW  — waqt timer (left) + fasting timer (right)
@@ -612,8 +480,10 @@ private fun SunriseSunsetRow(emoji: String, label: String, time: String, accent:
 
 @Composable
 private fun CountdownRow(uiModel: PrayerTimeUiModel) {
-    val hasWaqt = uiModel.currentPrayer?.startTimeInstant != null && uiModel.currentPrayer.endTimeInstant != null
-    val hasFasting = uiModel.iftarTime != null && (uiModel.iftarTime.iftarInstant != null || uiModel.iftarTime.sahriInstant != null)
+    val hasWaqt =
+        uiModel.currentPrayer?.startTimeInstant != null && uiModel.currentPrayer.endTimeInstant != null
+    val hasFasting =
+        uiModel.iftarTime != null && (uiModel.iftarTime.iftarInstant != null || uiModel.iftarTime.sahriInstant != null)
 
     if (!hasWaqt && !hasFasting) return
 
@@ -625,12 +495,12 @@ private fun CountdownRow(uiModel: PrayerTimeUiModel) {
     ) {
         if (hasWaqt) {
             Box(modifier = Modifier.weight(1f)) {
-                WaqtCountdown(uiModel.currentPrayer!!)
+                WaqtCountdown(uiModel.currentPrayer)
             }
         }
         if (hasFasting) {
             Box(modifier = Modifier.weight(1f)) {
-                FastingCountdown(uiModel.iftarTime!!)
+                FastingCountdown(uiModel.iftarTime)
             }
         }
     }
@@ -652,7 +522,10 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
         }
     }
     val progress = remember(remaining) {
-        (1f - remaining.inWholeMilliseconds.toFloat() / total.inWholeMilliseconds.toFloat()).coerceIn(0f, 1f)
+        (1f - remaining.inWholeMilliseconds.toFloat() / total.inWholeMilliseconds.toFloat()).coerceIn(
+            0f,
+            1f
+        )
     }
 
     Column(
@@ -668,8 +541,24 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
                 val sw = 6.dp.toPx()
                 val arcSize = Size(size.width - sw, size.height - sw)
                 val tl = Offset(sw / 2, sw / 2)
-                drawArc(color = track, startAngle = 0f, sweepAngle = 360f, useCenter = false, topLeft = tl, size = arcSize, style = Stroke(sw))
-                drawArc(color = accent, startAngle = -90f, sweepAngle = 360f * progress, useCenter = false, topLeft = tl, size = arcSize, style = Stroke(sw, cap = StrokeCap.Round))
+                drawArc(
+                    color = track,
+                    startAngle = 0f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    topLeft = tl,
+                    size = arcSize,
+                    style = Stroke(sw)
+                )
+                drawArc(
+                    color = accent,
+                    startAngle = -90f,
+                    sweepAngle = 360f * progress,
+                    useCenter = false,
+                    topLeft = tl,
+                    size = arcSize,
+                    style = Stroke(sw, cap = StrokeCap.Round)
+                )
             }
             Text("⏱️", fontSize = 18.sp)
         }
@@ -691,36 +580,43 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
 
 @Composable
 private fun FastingCountdown(iftar: IftarTimeUiModel) {
-    val now = Clock.System.now()
     val accent = ComposaTheme.color.prayer.fastingAccent
 
-    // Determine which is closer: iftar or suhur
     val iftarInstant = iftar.iftarInstant
     val sahriInstant = iftar.sahriInstant
 
-    val targetInstant: Instant?
-    val targetLabel: String
-    val targetEmoji: String
+    val iftarLabel = stringResource(Res.string.text_iftar)
+    val sahriLabel = stringResource(Res.string.text_suhur)
 
-    if (iftarInstant != null && iftarInstant > now) {
-        targetInstant = iftarInstant
-        targetLabel = stringResource(Res.string.text_iftar)
-        targetEmoji = "🍽️"
-    } else if (sahriInstant != null && sahriInstant > now) {
-        targetInstant = sahriInstant
-        targetLabel = stringResource(Res.string.text_suhur)
-        targetEmoji = "🥣"
-    } else {
-        targetInstant = null
-        targetLabel = stringResource(Res.string.text_iftar)
-        targetEmoji = "🍽️"
+    // ── Live target that auto-transitions iftar → sahri ───────────────
+    data class Target(val instant: Instant?, val label: String, val emoji: String)
+
+    fun resolveTarget(now: Instant): Target {
+        return when {
+            iftarInstant != null && iftarInstant > now ->
+                Target(iftarInstant, iftarLabel, "🍽️")
+            sahriInstant != null && sahriInstant > now ->
+                Target(sahriInstant, sahriLabel, "🥣")
+            else ->
+                Target(null, iftarLabel, "🍽️")
+        }
     }
 
+    var target by remember { mutableStateOf(resolveTarget(Clock.System.now())) }
     var remaining by remember { mutableStateOf(Duration.ZERO) }
-    LaunchedEffect(targetInstant) {
-        if (targetInstant == null) return@LaunchedEffect
+
+    LaunchedEffect(iftarInstant, sahriInstant) {
         while (true) {
-            val d = targetInstant - Clock.System.now()
+            val now = Clock.System.now()
+            val resolved = resolveTarget(now)
+            target = resolved
+
+            if (resolved.instant == null) {
+                remaining = Duration.ZERO
+                break // nothing left to count down
+            }
+
+            val d = resolved.instant - now
             remaining = if (d.isPositive()) d else Duration.ZERO
             delay(1000)
         }
@@ -737,9 +633,9 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
         Box(
             Modifier.size(64.dp).clip(CircleShape).background(accent.copy(alpha = 0.12f)),
             contentAlignment = Alignment.Center,
-        ) { Text(targetEmoji, fontSize = 24.sp) }
+        ) { Text(target.emoji, fontSize = 24.sp) }
         Spacer(Modifier.height(8.dp))
-        if (targetInstant != null && remaining > Duration.ZERO) {
+        if (target.instant != null && remaining > Duration.ZERO) {
             Text(
                 remaining.formatDuration().localizeDigits(),
                 style = ComposaTheme.typography.bodyEmphasized,
@@ -750,7 +646,7 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
         }
         Spacer(Modifier.height(2.dp))
         Text(
-            targetLabel,
+            target.label,
             style = ComposaTheme.typography.caption,
             color = ComposaTheme.color.textNeutralSubtle,
             textAlign = TextAlign.Center,
@@ -759,37 +655,7 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════════
-//  3. PRAYER TIMES + FASTING  — side by side
-// ═════════════════════════════════════════════════════════════════════════════════
-
-@Composable
-private fun PrayerAndFastingRow(
-    uiModel: PrayerTimeUiModel,
-    onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
-) {
-    val hasFasting = uiModel.iftarTime != null
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = ComposaSpacing.Medium),
-        horizontalArrangement = Arrangement.spacedBy(ComposaSpacing.Small),
-    ) {
-        // Prayer list — takes more space
-        Box(modifier = Modifier.weight(if (hasFasting) 1.6f else 1f)) {
-            PrayerTimesCard(uiModel, onUpdateNotification)
-        }
-        // Fasting card — compact right column
-        if (hasFasting) {
-            Box(modifier = Modifier.weight(1f)) {
-                FastingSideCard(uiModel.iftarTime!!)
-            }
-        }
-    }
-}
-
-// ═════════════════════════════════════════════════════════════════════════════════
-//  3a. PRAYER TIMES CARD  (no outer horizontal padding — parent handles it)
+//  3. PRAYER TIMES CARD
 // ═════════════════════════════════════════════════════════════════════════════════
 
 @Composable
@@ -806,35 +672,39 @@ private fun PrayerTimesCard(
     val pO = stringResource(Res.string.button_open_settings)
     val pC = stringResource(Res.string.text_cancel)
 
-    val currentWaqtBg = ComposaTheme.color.prayer.currentWaqtBg
+    val currentWaqtBg = ComposaTheme.color.backgroundActionSubtle
     val currentWaqtText = ComposaTheme.color.prayer.currentWaqtText
     val cardBg = ComposaTheme.color.prayer.cardBg
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = ComposaSpacing.Medium)
             .clip(RoundedCornerShape(20.dp))
             .background(cardBg),
     ) {
         // Header
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                Modifier.size(34.dp).clip(CircleShape).background(currentWaqtText.copy(0.12f)),
-                contentAlignment = Alignment.Center,
-            ) { Text("🕌", fontSize = 18.sp) }
-            Spacer(Modifier.width(8.dp))
-            Text(
-                stringResource(Res.string.text_prayer_all_times),
-                style = ComposaTheme.typography.footnoteEmphasized,
-                color = ComposaTheme.color.textNeutral,
-            )
-        }
-        HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.4f))
+        Cell(
+            leftSlot = LeftSlot.Emoji(
+                emoji = "🕌",
+                accentColor = currentWaqtText,
+                size = 34.dp,
+                fontSize = 18,
+            ),
+            centerSlot = CenterSlot.Title(
+                title = stringResource(Res.string.text_prayer_all_times),
+            ),
+            rightSlot = RightSlot.None,
+            backgroundColor = Color.Transparent,
+        )
+        HorizontalDivider(
+            Modifier.padding(horizontal = 12.dp),
+            0.5.dp,
+            ComposaTheme.color.strokeNeutralSubtle.copy(0.4f)
+        )
 
-        val visible = uiModel.intervals.filter { it.name.toDisplayString() != Res.string.text_salat_ud_duha }
+        val visible =
+            uiModel.intervals.filter { it.name.toDisplayString() != Res.string.text_salat_ud_duha }
         visible.forEachIndexed { idx, interval ->
             val isCurrent = interval.startTimeInstant == uiModel.currentPrayer?.startTimeInstant
             var notify by remember { mutableStateOf(interval.shouldNotify) }
@@ -844,7 +714,7 @@ private fun PrayerTimesCard(
                 time = interval.displayableStartTime.localizeTime(),
                 isCurrent = isCurrent,
                 shouldNotify = notify,
-                emoji = interval.name.toEmoji(),
+                emoji = interval.emoji,
                 currentWaqtBg = currentWaqtBg,
                 currentWaqtText = currentWaqtText,
                 onClick = {
@@ -853,13 +723,20 @@ private fun PrayerTimesCard(
                             ctrl.providePermission(Permission.REMOTE_NOTIFICATION)
                             notify = !notify
                             onUpdateNotification(notify, interval.name)
-                        } catch (_: DeniedException) { showPermissionRationalDialog(pT, pM, pO, pC, { ctrl.openAppSettings() }) }
-                        catch (_: DeniedAlwaysException) { showPermissionRationalDialog(pT, pM, pO, pC, { ctrl.openAppSettings() }) }
+                        } catch (_: DeniedException) {
+                            showPermissionRationalDialog(pT, pM, pO, pC, { ctrl.openAppSettings() })
+                        } catch (_: DeniedAlwaysException) {
+                            showPermissionRationalDialog(pT, pM, pO, pC, { ctrl.openAppSettings() })
+                        }
                     }
                 },
             )
             if (idx < visible.lastIndex) {
-                HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.3f))
+                HorizontalDivider(
+                    Modifier.padding(horizontal = 12.dp),
+                    0.5.dp,
+                    ComposaTheme.color.strokeNeutralSubtle.copy(0.3f)
+                )
             }
         }
     }
@@ -872,110 +749,80 @@ private fun CompactPrayerRow(
     currentWaqtBg: Color, currentWaqtText: Color,
     onClick: () -> Unit,
 ) {
-    val bg = if (isCurrent) currentWaqtBg.copy(alpha = 0.12f) else Color.Transparent
-
-    Row(
-        modifier = Modifier.fillMaxWidth().background(bg).clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 11.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(emoji, fontSize = 16.sp)
-        Spacer(Modifier.width(6.dp))
-        Text(
-            name,
-            style = if (isCurrent) ComposaTheme.typography.footnoteEmphasized else ComposaTheme.typography.footnote,
-            color = if (isCurrent) currentWaqtText else ComposaTheme.color.textNeutral,
-            modifier = Modifier.weight(1f),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Spacer(Modifier.width(4.dp))
-        Text(
-            time,
-            style = ComposaTheme.typography.footnoteEmphasized,
-            color = if (isCurrent) currentWaqtText else ComposaTheme.color.textNeutralSubtle,
-        )
-        Spacer(Modifier.width(6.dp))
-        val iconRes = if (shouldNotify) Res.drawable.ic_notification_on else Res.drawable.ic_notification_off
-        val tint = if (shouldNotify) currentWaqtText else ComposaTheme.color.textNeutralSubtle
-        Icon(painterResource(iconRes), null, tint = tint, modifier = Modifier.size(18.dp))
-    }
+    val bg = if (isCurrent) currentWaqtBg.copy(alpha = 0.50f) else Color.Transparent
+    Cell(
+        leftSlot = LeftSlot.Emoji(emoji = emoji, fontSize = 16),
+        centerSlot = CenterSlot.TitleWithLabel(
+            title = name,
+            label = time
+        ),
+        rightSlot = RightSlot.Icon(
+            data = DrawableData(
+                imageRes = if (shouldNotify) Res.drawable.ic_notification_on else Res.drawable.ic_notification_off,
+                tint = if (shouldNotify) currentWaqtText else ComposaTheme.color.textNeutralSubtle,
+            )
+        ),
+        backgroundColor = bg,
+        onClick = onClick
+    )
 }
 
 // ═════════════════════════════════════════════════════════════════════════════════
-//  3b. FASTING SIDE CARD  (compact vertical card for the right column)
+//  4. FASTING INFO CARD  (Sahri / Iftar — calendar style)
 // ═════════════════════════════════════════════════════════════════════════════════
 
 @Composable
-private fun FastingSideCard(iftar: IftarTimeUiModel) {
-    val accent = ComposaTheme.color.prayer.fastingAccent
-    val cardBg = ComposaTheme.color.prayer.cardBg
-    val now = Clock.System.now()
-
-    // Determine closer fasting event for mini countdown
-    val iftarInstant = iftar.iftarInstant
-    val sahriInstant = iftar.sahriInstant
-    val closerIsIftar = iftarInstant != null && iftarInstant > now
-    val closerInstant = if (closerIsIftar) iftarInstant else if (sahriInstant != null && sahriInstant > now) sahriInstant else null
-
-    var remaining by remember { mutableStateOf(Duration.ZERO) }
-    LaunchedEffect(closerInstant) {
-        if (closerInstant == null) return@LaunchedEffect
-        while (true) {
-            val d = closerInstant - Clock.System.now()
-            remaining = if (d.isPositive()) d else Duration.ZERO
-            delay(1000)
-        }
-    }
+private fun FastingInfoCard(sahri: String?, iftar: String?) {
+    val accent = Color(0xFF4A148C)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = ComposaSpacing.Medium)
             .clip(RoundedCornerShape(20.dp))
-            .background(cardBg),
+            .background(accent.copy(alpha = 0.06f)),
     ) {
-        // Header
+        // Section header
+        Cell(
+            leftSlot = LeftSlot.Emoji(
+                emoji = "🌙",
+                accentColor = accent.copy(alpha = 0.12f),
+                size = 34.dp,
+                fontSize = 18,
+            ),
+            centerSlot = CenterSlot.Title(
+                title = stringResource(Res.string.text_prayer_fasting),
+            ),
+            rightSlot = RightSlot.None,
+            backgroundColor = Color.Transparent,
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
+            thickness = 0.5.dp,
+            color = accent.copy(alpha = 0.10f),
+        )
+
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(ComposaSpacing.Medium),
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            Box(
-                Modifier.size(34.dp).clip(CircleShape).background(accent.copy(0.12f)),
-                contentAlignment = Alignment.Center,
-            ) { Text("🌙", fontSize = 18.sp) }
-            Spacer(Modifier.width(8.dp))
-            Text(
-                stringResource(Res.string.text_prayer_fasting),
-                style = ComposaTheme.typography.footnoteEmphasized,
-                color = ComposaTheme.color.textNeutral,
-            )
-        }
-        HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.4f))
-
-        // Iftar row
-        FastingCompactRow("🍽️", stringResource(Res.string.text_iftar), (iftar.iftarStartTime ?: "—").localizeTime(), accent)
-        HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.3f))
-
-        // Suhur row
-        FastingCompactRow("🥣", stringResource(Res.string.text_suhur), (iftar.lastTimeOfSahri ?: "—").localizeTime(), accent)
-
-        // Mini countdown for closer event
-        if (closerInstant != null && remaining > Duration.ZERO) {
-            HorizontalDivider(Modifier.padding(horizontal = 12.dp), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.3f))
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    if (closerIsIftar) "🍽️ ${stringResource(Res.string.text_iftar)}" else "🥣 ${stringResource(Res.string.text_suhur)}",
-                    style = ComposaTheme.typography.footnote,
-                    color = ComposaTheme.color.textNeutralSubtle,
+            sahri?.let {
+                FastingTimeChip(
+                    emoji = "🍽️",
+                    label = stringResource(Res.string.text_suhur),
+                    value = it,
+                    accentColor = accent,
                 )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    remaining.formatDuration().localizeDigits(),
-                    style = ComposaTheme.typography.bodyEmphasized,
-                    color = accent,
+            }
+            iftar?.let {
+                FastingTimeChip(
+                    emoji = "🌅",
+                    label = stringResource(Res.string.text_iftar),
+                    value = it,
+                    accentColor = Color(0xFFE65100),
                 )
             }
         }
@@ -983,27 +830,48 @@ private fun FastingSideCard(iftar: IftarTimeUiModel) {
 }
 
 @Composable
-private fun FastingCompactRow(emoji: String, label: String, value: String, accent: Color) {
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 11.dp),
-        verticalAlignment = Alignment.CenterVertically,
+private fun FastingTimeChip(
+    emoji: String,
+    label: String,
+    value: String,
+    accentColor: Color,
+) {
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(accentColor.copy(alpha = 0.08f))
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(emoji, fontSize = 16.sp)
-        Spacer(Modifier.width(6.dp))
-        Text(label, style = ComposaTheme.typography.footnote, color = ComposaTheme.color.textNeutral, modifier = Modifier.weight(1f))
-        Text(value, style = ComposaTheme.typography.footnoteEmphasized, color = accent)
+        Text(emoji, fontSize = 22.sp)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = label,
+            style = ComposaTheme.typography.caption,
+            color = ComposaTheme.color.textNeutralSubtle,
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = value.localizeTime(),
+            style = ComposaTheme.typography.titleDemi,
+            color = ComposaTheme.color.textNeutral,
+        )
     }
 }
 
 // ═════════════════════════════════════════════════════════════════════════════════
-//  4. ANNOUNCEMENT SECTION
+//  5. ANNOUNCEMENT SECTION
 // ═════════════════════════════════════════════════════════════════════════════════
 
 @Composable
 private fun AnnouncementSection() {
     val accent = ComposaTheme.color.prayer.announcementAccent
 
-    SectionCard(emoji = "📢", title = stringResource(Res.string.text_prayer_announcement), accentColor = accent) {
+    SectionCard(
+        emoji = "📢",
+        title = stringResource(Res.string.text_prayer_announcement),
+        accentColor = accent
+    ) {
         Row(
             Modifier.fillMaxWidth().padding(ComposaSpacing.Medium),
             verticalAlignment = Alignment.CenterVertically,
@@ -1034,27 +902,28 @@ private fun SectionCard(
         modifier = Modifier.fillMaxWidth().padding(horizontal = ComposaSpacing.Medium)
             .clip(RoundedCornerShape(20.dp)).background(cardBg),
     ) {
-        Row(Modifier.fillMaxWidth().padding(ComposaSpacing.Medium), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.size(40.dp).clip(CircleShape).background(accentColor.copy(0.12f)),
-                contentAlignment = Alignment.Center,
-            ) { Text(emoji, fontSize = 20.sp) }
-            Spacer(Modifier.width(12.dp))
-            Text(title, style = ComposaTheme.typography.subheadEmphasized, color = ComposaTheme.color.textNeutral)
-        }
-        HorizontalDivider(Modifier.padding(horizontal = ComposaSpacing.Medium), 0.5.dp, ComposaTheme.color.strokeNeutralSubtle.copy(0.4f))
+        Cell(
+            leftSlot = LeftSlot.Emoji(
+                emoji = emoji,
+                accentColor = accentColor.copy(0.12f),
+                size = 34.dp,
+                fontSize = 18,
+            ),
+            centerSlot = CenterSlot.Title(
+                title = title,
+            ),
+            rightSlot = RightSlot.None,
+            backgroundColor = Color.Transparent,
+        )
+        HorizontalDivider(
+            Modifier.padding(horizontal = ComposaSpacing.Medium),
+            0.5.dp,
+            ComposaTheme.color.strokeNeutralSubtle.copy(0.4f)
+        )
         content()
     }
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
-private fun PrayerNameEnum.toEmoji(): String = when (this) {
-    PrayerNameEnum.FAJR -> "🌅"
-    PrayerNameEnum.SALAT_UD_DUHA -> "☀️"
-    PrayerNameEnum.DUHR -> "🌤️"
-    PrayerNameEnum.ASR -> "⛅"
-    PrayerNameEnum.MAGHRIB -> "🌇"
-    PrayerNameEnum.ISHA -> "🌙"
-}
 

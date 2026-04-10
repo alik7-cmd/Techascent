@@ -55,13 +55,15 @@ fun PrayerData.toDto(): PrayerTimeDto {
     val asrStart = LocalDateTime(apiDate, asrTime).truncateToMinute()
     val maghribStart = LocalDateTime(apiDate, maghribTime).truncateToMinute()
     val ishaStart = LocalDateTime(apiDate, ishaTime).truncateToMinute()
-    val imsak = LocalDateTime(apiDate, imsakTime).truncateToMinute()
 
     // Next day's fajr (Isha interval ends next day fajr)
     val nextDay = fajrStart.date.plus(1, DateTimeUnit.DAY) // or fajrStart.date.nextDay()
 
     // Create next day fajr LocalDateTime
     val nextDayFajrStart = LocalDateTime(nextDay, fajrStart.time)
+
+    // Sahri (imsak) for today's fast ends tomorrow morning, not today
+    val nextDayImsak = LocalDateTime(nextDay, imsakTime).truncateToMinute()
 
     // Create intervals
     val intervals = listOf(
@@ -94,7 +96,7 @@ fun PrayerData.toDto(): PrayerTimeDto {
         sunset = sunsetStart,
         iftarTime = IftarTimeDto(
             startTime = sunsetStart,
-            endTime = imsak
+            endTime = nextDayImsak
         ),
         location = LocationDto(
             latitude = this.meta.latitude,
@@ -138,13 +140,15 @@ fun Data.toDto(): PrayerTimeDto {
     val asrStart = LocalDateTime(apiDate, asrTime).truncateToMinute()
     val maghribStart = LocalDateTime(apiDate, maghribTime).truncateToMinute()
     val ishaStart = LocalDateTime(apiDate, ishaTime).truncateToMinute()
-    val imsak = LocalDateTime(apiDate, imsakTime).truncateToMinute()
 
     // Next day's fajr (Isha interval ends next day fajr)
     val nextDay = fajrStart.date.plus(1, DateTimeUnit.DAY) // or fajrStart.date.nextDay()
 
     // Create next day fajr LocalDateTime
     val nextDayFajrStart = LocalDateTime(nextDay, fajrStart.time)
+
+    // Sahri (imsak) for today's fast ends tomorrow morning, not today
+    val nextDayImsak = LocalDateTime(nextDay, imsakTime).truncateToMinute()
 
     // Create intervals
     val intervals = listOf(
@@ -177,7 +181,7 @@ fun Data.toDto(): PrayerTimeDto {
         sunset = sunsetStart,
         iftarTime = IftarTimeDto(
             startTime = sunsetStart,
-            endTime = imsak
+            endTime = nextDayImsak
         ),
         location = LocationDto(
             latitude = this.meta.latitude,

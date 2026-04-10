@@ -1,12 +1,6 @@
 package org.techascent.muslim.utility
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,12 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,12 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.button_open_settings
 import apphub.composeapp.generated.resources.text_cancel
@@ -67,6 +53,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.featurecard.FeatureCardCompact
+import org.techascent.composa.featurecard.FeatureCardWide
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.openNearbyMosques
 import org.techascent.muslim.showNativeResetDialog as showPermissionRationalDialog
@@ -113,7 +101,7 @@ internal fun UtilityScreenV2(
             // Wide (hero) cards — first two items
             val wideItems = uiState.listOfFeatures.filter { it.isWide }
             items(wideItems) { item ->
-                FeatureCardWide(
+                val onClick = rememberFeatureClickHandler(
                     item = item,
                     onNavigateToCompass = onNavigateToCompass,
                     onNavigateToTasbeeh = onNavigateToTasbeeh,
@@ -122,6 +110,13 @@ internal fun UtilityScreenV2(
                     onNavigateManualHalalCheck = onNavigateManualHalalCheck,
                     onNavigateScanHistory = onNavigateScanHistory,
                     onNavigateToCalendar = onNavigateToCalendar,
+                )
+                FeatureCardWide(
+                    emoji = item.emoji,
+                    title = stringResource(item.titleRes),
+                    description = item.descriptionRes?.let { stringResource(it) },
+                    accentColor = item.accentColor,
+                    onClick = onClick,
                 )
             }
 
@@ -135,7 +130,7 @@ internal fun UtilityScreenV2(
                 ) {
                     rowItems.forEach { item ->
                         Box(modifier = Modifier.weight(1f)) {
-                            FeatureCardCompact(
+                            val onClick = rememberFeatureClickHandler(
                                 item = item,
                                 onNavigateToCompass = onNavigateToCompass,
                                 onNavigateToTasbeeh = onNavigateToTasbeeh,
@@ -144,6 +139,13 @@ internal fun UtilityScreenV2(
                                 onNavigateManualHalalCheck = onNavigateManualHalalCheck,
                                 onNavigateScanHistory = onNavigateScanHistory,
                                 onNavigateToCalendar = onNavigateToCalendar,
+                            )
+                            FeatureCardCompact(
+                                emoji = item.emoji,
+                                title = stringResource(item.titleRes),
+                                description = item.descriptionRes?.let { stringResource(it) },
+                                accentColor = item.accentColor,
+                                onClick = onClick,
                             )
                         }
                     }
@@ -180,175 +182,6 @@ private fun GreetingHeader() {
     }
 }
 
-// ─── Wide Feature Card (Hero-style) ─────────────────────────────────────────────
-
-@Composable
-private fun FeatureCardWide(
-    item: FeatureItem,
-    onNavigateToTasbeeh: () -> Unit,
-    onNavigateToCompass: () -> Unit,
-    onNavigateHalalScanner: () -> Unit,
-    onNavigateToQuran: () -> Unit,
-    onNavigateManualHalalCheck: () -> Unit,
-    onNavigateScanHistory: () -> Unit,
-    onNavigateToCalendar: () -> Unit,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.97f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "wideScale",
-    )
-
-    val onClick = rememberFeatureClickHandler(
-        item = item,
-        onNavigateToCompass = onNavigateToCompass,
-        onNavigateToTasbeeh = onNavigateToTasbeeh,
-        onNavigateHalalScanner = onNavigateHalalScanner,
-        onNavigateToQuran = onNavigateToQuran,
-        onNavigateManualHalalCheck = onNavigateManualHalalCheck,
-        onNavigateScanHistory = onNavigateScanHistory,
-        onNavigateToCalendar = onNavigateToCalendar,
-    )
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .scale(scale)
-            .clip(RoundedCornerShape(20.dp))
-            .background(item.accentColor.copy(alpha = 0.08f))
-            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
-            .padding(ComposaSpacing.Medium),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        // Emoji circle
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(item.accentColor.copy(alpha = 0.15f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(text = item.emoji, fontSize = 28.sp)
-        }
-
-        Spacer(modifier = Modifier.width(ComposaSpacing.Medium))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(item.titleRes),
-                style = ComposaTheme.typography.titleDemi,
-                color = ComposaTheme.color.textNeutral,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            item.descriptionRes?.let { descRes ->
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(descRes),
-                    style = ComposaTheme.typography.footnote,
-                    color = ComposaTheme.color.textNeutralSubtle,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(ComposaSpacing.Small))
-
-        // Arrow indicator
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(item.accentColor.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "→",
-                fontSize = 18.sp,
-                color = item.accentColor,
-            )
-        }
-    }
-}
-
-// ─── Compact Feature Card (Grid-style) ──────────────────────────────────────────
-
-@Composable
-private fun FeatureCardCompact(
-    item: FeatureItem,
-    onNavigateToTasbeeh: () -> Unit,
-    onNavigateToCompass: () -> Unit,
-    onNavigateHalalScanner: () -> Unit,
-    onNavigateToQuran: () -> Unit,
-    onNavigateManualHalalCheck: () -> Unit,
-    onNavigateScanHistory: () -> Unit,
-    onNavigateToCalendar: () -> Unit,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "compactScale",
-    )
-
-    val onClick = rememberFeatureClickHandler(
-        item = item,
-        onNavigateToCompass = onNavigateToCompass,
-        onNavigateToTasbeeh = onNavigateToTasbeeh,
-        onNavigateHalalScanner = onNavigateHalalScanner,
-        onNavigateToQuran = onNavigateToQuran,
-        onNavigateManualHalalCheck = onNavigateManualHalalCheck,
-        onNavigateScanHistory = onNavigateScanHistory,
-        onNavigateToCalendar = onNavigateToCalendar,
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .scale(scale)
-            .clip(RoundedCornerShape(20.dp))
-            .background(item.accentColor.copy(alpha = 0.06f))
-            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
-            .padding(ComposaSpacing.Medium),
-        horizontalAlignment = Alignment.Start,
-    ) {
-        // Emoji circle
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(item.accentColor.copy(alpha = 0.14f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(text = item.emoji, fontSize = 24.sp)
-        }
-
-        Spacer(modifier = Modifier.height(ComposaSpacing.Small))
-
-        Text(
-            text = stringResource(item.titleRes),
-            style = ComposaTheme.typography.subheadEmphasized,
-            color = ComposaTheme.color.textNeutral,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-
-        item.descriptionRes?.let { descRes ->
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = stringResource(descRes),
-                style = ComposaTheme.typography.caption,
-                color = ComposaTheme.color.textNeutralSubtle,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-}
 
 // ─── Shared click handler ───────────────────────────────────────────────────────
 

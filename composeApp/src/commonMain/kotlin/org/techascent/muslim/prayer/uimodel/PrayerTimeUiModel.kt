@@ -52,6 +52,7 @@ data class PrayerTimeUiModel(
 @Serializable
 data class PrayerTimeIntervalModel(
     val name: PrayerNameEnum,
+    val emoji: String,
     val displayableStartTime: String,
     val displayableEndTime: String,
     val startTimeInstant: Instant? = null,
@@ -93,8 +94,10 @@ internal suspend fun PrayerTimeDto.toUiModel(
 }
 
 private fun PrayerTimeInterval.toUiModel(): PrayerTimeIntervalModel {
+    val prayerName = name.toPrayerNameEnum()
     return PrayerTimeIntervalModel(
-        name = name.toPrayerNameEnum(),
+        name = prayerName,
+        emoji = prayerName.toEmoji(),
         displayableStartTime = startTime.toHourMinuteString(is24HourFormat = true),
         displayableEndTime = endTime.toHourMinuteString(is24HourFormat = true),
         startTimeInstant = startTime.toInstant(TimeZone.currentSystemDefault()),
@@ -185,4 +188,13 @@ fun PrayerNameEnum.toDisplayString(): StringResource {
         PrayerNameEnum.MAGHRIB -> Res.string.text_maghrib
         PrayerNameEnum.ISHA -> Res.string.text_isha
     }
+}
+
+fun PrayerNameEnum.toEmoji(): String = when (this) {
+    PrayerNameEnum.FAJR -> "🌅"
+    PrayerNameEnum.SALAT_UD_DUHA -> "☀️"
+    PrayerNameEnum.DUHR -> "🌤️"
+    PrayerNameEnum.ASR -> "⛅"
+    PrayerNameEnum.MAGHRIB -> "🌇"
+    PrayerNameEnum.ISHA -> "🌙"
 }
