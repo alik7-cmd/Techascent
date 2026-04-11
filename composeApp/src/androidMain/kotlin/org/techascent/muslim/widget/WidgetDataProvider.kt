@@ -34,6 +34,10 @@ data class WidgetPrayerData(
     val currentPrayerEnd: String,
     val locationLabel: String,
     val hijriDate: String,
+    val currentDate: String,
+    val iftarTime: String?,
+    val sahriTime: String?,
+    val lastUpdated: String,
     /** All prayer times for today (name, emoji, start time, isCurrent). */
     val allPrayers: List<WidgetPrayerRow>,
 )
@@ -89,6 +93,7 @@ suspend fun writeWidgetSnapshot(context: Context) {
             .putString("cache_date", currentDate)
             .putBoolean("is_24hr", is24Hr)
             .putString("address_json", addressJson ?: "")
+            .putLong("last_updated", System.currentTimeMillis())
             .apply()
 
         Log.d(TAG, "Widget snapshot written for $currentDate")
@@ -123,6 +128,7 @@ private fun loadWidgetDataInternal(context: Context): WidgetPrayerData? {
 
     val raw = sp.getString(KEY_WIDGET_JSON, null) ?: return null
     val is24Hr = sp.getBoolean("is_24hr", false)
+    val lastUpdatedMillis = sp.getLong("last_updated", 0L)
     val currentDate = getCurrentDateFormatted()
 
     val monthData: List<PrayerTimeUiModel> = try {
@@ -157,6 +163,29 @@ private fun loadWidgetDataInternal(context: Context): WidgetPrayerData? {
         }
     }
 
+    // Iftar & Sahri
+    val iftarDisplay = todayModel.iftarTime?.iftarInstant?.toFormattedTimeString(is24Hr)
+        ?: todayModel.iftarTime?.iftarStartTime
+    val sahriDisplay = todayModel.iftarTime?.sahriInstant?.toFormattedTimeString(is24Hr)
+        ?: todayModel.iftarTime?.lastTimeOfSahri
+
+    // Current date formatted for display (e.g. "11 Apr 2026")
+    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val displayDate = buildString {
+        append(now.dayOfMonth.toString().padStart(2, '0'))
+        append(" ")
+        append(now.month.name.take(3).lowercase()
+            .replaceFirstChar { it.uppercaseChar() })
+        append(" ")
+        append(now.year)
+    }
+
+    // Last updated time
+    val lastUpdatedStr = if (lastUpdatedMillis > 0) {
+        val updatedInstant = kotlinx.datetime.Instant.fromEpochMilliseconds(lastUpdatedMillis)
+        updatedInstant.toFormattedTimeString(is24Hr)
+    } else ""
+
     // Build rows for all prayers (exclude Duha)
     val allPrayers = todayModel.intervals
         .filter { it.name != PrayerNameEnum.SALAT_UD_DUHA }
@@ -178,6 +207,10 @@ private fun loadWidgetDataInternal(context: Context): WidgetPrayerData? {
         currentPrayerEnd = endTime,
         locationLabel = locationLabel,
         hijriDate = todayModel.hijriDate,
+        currentDate = displayDate,
+        iftarTime = iftarDisplay,
+        sahriTime = sahriDisplay,
+        lastUpdated = lastUpdatedStr,
         allPrayers = allPrayers,
     )
 }
@@ -197,4 +230,3 @@ private fun PrayerNameEnum.toWidgetDisplayName(): String = when (this) {
     PrayerNameEnum.MAGHRIB -> "Maghrib"
     PrayerNameEnum.ISHA -> "Isha"
 }
-

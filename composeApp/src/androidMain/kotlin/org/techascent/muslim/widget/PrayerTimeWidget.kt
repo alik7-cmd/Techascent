@@ -92,17 +92,12 @@ private fun PrayerWidgetContent(data: WidgetPrayerData, context: Context) {
                 modifier = GlanceModifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = data.currentPrayerEmoji,
-                    style = TextStyle(fontSize = 20.sp),
-                )
-                Spacer(GlanceModifier.width(6.dp))
                 Column(modifier = GlanceModifier.defaultWeight()) {
                     Text(
                         text = data.currentPrayerName,
                         style = TextStyle(
                             color = textColor,
-                            fontSize = 16.sp,
+                            fontSize = 35.sp,
                             fontWeight = FontWeight.Bold,
                         ),
                     )
@@ -116,16 +111,36 @@ private fun PrayerWidgetContent(data: WidgetPrayerData, context: Context) {
                         )
                     }
                 }
-                // Location on the right
-                Text(
-                    text = data.locationLabel,
-                    style = TextStyle(
-                        color = subtleColor,
-                        fontSize = 9.sp,
-                        textAlign = TextAlign.End,
-                    ),
-                    maxLines = 1,
-                )
+                Column {
+                    Text(
+                        text = data.currentDate,
+                        style = TextStyle(
+                            color = textColor,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                        ),
+                    )
+                    if (data.hijriDate.isNotEmpty()) {
+                        Text(
+                            text = data.hijriDate,
+                            style = TextStyle(
+                                color = subtleColor,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Normal,
+                            ),
+                        )
+                    }
+                    Text(
+                        text = data.locationLabel,
+                        style = TextStyle(
+                            color = subtleColor,
+                            fontSize = 9.sp,
+                            textAlign = TextAlign.End,
+                        ),
+                        maxLines = 1,
+                    )
+                }
+
             }
 
             Spacer(GlanceModifier.height(6.dp))

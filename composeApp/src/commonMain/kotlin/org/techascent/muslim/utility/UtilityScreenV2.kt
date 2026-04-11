@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
@@ -54,7 +54,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.featurecard.FeatureCardCompact
-import org.techascent.composa.featurecard.FeatureCardWide
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.openNearbyMosques
 import org.techascent.muslim.showNativeResetDialog as showPermissionRationalDialog
@@ -92,69 +91,57 @@ internal fun UtilityScreenV2(
             ),
             verticalArrangement = Arrangement.spacedBy(ComposaSpacing.Small),
         ) {
-            // ── Header ──────────────────────────────────────────────────
-            item {
-                GreetingHeader()
-            }
+            // ── Categorised feature cards ───────────────────────────────
+            uiState.categories.forEach { category ->
+                // Section title
+                item(key = "category_${category.titleRes.hashCode()}") {
+                    Text(
+                        text = stringResource(category.titleRes),
+                        style = ComposaTheme.typography.titleMediumEmphasized,
+                        color = ComposaTheme.color.textNeutral,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = ComposaSpacing.Medium, bottom = ComposaSpacing.Small),
+                    )
+                }
 
-            // ── Feature cards ───────────────────────────────────────────
-            // Wide (hero) cards — first two items
-            val wideItems = uiState.listOfFeatures.filter { it.isWide }
-            items(wideItems) { item ->
-                val onClick = rememberFeatureClickHandler(
-                    item = item,
-                    onNavigateToCompass = onNavigateToCompass,
-                    onNavigateToTasbeeh = onNavigateToTasbeeh,
-                    onNavigateHalalScanner = onNavigateHalalScanner,
-                    onNavigateToQuran = onNavigateToQuran,
-                    onNavigateManualHalalCheck = onNavigateManualHalalCheck,
-                    onNavigateScanHistory = onNavigateScanHistory,
-                    onNavigateToCalendar = onNavigateToCalendar,
-                )
-                FeatureCardWide(
-                    emoji = item.emoji,
-                    title = stringResource(item.titleRes),
-                    description = item.descriptionRes?.let { stringResource(it) },
-                    accentColor = item.accentColor,
-                    onClick = onClick,
-                )
-            }
-
-            // Compact grid — remaining items in pairs
-            val compactItems = uiState.listOfFeatures.filter { !it.isWide }
-            val rows = compactItems.chunked(2)
-            items(rows) { rowItems ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ComposaSpacing.Small),
-                ) {
-                    rowItems.forEach { item ->
-                        Box(modifier = Modifier.weight(1f)) {
-                            val onClick = rememberFeatureClickHandler(
-                                item = item,
-                                onNavigateToCompass = onNavigateToCompass,
-                                onNavigateToTasbeeh = onNavigateToTasbeeh,
-                                onNavigateHalalScanner = onNavigateHalalScanner,
-                                onNavigateToQuran = onNavigateToQuran,
-                                onNavigateManualHalalCheck = onNavigateManualHalalCheck,
-                                onNavigateScanHistory = onNavigateScanHistory,
-                                onNavigateToCalendar = onNavigateToCalendar,
-                            )
-                            FeatureCardCompact(
-                                emoji = item.emoji,
-                                title = stringResource(item.titleRes),
-                                description = item.descriptionRes?.let { stringResource(it) },
-                                accentColor = item.accentColor,
-                                onClick = onClick,
-                            )
+                // Items in pairs (compact grid)
+                val rows = category.items.chunked(2)
+                items(rows) { rowItems ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(ComposaSpacing.Small),
+                    ) {
+                        rowItems.forEach { item ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                val onClick = rememberFeatureClickHandler(
+                                    item = item,
+                                    onNavigateToCompass = onNavigateToCompass,
+                                    onNavigateToTasbeeh = onNavigateToTasbeeh,
+                                    onNavigateHalalScanner = onNavigateHalalScanner,
+                                    onNavigateToQuran = onNavigateToQuran,
+                                    onNavigateManualHalalCheck = onNavigateManualHalalCheck,
+                                    onNavigateScanHistory = onNavigateScanHistory,
+                                    onNavigateToCalendar = onNavigateToCalendar,
+                                )
+                                FeatureCardCompact(
+                                    emoji = item.emoji,
+                                    title = stringResource(item.titleRes),
+                                    description = item.descriptionRes?.let { stringResource(it) },
+                                    accentColor = item.accentColor,
+                                    onClick = onClick,
+                                )
+                            }
                         }
-                    }
-                    // Fill remaining space if odd count
-                    if (rowItems.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
+                        // Fill remaining space if odd count
+                        if (rowItems.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                 }
             }
+
+            item { Spacer(modifier = Modifier.size(ComposaSpacing.ExtraExtraExtraLarge)) }
         }
     }
 }
@@ -246,4 +233,3 @@ private fun rememberFeatureClickHandler(
         }
     }
 }
-

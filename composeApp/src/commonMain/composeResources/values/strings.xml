@@ -164,6 +164,10 @@ There isn’t enough reliable information about this product’s ingredients or 
     <string name="text_utility_greeting">Assalamu Alaikum</string>
     <string name="text_utility_subtitle">Explore tools to enrich your daily worship</string>
 
+    <string name="text_category_faith_knowledge">Faith &amp; Knowledge</string>
+    <string name="text_category_daily_tools">Daily Essentials</string>
+    <string name="text_category_more">Plan &amp; Explore</string>
+
     <string name="text_qibla_direction">Qibla Direction</string>
     <string name="text_qibla_subtitle">Face the Kaaba in Mecca</string>
     <string name="text_qibla_degree">%1$.0f°</string>
