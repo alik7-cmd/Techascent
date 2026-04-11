@@ -6,49 +6,62 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <!-- Header: current waqt -->
+    <!-- Header: date + location -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="⛅"
-            android:textSize="20sp" />
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Asr"
-                android:textColor="#FFFFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:text="11 Apr 2026"
+                android:textColor="#B3FFFFFF"
+                android:textSize="10sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3:45 PM – 6:15 PM"
-                android:textColor="#B3FFFFFF"
-                android:textSize="11sp" />
+                android:text="13 Shawwal 1447"
+                android:textColor="#73FFFFFF"
+                android:textSize="9sp" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Dhaka, BD"
-            android:textColor="#B3FFFFFF"
+            android:textColor="#73FFFFFF"
             android:textSize="9sp" />
     </LinearLayout>
+
+    <!-- Spacer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="6dp" />
+
+    <!-- Current waqt (hero) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Asr"
+        android:textColor="#FFFFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3:45 PM – 6:15 PM"
+        android:textColor="#B3FFFFFF"
+        android:textSize="11sp" />
 
     <!-- Divider -->
     <View
@@ -56,14 +69,14 @@
         android:layout_height="1dp"
         android:layout_marginTop="6dp"
         android:layout_marginBottom="4dp"
-        android:background="#33FFFFFF" />
+        android:background="#2EFFFFFF" />
 
     <!-- Fajr -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:paddingHorizontal="4dp"
+        android:paddingHorizontal="6dp"
         android:paddingVertical="3dp">
 
         <TextView
@@ -94,7 +107,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:paddingHorizontal="4dp"
+        android:paddingHorizontal="6dp"
         android:paddingVertical="3dp">
 
         <TextView
@@ -124,9 +137,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#26FFFFFF"
+        android:background="#24FFFFFF"
         android:gravity="center_vertical"
-        android:paddingHorizontal="4dp"
+        android:paddingHorizontal="6dp"
         android:paddingVertical="3dp">
 
         <TextView
@@ -159,7 +172,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:paddingHorizontal="4dp"
+        android:paddingHorizontal="6dp"
         android:paddingVertical="3dp">
 
         <TextView
@@ -190,7 +203,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:paddingHorizontal="4dp"
+        android:paddingHorizontal="6dp"
         android:paddingVertical="3dp">
 
         <TextView
@@ -215,5 +228,87 @@
             android:textColor="#B3FFFFFF"
             android:textSize="12sp" />
     </LinearLayout>
+
+    <!-- Divider before fasting -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="#2EFFFFFF" />
+
+    <!-- Iftar / Sahri chips -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Sahri chip -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#1AFFFFFF"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sahri"
+                android:textColor="#B3FFFFFF"
+                android:textSize="10sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="4:05 AM"
+                android:textColor="#FFFFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="6dp"
+            android:layout_height="1dp" />
+
+        <!-- Iftar chip -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#1AFFFFFF"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Iftar"
+                android:textColor="#B3FFFFFF"
+                android:textSize="10sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="6:15 PM"
+                android:textColor="#FFFFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Last updated -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="end"
+        android:text="Updated 3:30 PM"
+        android:textColor="#73FFFFFF"
+        android:textSize="8sp" />
 
 </LinearLayout>

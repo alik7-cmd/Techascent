@@ -21,12 +21,19 @@ import apphub.composeapp.generated.resources.text_utility_desc_mosque
 import apphub.composeapp.generated.resources.text_utility_desc_zakat
 import apphub.composeapp.generated.resources.title_prayer_calendar
 import apphub.composeapp.generated.resources.text_utility_desc_calendar
-import org.jetbrains.compose.resources.DrawableResource
+import apphub.composeapp.generated.resources.text_category_faith_knowledge
+import apphub.composeapp.generated.resources.text_category_daily_tools
+import apphub.composeapp.generated.resources.text_category_more
 import org.jetbrains.compose.resources.StringResource
 
 data class UtilityUiState(
     @Stable
-    val listOfFeatures: List<FeatureItem> = featureList
+    val categories: List<FeatureCategory> = featureCategories
+)
+
+data class FeatureCategory(
+    val titleRes: StringResource,
+    val items: List<FeatureItem>,
 )
 
 data class FeatureItem(
@@ -35,31 +42,16 @@ data class FeatureItem(
     val tint: Color = Color.Unspecified,
     val emoji: String = "",
     val accentColor: Color = Color(0xFF4CAF50),
-    val isWide: Boolean = false,
 )
 
-private val featureList = listOf(
+// ── Faith & Knowledge: Halal-related + Quran ────────────────────────────────────
+private val faithAndKnowledgeItems = listOf(
     FeatureItem(
         titleRes = Res.string.title_halal_scanner,
         descriptionRes = Res.string.text_utility_desc_halal,
         tint = Color.Green,
         emoji = "🔍",
         accentColor = Color(0xFF4CAF50),
-        isWide = true,
-    ),
-    FeatureItem(
-        titleRes = Res.string.title_quran,
-        descriptionRes = Res.string.text_utility_desc_quran,
-        emoji = "📖",
-        accentColor = Color(0xFF1565C0),
-        isWide = true,
-    ),
-    FeatureItem(
-        titleRes = Res.string.title_prayer_calendar,
-        descriptionRes = Res.string.text_utility_desc_calendar,
-        emoji = "🗓️",
-        accentColor = Color(0xFFD84315),
-        isWide = true,
     ),
     FeatureItem(
         titleRes = Res.string.title_manual_halal_check,
@@ -74,11 +66,15 @@ private val featureList = listOf(
         accentColor = Color(0xFF5E35B1),
     ),
     FeatureItem(
-        titleRes = Res.string.title_tasbeeh,
-        descriptionRes = Res.string.text_utility_desc_tasbeeh,
-        emoji = "📿",
-        accentColor = Color(0xFF7B1FA2),
+        titleRes = Res.string.title_quran,
+        descriptionRes = Res.string.text_utility_desc_quran,
+        emoji = "📖",
+        accentColor = Color(0xFF1565C0),
     ),
+)
+
+// ── Daily Essentials: Qibla, Tasbeeh, Nearby Mosque ─────────────────────────────
+private val dailyToolsItems = listOf(
     FeatureItem(
         titleRes = Res.string.title_quibla,
         descriptionRes = Res.string.text_utility_desc_qibla,
@@ -86,15 +82,46 @@ private val featureList = listOf(
         accentColor = Color(0xFF00838F),
     ),
     FeatureItem(
+        titleRes = Res.string.title_tasbeeh,
+        descriptionRes = Res.string.text_utility_desc_tasbeeh,
+        emoji = "📿",
+        accentColor = Color(0xFF7B1FA2),
+    ),
+    FeatureItem(
         titleRes = Res.string.title_nearby_mosque,
         descriptionRes = Res.string.text_utility_desc_mosque,
         emoji = "🕌",
         accentColor = Color(0xFFE65100),
+    ),
+)
+
+// ── Plan & Explore: Calendar, Zakat ─────────────────────────────────────────────
+private val planAndExploreItems = listOf(
+    FeatureItem(
+        titleRes = Res.string.title_prayer_calendar,
+        descriptionRes = Res.string.text_utility_desc_calendar,
+        emoji = "🗓️",
+        accentColor = Color(0xFFD84315),
     ),
     FeatureItem(
         titleRes = Res.string.title_zakat_calculator,
         descriptionRes = Res.string.text_utility_desc_zakat,
         emoji = "💰",
         accentColor = Color(0xFF2E7D32),
+    ),
+)
+
+private val featureCategories = listOf(
+    FeatureCategory(
+        titleRes = Res.string.text_category_faith_knowledge,
+        items = faithAndKnowledgeItems,
+    ),
+    FeatureCategory(
+        titleRes = Res.string.text_category_daily_tools,
+        items = dailyToolsItems,
+    ),
+    FeatureCategory(
+        titleRes = Res.string.text_category_more,
+        items = planAndExploreItems,
     ),
 )

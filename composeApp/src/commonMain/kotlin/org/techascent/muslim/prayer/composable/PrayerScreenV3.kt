@@ -64,7 +64,7 @@ import apphub.composeapp.generated.resources.text_prayer_announcement
 import apphub.composeapp.generated.resources.text_prayer_data_announcement
 import apphub.composeapp.generated.resources.text_prayer_fasting
 import apphub.composeapp.generated.resources.text_remaining_time
-import apphub.composeapp.generated.resources.text_salat_ud_duha
+
 import apphub.composeapp.generated.resources.text_suhur
 import apphub.composeapp.generated.resources.text_sunrise
 import apphub.composeapp.generated.resources.text_sunset
@@ -704,7 +704,7 @@ private fun PrayerTimesCard(
         )
 
         val visible =
-            uiModel.intervals.filter { it.name.toDisplayString() != Res.string.text_salat_ud_duha }
+            uiModel.intervals.filter { it.name != PrayerNameEnum.SALAT_UD_DUHA }
         visible.forEachIndexed { idx, interval ->
             val isCurrent = interval.startTimeInstant == uiModel.currentPrayer?.startTimeInstant
             var notify by remember { mutableStateOf(interval.shouldNotify) }

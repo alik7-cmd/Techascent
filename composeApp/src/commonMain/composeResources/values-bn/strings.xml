@@ -147,6 +147,10 @@
     <string name="text_utility_greeting">আসসালামু আলাইকুম</string>
     <string name="text_utility_subtitle">আপনার ইবাদতকে সমৃদ্ধ করতে টুলসমূহ অন্বেষণ করুন</string>
 
+    <string name="text_category_faith_knowledge">ঈমান ও জ্ঞান</string>
+    <string name="text_category_daily_tools">দৈনন্দিন প্রয়োজনীয়</string>
+    <string name="text_category_more">পরিকল্পনা ও খুজুন</string>
+
     <string name="text_qibla_direction">কিবলার দিক</string>
     <string name="text_qibla_subtitle">মক্কার কাবার দিকে মুখ করুন</string>
     <string name="text_qibla_degree">%1$.0f°</string>
