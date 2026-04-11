@@ -44,8 +44,7 @@
     <string name="text_prayer_fasting">রোজা</string>
     <string name="text_prayer_announcement">ঘোষণা</string>
 
-    <string name="text_prayer_data_announcement">আমরা আপনার গোপনীয়তাকে গুরুত্ব দিই — এই অ্যাপ কোনো ব্যক্তিগত তথ্য সংগ্রহ, সংরক্ষণ বা প্রক্রিয়া করে না। সব তথ্য আপনার ডিভাইসেই থাকে।</string>
-
+    <string name="text_prayer_data_announcement">🚀 বড় আপডেট: প্রেয়ার টাইম উইজেট চালু হয়েছে — এখন হোম স্ক্রিন থেকেই সহজে নামাজের সময় দেখুন এবং আর কোনো নামাজ মিস করবেন না!\n\n🔒আমরা আপনার গোপনীয়তাকে গুরুত্ব দিই — এই অ্যাপ কোনো ব্যক্তিগত তথ্য সংগ্রহ, সংরক্ষণ বা প্রক্রিয়া করে না। সব তথ্য আপনার ডিভাইসেই থাকে।</string>
     <string name="text_prayer_no_announcement">এই মুহূর্তে কোনো ঘোষণা নেই।</string>
     <string name="text_prayer_next_fast">পরবর্তী রোজার সময়</string>
     <string name="text_prayer_sun_progress">সূর্যের অগ্রগতি</string>
