@@ -72,6 +72,10 @@ kotlin {
             // Coroutine support for WorkManager
             implementation("androidx.work:work-runtime:2.8.1")
             implementation(libs.androidx.appcompat)
+
+            // Glance for App Widgets
+            implementation("androidx.glance:glance-appwidget:1.1.1")
+            implementation("androidx.glance:glance-material3:1.1.1")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

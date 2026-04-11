@@ -56,3 +56,6 @@ actual fun rememberUrlLauncher(): UrlLauncher {
     return remember { UrlLauncher() }
 }
 
+actual suspend fun refreshHomeWidgets() {
+    // No-op on wasmJs
+}

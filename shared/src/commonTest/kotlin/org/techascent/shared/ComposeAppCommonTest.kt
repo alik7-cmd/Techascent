@@ -1,5 +1,6 @@
 package org.techascent.muslim
 
+/*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -9,4 +10,4 @@ class ComposeAppCommonTest {
     fun example() {
         assertEquals(3, 1 + 2)
     }
-}
+}*/

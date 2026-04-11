@@ -23,6 +23,7 @@ import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.formatForDisplay
 import org.techascent.muslim.prayer.usecase.PrayerNotificationUseCase
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
+import org.techascent.muslim.refreshHomeWidgets
 import org.techascent.shared.network.ResultState
 import kotlin.time.ExperimentalTime
 
@@ -72,6 +73,8 @@ class PrayerTimeViewModel(
                     _rawState.emit(
                         value = PrayerTimeUiState.Success(data = it.data)
                     )
+                    // Refresh home-screen widget with latest prayer data
+                    refreshHomeWidgets()
                 }
 
                 is ResultState.Error -> _rawState.emit(
