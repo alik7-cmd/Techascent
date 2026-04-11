@@ -15,6 +15,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import org.techascent.muslim.datastore.DataStoreKey
+import org.techascent.muslim.ensureContext
 import org.techascent.muslim.getPrayerNotificationService
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
@@ -43,6 +44,7 @@ class DailyPrayerRescheduleWorker(
         return try {
             Log.d(TAG, "Daily prayer reschedule worker started")
 
+            ensureContext(context)
             val dataStore = provideDataStore()
 
             // 1. Read the notify prayers list from datastore

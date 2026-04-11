@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import org.techascent.muslim.servive.DailyPrayerScheduler
+import org.techascent.muslim.widget.WidgetUpdater
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,6 +17,9 @@ class MainActivity : AppCompatActivity() {
 
         // Ensure daily prayer notification rescheduler is running
         DailyPrayerScheduler.scheduleDailyWorker(this)
+
+        // Initialize widget updater so widgets refresh when data loads
+        WidgetUpdater.init(this)
 
         setContent {
             App()

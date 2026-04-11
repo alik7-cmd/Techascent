@@ -280,4 +280,6 @@ actual fun rememberUrlLauncher(): UrlLauncher {
     }
 }
 
-
+actual suspend fun refreshHomeWidgets() {
+    // No-op on iOS — widgets are managed differently (WidgetKit)
+}

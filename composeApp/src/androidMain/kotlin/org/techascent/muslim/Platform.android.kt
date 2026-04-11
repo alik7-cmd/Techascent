@@ -39,6 +39,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import okio.Path.Companion.toPath
 import org.techascent.muslim.servive.AndroidLocationService
 import org.techascent.muslim.servive.AndroidPrayerNotificationService
+import org.techascent.muslim.widget.WidgetUpdater
 
 
 actual fun playBeep() {
@@ -46,15 +47,36 @@ actual fun playBeep() {
     toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
 }
 
+@Volatile
 private var appContext: Context? = null
+
+/**
+ * Process-wide singleton DataStore so that the app and widget
+ * never create two active instances for the same file (which would crash).
+ */
+@Volatile
+private var dataStoreInstance: DataStore<Preferences>? = null
+private val dataStoreLock = Any()
 
 fun initHaptics(context: Context) {
     appContext = context
 }
 
+/**
+ * Ensures [appContext] is set. Safe to call from anywhere (Activity, Widget, Worker).
+ * Uses applicationContext to avoid leaking Activity references.
+ */
+fun ensureContext(context: Context) {
+    if (appContext == null) {
+        appContext = context.applicationContext
+    }
+}
+
 actual fun provideDataStore(): DataStore<Preferences> {
-    return createDataStore {
-        appContext!!.filesDir.resolve(DATA_STORE_FILE_NAME).absolutePath
+    return dataStoreInstance ?: synchronized(dataStoreLock) {
+        dataStoreInstance ?: createDataStore {
+            appContext!!.filesDir.resolve(DATA_STORE_FILE_NAME).absolutePath
+        }.also { dataStoreInstance = it }
     }
 }
 
@@ -284,9 +306,6 @@ actual fun rememberUrlLauncher(): UrlLauncher {
     }
 }
 
-
-
-
-
-
-
+actual suspend fun refreshHomeWidgets() {
+    WidgetUpdater.refreshWidgets()
+}

@@ -73,3 +73,9 @@ expect class UrlLauncher {
 
 @Composable
 expect fun rememberUrlLauncher(): UrlLauncher
+
+/**
+ * Refreshes home-screen widgets (Android) or does nothing (iOS/other).
+ */
+expect suspend fun refreshHomeWidgets()
+

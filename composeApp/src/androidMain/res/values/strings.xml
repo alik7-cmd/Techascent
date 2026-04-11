@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Muslim – Namaz &amp; Halal Scanner</string>
+    <string name="widget_description">Shows current prayer time and all daily prayer times</string>
 </resources>
