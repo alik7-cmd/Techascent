@@ -711,7 +711,7 @@ private fun PrayerTimesCard(
 
             CompactPrayerRow(
                 name = stringResource(interval.name.toDisplayString()),
-                time = interval.displayableStartTime.localizeTime(),
+                time = "${interval.displayableStartTime.localizeTime()} - ${interval.displayableEndTime.localizeTime()}",
                 isCurrent = isCurrent,
                 shouldNotify = notify,
                 emoji = interval.emoji,
