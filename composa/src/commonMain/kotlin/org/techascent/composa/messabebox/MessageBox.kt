@@ -13,10 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import apphub.composa.generated.resources.Res
-import apphub.composa.generated.resources.baseline_error
-import apphub.composa.generated.resources.baseline_info
-import apphub.composa.generated.resources.baseline_warning
+import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
@@ -36,7 +33,6 @@ fun MessageBox(
     onClickLabel: String? = null
 ) {
     val backgroundColor = getMessageBoxBackgroundColor(messageType)
-    val leftIcon = getMessageBoxIcon(messageType)
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -47,7 +43,7 @@ fun MessageBox(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
+        Text(
             modifier = Modifier
                 .padding(
                     start = ComposaSpacing.Medium,
@@ -56,8 +52,8 @@ fun MessageBox(
                     bottom = ComposaSpacing.Small,
                 )
                 .align(Alignment.CenterVertically),
-            painter = painterResource(resource = leftIcon.imageRes),
-            contentDescription = leftIcon.contentDescription,
+            text = getMessageBoxEmoji(messageType),
+            fontSize = 18.sp,
         )
 
         Text(
@@ -87,25 +83,11 @@ fun MessageBox(
 }
 
 @Composable
-private fun getMessageBoxIcon(messageType: MessageType): DrawableData {
+private fun getMessageBoxEmoji(messageType: MessageType): String {
     return when (messageType) {
-        is MessageType.Error -> DrawableData(
-            imageRes = Res.drawable.baseline_error,
-            contentDescription = "Error",
-            tint = Color.Unspecified
-        )
-
-        is MessageType.Info -> DrawableData(
-            imageRes = Res.drawable.baseline_info,
-            contentDescription = "Info",
-            tint = Color.Unspecified
-        )
-
-        is MessageType.Warning -> DrawableData(
-            imageRes = Res.drawable.baseline_warning,
-            contentDescription = "Warning",
-            tint = Color.Unspecified
-        )
+        is MessageType.Warning -> "⚠️️"
+        is MessageType.Info -> "ℹ️"
+        is MessageType.Error -> "❌"
     }
 }
 
