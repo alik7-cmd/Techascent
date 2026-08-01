@@ -43,6 +43,8 @@ class HalalScannerViewModel(
                     _uiState.value = HalalScannerUiState.Success(productUiState)
                     saveToHistory(productUiState.toHistoryItem(barcode = barcode, source = ScanSource.SCANNER))
                 }
+
+                else -> Unit
             }
         }
     }
@@ -62,6 +64,8 @@ class HalalScannerViewModel(
                     _uiState.value = HalalScannerUiState.Success(productUiState)
                     saveToHistory(productUiState.toHistoryItem(barcode = barcode, source = ScanSource.MANUAL_BARCODE))
                 }
+
+                else -> Unit
             }
         }
     }

@@ -71,9 +71,6 @@ class PrayerTimeViewUseCase(
      * 2. Checks in-memory cache → DataStore cache → remote (12-month prefetch).
      */
     suspend fun getMonthlyPrayerTimes(): Flow<ResultState<PrayerTimeUiModel>> {
-        val location = locationService.getCurrentLocation()
-            ?: return flowOf(ResultState.Error("Location not found"))
-
         // ── 1. Single DataStore read for all prefs ──────────────────────
         val prefs = dataStore.data.first()
         val code = prefs[intPreferencesKey(DataStoreKey.SCHOOL_PREFERENCE)] ?: School.HANAFI.code
@@ -83,21 +80,46 @@ class PrayerTimeViewUseCase(
         val year = now.year
         val month = now.monthNumber
 
-        // Cache the notify list for later updateCurrentPrayer calls
         notifyListCache = readNotifyPrayersList(prefs)
 
-        // ── 2. Resolve address (with in-memory cache) ───────────────────
-        val addressInfo = resolveAddress(location.latitude, location.longitude, prefs)
-        val city = addressInfo.district ?: "default"
+        // ── 2. Try to get live GPS location ─────────────────────────────
+        val location = locationService.getCurrentLocation()
 
-        // ── 3. Try in-memory → DataStore cache for the current month ────
+        // ── 3. Resolve address — live GPS or fall back to cached ─────────
+        val locationUnavailable = location == null
+        val addressInfo = if (location != null) {
+            resolveAddress(location.latitude, location.longitude, prefs)
+        } else {
+            // GPS off → try in-memory cache, then DataStore cache
+            addressCache
+                ?: prefs[stringPreferencesKey(ADDRESS_CACHE_KEY)]?.let {
+                    try {
+                        json.decodeFromString<AddressInfo>(it).also { a -> addressCache = a }
+                    } catch (_: Exception) { null }
+                }
+                ?: return flowOf(ResultState.Error("Location is unavailable and no cached data was found. Please enable GPS and open the app once to download prayer times for offline use."))
+        }
+
+        val city = addressInfo.district ?: addressInfo.city ?: "default"
+
+        // ── 4. Try in-memory → DataStore cache for the current month ────
         val cacheKey = cacheKeyFor(city, school, year, month)
         val todayFromCache = findTodayInCache(cacheKey, currentDate, prefs)
         if (todayFromCache != null) {
-            return flowOf(ResultState.Success(updateCurrentPrayer(todayFromCache)))
+            val data = updateCurrentPrayer(todayFromCache)
+            return if (locationUnavailable) {
+                val displayCity = addressInfo.city ?: addressInfo.district ?: "unknown"
+                flowOf(ResultState.Warning(data = data, message = displayCity))
+            } else {
+                flowOf(ResultState.Success(data))
+            }
         }
 
-        // ── 4. Cache miss → fetch 12 months in parallel & cache ─────────
+        // ── 5. Cache miss — only fetch if we have live location ──────────
+        if (location == null) {
+            return flowOf(ResultState.Error("Location is unavailable and no cached data was found. Please enable GPS and open the app once to download prayer times for offline use."))
+        }
+
         return fetchAndCacheYear(
             year = year,
             startMonth = month,
@@ -190,6 +212,7 @@ class PrayerTimeViewUseCase(
                 }
                 is ResultState.Error -> send(resultState)
                 is ResultState.Loading -> send(resultState)
+                else -> Unit
             }
         }
     }
@@ -269,40 +292,112 @@ class PrayerTimeViewUseCase(
         }
     }
 
-    // ── Address resolution (with cache) ─────────────────────────────────
+    // ── Address resolution (with location-change detection) ─────────────
 
     private suspend fun resolveAddress(
         latitude: Double,
         longitude: Double,
         prefs: Preferences
     ): AddressInfo {
-        // Fast: in-memory
-        addressCache?.let { return it }
 
-        // Medium: DataStore
+        // ── 1. In-memory cache exists → geocode fresh & compare ─────────
+        addressCache?.let { cached ->
+            val fresh = try {
+                getPlaceName(latitude, longitude)
+            } catch (_: Exception) {
+                return cached // Geocoder failed (offline) → serve cached silently
+            }
+
+            return if (isSameLocation(fresh, cached)) {
+                cached // Same area → keep existing prayer cache
+            } else {
+                // User moved to a different area → invalidate prayer cache
+                invalidatePrayerCacheOnly()
+                val updated = fresh.copy(latitude = latitude, longitude = longitude)
+                addressCache = updated
+                persistAddress(updated)
+                updated
+            }
+        }
+
+        // ── 2. DataStore cache exists → geocode fresh & compare ─────────
         val cachedJson = prefs[stringPreferencesKey(ADDRESS_CACHE_KEY)]
         if (cachedJson != null) {
             try {
                 val cached = json.decodeFromString<AddressInfo>(cachedJson)
-                addressCache = cached
-                return cached
+                val fresh = try {
+                    getPlaceName(latitude, longitude)
+                } catch (_: Exception) {
+                    addressCache = cached
+                    return cached // Geocoder failed (offline) → serve cached silently
+                }
+
+                return if (isSameLocation(fresh, cached)) {
+                    addressCache = cached
+                    cached // Same area → keep existing prayer cache
+                } else {
+                    // User moved → invalidate prayer cache, update address
+                    invalidatePrayerCacheOnly()
+                    val updated = fresh.copy(latitude = latitude, longitude = longitude)
+                    addressCache = updated
+                    persistAddress(updated)
+                    updated
+                }
             } catch (_: Exception) { /* fall through */ }
         }
 
-        // Slow: Geocoder
+        // ── 3. No cache at all (first install) → geocode and store ──────
         val info = try {
             getPlaceName(latitude, longitude)
         } catch (_: Exception) {
             AddressInfo(district = null, city = null, country = null, address = "Unknown")
         }
-        addressCache = info
+        val withCoords = info.copy(latitude = latitude, longitude = longitude)
+        addressCache = withCoords
+        persistAddress(withCoords)
+        return withCoords
+    }
 
-        // Persist for next cold start
+    /**
+     * Compares two addresses by district → city → country (priority order).
+     * Returns true if they represent the same prayer-time area.
+     */
+    private fun isSameLocation(fresh: AddressInfo, cached: AddressInfo): Boolean {
+        return when {
+            fresh.district != null && cached.district != null ->
+                fresh.district.equals(cached.district, ignoreCase = true) &&
+                fresh.country.equals(cached.country, ignoreCase = true)
+
+            fresh.city != null && cached.city != null ->
+                fresh.city.equals(cached.city, ignoreCase = true) &&
+                fresh.country.equals(cached.country, ignoreCase = true)
+
+            else ->
+                fresh.country.equals(cached.country, ignoreCase = true)
+        }
+    }
+
+    /**
+     * Clears ONLY prayer-time month caches (memory + DataStore).
+     * Does NOT clear the address cache — caller handles that separately.
+     */
+    private suspend fun invalidatePrayerCacheOnly() {
+        memoryCache.clear()
+        try {
+            dataStore.edit { prefs ->
+                val toRemove = prefs.asMap().keys.filter { it.name.startsWith(PREFIX) }
+                toRemove.forEach { prefs.remove(it) }
+            }
+        } catch (_: Exception) { }
+    }
+
+    /**
+     * Persists an AddressInfo to DataStore.
+     */
+    private suspend fun persistAddress(info: AddressInfo) {
         try {
             dataStore.edit { it[stringPreferencesKey(ADDRESS_CACHE_KEY)] = json.encodeToString(info) }
         } catch (_: Exception) { }
-
-        return info
     }
 
     // ── Notify prayer list ──────────────────────────────────────────────
@@ -341,17 +436,15 @@ class PrayerTimeViewUseCase(
     }
 
     /**
-     * Clears all prayer-time caches (memory + DataStore).
-     * Call this when the user changes school or location.
+     * Clears ALL caches (memory + DataStore) including address.
+     * Call this when the user changes school setting.
      */
     suspend fun invalidateCache() {
-        memoryCache.clear()
+        invalidatePrayerCacheOnly()
         addressCache = null
         notifyListCache = null
         try {
             dataStore.edit { prefs ->
-                val toRemove = prefs.asMap().keys.filter { it.name.startsWith(PREFIX) }
-                toRemove.forEach { prefs.remove(it) }
                 prefs.remove(stringPreferencesKey(ADDRESS_CACHE_KEY))
             }
         } catch (_: Exception) { }

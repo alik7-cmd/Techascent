@@ -218,6 +218,9 @@
     <!-- Location Permission -->
     <string name="text_location_denied_permanently">⚠️  লোকেশন অনুমতি স্থায়ীভাবে অস্বীকার করা হয়েছে।\nদয়া করে আপনার ডিভাইস সেটিংস থেকে এটি চালু করুন।</string>
 
+    <!-- Location Warning Banner -->
+    <string name="warning_location_gps_off">লোকেশন বন্ধ আছে। সর্বশেষ পরিচিত অবস্থান (%1$s)-এর ক্যাশ করা নামাজের সময় দেখানো হচ্ছে। নতুন শহরে গেলে অ্যাপ সনাক্ত করতে পারে, তার জন্য GPS চালু রাখুন।</string>
+
     <!-- Manual Halal Check Result -->
     <string name="text_check_result">যাচাইয়ের ফলাফল</string>
     <string name="text_check_another">আরেকটি যাচাই করুন</string>

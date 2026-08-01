@@ -51,6 +51,10 @@ class PrayerTimeViewModel(
             is PrayerTimeUiState.Success -> PrayerTimeUiState.Success(
                 data = state.data.formatForDisplay(format)
             )
+            is PrayerTimeUiState.SuccessWithWarning -> PrayerTimeUiState.SuccessWithWarning(
+                data = state.data.formatForDisplay(format),
+                cityName = state.cityName
+            )
             else -> state
         }
     }.onStart {
@@ -74,6 +78,17 @@ class PrayerTimeViewModel(
                         value = PrayerTimeUiState.Success(data = it.data)
                     )
                     // Refresh home-screen widget with latest prayer data
+                    refreshHomeWidgets()
+                }
+
+                is ResultState.Warning -> {
+                    schedulePrayerNotifications(it.data)
+                    _rawState.emit(
+                        value = PrayerTimeUiState.SuccessWithWarning(
+                            data = it.data,
+                            cityName = it.message
+                        )
+                    )
                     refreshHomeWidgets()
                 }
 

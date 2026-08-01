@@ -64,6 +64,7 @@ import apphub.composeapp.generated.resources.text_prayer_announcement
 import apphub.composeapp.generated.resources.text_prayer_data_announcement
 import apphub.composeapp.generated.resources.text_prayer_fasting
 import apphub.composeapp.generated.resources.text_remaining_time
+import apphub.composeapp.generated.resources.warning_location_gps_off
 
 import apphub.composeapp.generated.resources.text_suhur
 import apphub.composeapp.generated.resources.text_sunrise
@@ -86,6 +87,8 @@ import org.techascent.composa.cell.left.LeftSlot
 import org.techascent.composa.cell.right.RightSlot
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
+import org.techascent.composa.messabebox.MessageBox
+import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.sunprogress.SunProgressCard
 import org.techascent.composa.sunprogress.SunProgressConfig
 import org.techascent.composa.sunprogress.lerpColor
@@ -135,11 +138,34 @@ internal fun PrayerContentV3(
                     uiModel = uiState.data,
                     onUpdateNotification = onUpdateNotification,
                 )
-
+                is PrayerTimeUiState.SuccessWithWarning -> {
+                    item { LocationWarningBanner(cityName = uiState.cityName) }
+                    prayerBodyV3(
+                        uiModel = uiState.data,
+                        onUpdateNotification = onUpdateNotification,
+                    )
+                }
                 is PrayerTimeUiState.Error -> errorContent(onRetry = onFetchPrayers)
             }
         }
     }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+//  LOCATION WARNING BANNER
+// ═════════════════════════════════════════════════════════════════════════════════
+
+@Composable
+private fun LocationWarningBanner(cityName: String) {
+    MessageBox(
+        message = stringResource(Res.string.warning_location_gps_off, cityName),
+        messageType = MessageType.Warning,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = ComposaSpacing.Medium)
+            .padding(top = ComposaSpacing.Small)
+            .clip(RoundedCornerShape(12.dp)),
+    )
 }
 
 // ═════════════════════════════════════════════════════════════════════════════════

@@ -221,6 +221,9 @@ There isn’t enough reliable information about this product’s ingredients or 
     <!-- Location Permission -->
     <string name="text_location_denied_permanently">⚠️  Location permission was permanently denied.\nPlease enable it in your device settings.</string>
 
+    <!-- Location Warning Banner -->
+    <string name="warning_location_gps_off">Location is turned off. Showing cached prayer times for your last known location (%1$s). Enable GPS so the app can detect if you\'ve traveled to a new city.</string>
+
     <!-- Manual Halal Check Result -->
     <string name="text_check_result">Check Result</string>
     <string name="text_check_another">Check Another</string>
