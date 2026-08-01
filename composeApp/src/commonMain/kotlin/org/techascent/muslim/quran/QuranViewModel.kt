@@ -75,6 +75,7 @@ class QuranViewModel(
                     is ResultState.Error -> SurahListUiState.Error(
                         message = result.message ?: "Failed to load surahs"
                     )
+                    else -> SurahListUiState.Error(message = "Unexpected state")
                 }
             }
         }
@@ -111,6 +112,7 @@ class QuranViewModel(
                         errorMessage = result.message ?: "Failed to load surah"
                     }
                     is ResultState.Loading -> { /* handled by initial state */ }
+                    else -> { /* no-op */ }
                 }
             }
 
@@ -132,6 +134,7 @@ class QuranViewModel(
                         // Translation failure is non-fatal, proceed without it
                     }
                     is ResultState.Loading -> { /* handled */ }
+                    else -> { /* no-op */ }
                 }
             }
 

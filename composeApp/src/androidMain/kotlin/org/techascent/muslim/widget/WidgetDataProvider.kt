@@ -17,6 +17,7 @@ import org.techascent.muslim.provideDataStore
 import org.techascent.shared.data.common.DataStoreKey
 import org.techascent.shared.data.common.PrayerNameEnum
 import org.techascent.shared.data.common.getCurrentDateFormatted
+import org.techascent.shared.data.common.getYesterdayDateFormatted
 import org.techascent.shared.data.common.toFormattedTimeString
 import org.techascent.shared.data.enum.School
 
@@ -86,10 +87,24 @@ suspend fun writeWidgetSnapshot(context: Context) {
         val cacheKey = "${DataStoreKey.MONTHLY_PRAYER_INITIAL}${city}_${school.name}_${year}_${month}"
         val raw = prefs[stringPreferencesKey(cacheKey)] ?: return
 
-        // Write the raw monthly JSON + metadata to SharedPreferences
+        // Also include the previous month so the after-midnight Isha fix works on the 1st of a month
+        val prevYear = if (month == 1) year - 1 else year
+        val prevMonth = if (month == 1) 12 else month - 1
+        val prevCacheKey = "${DataStoreKey.MONTHLY_PRAYER_INITIAL}${city}_${school.name}_${prevYear}_${prevMonth}"
+        val prevRaw = prefs[stringPreferencesKey(prevCacheKey)]
+        val combinedRaw = if (prevRaw != null) {
+            try {
+                val json2 = Json { ignoreUnknownKeys = true }
+                val current = json2.decodeFromString<List<PrayerTimeUiModel>>(raw)
+                val prev = json2.decodeFromString<List<PrayerTimeUiModel>>(prevRaw)
+                json2.encodeToString(current + prev)
+            } catch (_: Exception) { raw }
+        } else raw
+
+        // Write the combined monthly JSON + metadata to SharedPreferences
         val sp = widgetPrefs(context)
         sp.edit()
-            .putString(KEY_WIDGET_JSON, raw)
+            .putString(KEY_WIDGET_JSON, combinedRaw)
             .putString("cache_date", currentDate)
             .putBoolean("is_24hr", is24Hr)
             .putString("address_json", addressJson ?: "")
@@ -141,11 +156,28 @@ private fun loadWidgetDataInternal(context: Context): WidgetPrayerData? {
 
     // Determine current prayer using instants
     val nowInstant = Clock.System.now()
-    val currentInterval = todayModel.intervals.find { interval ->
+    var currentInterval = todayModel.intervals.find { interval ->
         interval.startTimeInstant != null &&
                 interval.endTimeInstant != null &&
                 nowInstant >= interval.startTimeInstant &&
                 nowInstant < interval.endTimeInstant
+    }
+
+    // After midnight but before Fajr: yesterday's Isha is still active
+    var activeIftarModel = todayModel.iftarTime
+    if (currentInterval == null) {
+        val todayFajr = todayModel.intervals
+            .firstOrNull { it.name == PrayerNameEnum.FAJR }?.startTimeInstant
+        if (todayFajr != null && nowInstant < todayFajr) {
+            val yesterdayDate = getYesterdayDateFormatted()
+            val yesterdayModel = monthData.find { it.currentDateTime == yesterdayDate }
+            val ishaFromYesterday = yesterdayModel?.intervals
+                ?.firstOrNull { it.name == PrayerNameEnum.ISHA }
+            if (ishaFromYesterday?.endTimeInstant != null && nowInstant < ishaFromYesterday.endTimeInstant) {
+                currentInterval = ishaFromYesterday
+                activeIftarModel = yesterdayModel.iftarTime // use yesterday's Suhoor window
+            }
+        }
     }
 
     val displayName = currentInterval?.name?.toWidgetDisplayName() ?: "—"
@@ -163,11 +195,11 @@ private fun loadWidgetDataInternal(context: Context): WidgetPrayerData? {
         }
     }
 
-    // Iftar & Sahri
-    val iftarDisplay = todayModel.iftarTime?.iftarInstant?.toFormattedTimeString(is24Hr)
-        ?: todayModel.iftarTime?.iftarStartTime
-    val sahriDisplay = todayModel.iftarTime?.sahriInstant?.toFormattedTimeString(is24Hr)
-        ?: todayModel.iftarTime?.lastTimeOfSahri
+    // Iftar & Sahri — use activeIftarModel so Suhoor is correct after midnight
+    val iftarDisplay = activeIftarModel?.iftarInstant?.toFormattedTimeString(is24Hr)
+        ?: activeIftarModel?.iftarStartTime
+    val sahriDisplay = activeIftarModel?.sahriInstant?.toFormattedTimeString(is24Hr)
+        ?: activeIftarModel?.lastTimeOfSahri
 
     // Current date formatted for display (e.g. "11 Apr 2026")
     val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -196,7 +228,7 @@ private fun loadWidgetDataInternal(context: Context): WidgetPrayerData? {
                 time = interval.startTimeInstant?.toFormattedTimeString(is24Hr)
                     ?: interval.displayableStartTime,
                 isCurrent = currentInterval != null &&
-                        interval.startTimeInstant == currentInterval.startTimeInstant,
+                        interval.name == currentInterval.name,
             )
         }
 

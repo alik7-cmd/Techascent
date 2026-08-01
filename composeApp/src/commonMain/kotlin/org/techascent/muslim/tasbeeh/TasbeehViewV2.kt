@@ -49,6 +49,15 @@ import apphub.composeapp.generated.resources.Res
 import apphub.composeapp.generated.resources.ic_back
 import apphub.composeapp.generated.resources.message_tasbeeh
 import apphub.composeapp.generated.resources.text_reset
+import apphub.composeapp.generated.resources.text_tasbeeh_alhamdulillah
+import apphub.composeapp.generated.resources.text_tasbeeh_allahu_akbar
+import apphub.composeapp.generated.resources.text_tasbeeh_astaghfirullah
+import apphub.composeapp.generated.resources.text_tasbeeh_goal
+import apphub.composeapp.generated.resources.text_tasbeeh_la_ilaha
+import apphub.composeapp.generated.resources.text_tasbeeh_of_goal
+import apphub.composeapp.generated.resources.text_tasbeeh_sets
+import apphub.composeapp.generated.resources.text_tasbeeh_subhanallah
+import apphub.composeapp.generated.resources.text_tasbeeh_total
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -186,9 +195,9 @@ private fun StatsRow(uiState: TasbeehUiState) {
             .padding(horizontal = ComposaSpacing.Small),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        StatCard(label = "Sets", value = uiState.sets.toString().localizeDigits())
-        StatCard(label = "Goal", value = uiState.goal.toString().localizeDigits())
-        StatCard(label = "Total", value = totalCount.toString().localizeDigits())
+        StatCard(label = stringResource(Res.string.text_tasbeeh_sets), value = uiState.sets.toString().localizeDigits())
+        StatCard(label = stringResource(Res.string.text_tasbeeh_goal), value = uiState.goal.toString().localizeDigits())
+        StatCard(label = stringResource(Res.string.text_tasbeeh_total), value = totalCount.toString().localizeDigits())
     }
 }
 
@@ -314,7 +323,7 @@ private fun TapCircle(
                     color = ComposaTheme.color.textNeutral,
                 )
                 Text(
-                    text = "of $goal".localizeDigits(),
+                    text = stringResource(Res.string.text_tasbeeh_of_goal, goal.toString()).localizeDigits(),
                     style = ComposaTheme.typography.footnote,
                     color = ComposaTheme.color.textNeutralSubtle,
                 )
@@ -328,13 +337,14 @@ private fun TapCircle(
 @Composable
 private fun DhikrSuggestion() {
     val dhikrList = listOf(
-        "سُبْحَانَ اللّٰهِ" to "SubhanAllah (Glory be to Allah)",
-        "اَلْحَمْدُ لِلّٰهِ" to "Alhamdulillah (Praise be to Allah)",
-        "اللّٰهُ أَكْبَرُ" to "Allahu Akbar (Allah is Greatest)",
-        "لَا إِلٰهَ إِلَّا اللّٰهُ" to "La ilaha illallah (None worthy of worship but Allah)",
-        "أَسْتَغْفِرُ اللّٰهَ" to "Astaghfirullah (I seek forgiveness from Allah)",
+        "سُبْحَانَ اللّٰهِ" to stringResource(Res.string.text_tasbeeh_subhanallah),
+        "اَلْحَمْدُ لِلّٰهِ" to stringResource(Res.string.text_tasbeeh_alhamdulillah),
+        "اللّٰهُ أَكْبَرُ" to stringResource(Res.string.text_tasbeeh_allahu_akbar),
+        "لَا إِلٰهَ إِلَّا اللّٰهُ" to stringResource(Res.string.text_tasbeeh_la_ilaha),
+        "أَسْتَغْفِرُ اللّٰهَ" to stringResource(Res.string.text_tasbeeh_astaghfirullah),
     )
-    val randomDhikr = remember { dhikrList.random() }
+    val randomIndex = remember { dhikrList.indices.random() }
+    val randomDhikr = dhikrList[randomIndex]
 
     Column(
         modifier = Modifier

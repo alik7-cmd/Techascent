@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -31,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +66,7 @@ import apphub.composeapp.generated.resources.text_prayer_announcement
 import apphub.composeapp.generated.resources.text_prayer_data_announcement
 import apphub.composeapp.generated.resources.text_prayer_fasting
 import apphub.composeapp.generated.resources.text_remaining_time
+import apphub.composeapp.generated.resources.warning_location_gps_off
 
 import apphub.composeapp.generated.resources.text_suhur
 import apphub.composeapp.generated.resources.text_sunrise
@@ -86,6 +89,8 @@ import org.techascent.composa.cell.left.LeftSlot
 import org.techascent.composa.cell.right.RightSlot
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
+import org.techascent.composa.messabebox.MessageBox
+import org.techascent.composa.messabebox.MessageType
 import org.techascent.composa.sunprogress.SunProgressCard
 import org.techascent.composa.sunprogress.SunProgressConfig
 import org.techascent.composa.sunprogress.lerpColor
@@ -101,6 +106,7 @@ import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
 import org.techascent.muslim.prayer.uimodel.toDisplayString
 import org.techascent.muslim.showNativeResetDialog as showPermissionRationalDialog
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 // ═════════════════════════════════════════════════════════════════════════════════
 //  PUBLIC ENTRY
@@ -114,32 +120,117 @@ internal fun PrayerContentV3(
     onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
     innerPadding: PaddingValues,
 ) {
+    val listState = rememberLazyListState()
+
+    // Show arrow when there are more items below (canScrollForward)
+    val showScrollIndicator by remember {
+        derivedStateOf { listState.canScrollForward }
+    }
+    val arrowAlpha by animateFloatAsState(
+        targetValue = if (showScrollIndicator) 1f else 0f,
+        animationSpec = tween(durationMillis = 400),
+        label = "scrollIndicatorAlpha"
+    )
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(ComposaTheme.color.backgroundAppBackground),
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                bottom = innerPadding.calculateBottomPadding() + ComposaSpacing.ExtraLarge,
-            ),
-            verticalArrangement = Arrangement.spacedBy(ComposaSpacing.Small),
-        ) {
-            item { GreetingRow(onNavigateHalalScanner) }
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding() + ComposaSpacing.ExtraLarge,
+                ),
+                verticalArrangement = Arrangement.spacedBy(ComposaSpacing.Small),
+            ) {
+                item { GreetingRow(onNavigateHalalScanner) }
 
-            when (uiState) {
-                is PrayerTimeUiState.Loading -> loadingContent()
-                is PrayerTimeUiState.Success -> prayerBodyV3(
-                    uiModel = uiState.data,
-                    onUpdateNotification = onUpdateNotification,
+                when (uiState) {
+                    is PrayerTimeUiState.Loading -> loadingContent()
+                    is PrayerTimeUiState.Success -> prayerBodyV3(
+                        uiModel = uiState.data,
+                        onUpdateNotification = onUpdateNotification,
+                    )
+                    is PrayerTimeUiState.SuccessWithWarning -> {
+                        item { LocationWarningBanner(cityName = uiState.cityName) }
+                        prayerBodyV3(
+                            uiModel = uiState.data,
+                            onUpdateNotification = onUpdateNotification,
+                        )
+                    }
+                    is PrayerTimeUiState.Error -> errorContent(onRetry = onFetchPrayers)
+                }
+            }
+
+            // Scroll-down indicator — fades out when bottom is reached
+            if (arrowAlpha > 0f && (uiState is PrayerTimeUiState.Success || uiState is PrayerTimeUiState.SuccessWithWarning)) {
+                ScrollDownIndicator(
+                    alpha = arrowAlpha,
+                    bottomPadding = innerPadding.calculateBottomPadding(),
+                    modifier = Modifier.align(Alignment.BottomCenter)
                 )
-
-                is PrayerTimeUiState.Error -> errorContent(onRetry = onFetchPrayers)
             }
         }
     }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+//  SCROLL DOWN INDICATOR
+// ═════════════════════════════════════════════════════════════════════════════════
+
+@Composable
+private fun ScrollDownIndicator(
+    alpha: Float,
+    bottomPadding: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .padding(bottom = bottomPadding + 16.dp)
+            .size(25.dp)
+            .graphicsLayer { this.alpha = alpha }
+            .background(
+                color = Color.Black.copy(alpha = 0.25f),
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(modifier = Modifier.size(ComposaSpacing.Medium)) {
+            val w = size.width
+            val h = size.height
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(w * 0.15f, h * 0.3f)
+                lineTo(w * 0.5f, h * 0.72f)
+                lineTo(w * 0.85f, h * 0.3f)
+            }
+            drawPath(
+                path = path,
+                color = Color.White,
+                style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
+            )
+        }
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+//  LOCATION WARNING BANNER
+// ═════════════════════════════════════════════════════════════════════════════════
+
+@Composable
+private fun LocationWarningBanner(cityName: String) {
+    MessageBox(
+        message = stringResource(Res.string.warning_location_gps_off, cityName),
+        messageType = MessageType.Warning,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = ComposaSpacing.Medium)
+            .padding(top = ComposaSpacing.Small)
+            .clip(RoundedCornerShape(12.dp)),
+    )
 }
 
 // ═════════════════════════════════════════════════════════════════════════════════
@@ -275,7 +366,16 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
         uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.FAJR }?.startTimeInstant
     val ishaStart =
         uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.startTimeInstant
-    val ishaEnd = uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.endTimeInstant
+    // For the NIGHT arc: prefer currentPrayer instants when it's Isha so the after-midnight
+    // case (currentPrayer = yesterday's Isha) gives a meaningful progress value.
+    val ishaEnd = if (uiModel.currentPrayer?.name == PrayerNameEnum.ISHA)
+        uiModel.currentPrayer?.endTimeInstant
+    else
+        uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.endTimeInstant
+    val nightIshaStart = if (uiModel.currentPrayer?.name == PrayerNameEnum.ISHA)
+        uiModel.currentPrayer?.startTimeInstant ?: ishaStart
+    else
+        ishaStart
 
     // ── Determine phase ──────────────────────────────────────────────
     val phase = remember(now, sunriseInstant, sunsetInstant, fajrStart, ishaStart) {
@@ -338,9 +438,9 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
         }
 
         DayPhase.NIGHT -> {
-            if (ishaStart != null && ishaEnd != null && ishaEnd > ishaStart) {
-                val total = (ishaEnd - ishaStart).inWholeMilliseconds.toFloat()
-                val elapsed = (now - ishaStart).inWholeMilliseconds.toFloat()
+            if (nightIshaStart != null && ishaEnd != null && ishaEnd > nightIshaStart) {
+                val total = (ishaEnd - nightIshaStart).inWholeMilliseconds.toFloat()
+                val elapsed = (now - nightIshaStart).inWholeMilliseconds.toFloat()
                 (elapsed / total).coerceIn(0f, 1f)
             } else 0.5f
         }
@@ -373,7 +473,7 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
     // ── Animated visibility for sunrise / sunset labels ───────────────
     var showSunTimes by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        delay(400) // brief pause after card appears
+        delay(400.milliseconds) // brief pause after card appears
         showSunTimes = true
     }
     val sunTimesAlpha by animateFloatAsState(
@@ -394,8 +494,25 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
             Column(
                 modifier = Modifier.fillMaxWidth()
                     .padding(horizontal = ComposaSpacing.Medium)
-                    .padding(top = ComposaSpacing.Small),
+                    .padding(top = ComposaSpacing.Medium),
             ) {
+                prayer?.let {
+                    Column() {
+                        Text(
+                            stringResource(it.name.toDisplayString()),
+                            style = ComposaTheme.typography.titleLarge,
+                            color = textOnSky,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "${it.displayableStartTime} – ${it.displayableEndTime}".localizeTime(),
+                            style = ComposaTheme.typography.footnote,
+                            color = subtleOnSky,
+                            modifier = Modifier.padding(bottom = 2.dp),
+                        )
+                    }
+                }
+                Spacer(Modifier.height(2.dp))
                 Text(
                     buildString {
                         append(
@@ -405,28 +522,11 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
                         append("  •  ")
                         append(uiModel.hijriDate)
                     }.localizeDigits(),
-                    style = ComposaTheme.typography.caption,
+                    style = ComposaTheme.typography.footnote,
                     color = subtleOnSky,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Spacer(Modifier.height(2.dp))
-                prayer?.let {
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text(
-                            stringResource(it.name.toDisplayString()),
-                            style = ComposaTheme.typography.titleEmphasized,
-                            color = textOnSky,
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            "${it.displayableStartTime} – ${it.displayableEndTime}".localizeTime(),
-                            style = ComposaTheme.typography.footnote,
-                            color = subtleOnSky,
-                            modifier = Modifier.padding(bottom = 2.dp),
-                        )
-                    }
-                }
             }
         },
         footerContent = {
@@ -518,7 +618,7 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
         while (true) {
             val d = end - Clock.System.now()
             remaining = if (d.isPositive()) d else Duration.ZERO
-            delay(1000)
+            delay(1000.milliseconds)
         }
     }
     val progress = remember(remaining) {
@@ -618,7 +718,7 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
 
             val d = resolved.instant - now
             remaining = if (d.isPositive()) d else Duration.ZERO
-            delay(1000)
+            delay(1000.milliseconds)
         }
     }
 
@@ -706,7 +806,7 @@ private fun PrayerTimesCard(
         val visible =
             uiModel.intervals.filter { it.name != PrayerNameEnum.SALAT_UD_DUHA }
         visible.forEachIndexed { idx, interval ->
-            val isCurrent = interval.startTimeInstant == uiModel.currentPrayer?.startTimeInstant
+            val isCurrent = interval.name == uiModel.currentPrayer?.name
             var notify by remember { mutableStateOf(interval.shouldNotify) }
 
             CompactPrayerRow(
