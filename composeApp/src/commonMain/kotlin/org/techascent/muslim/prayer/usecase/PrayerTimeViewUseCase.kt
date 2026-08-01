@@ -14,11 +14,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import org.techascent.shared.data.common.AddressInfo
 import org.techascent.shared.data.common.getCurrentDateFormatted
+import org.techascent.shared.data.common.getYesterdayDateFormatted
 import org.techascent.muslim.common.location.LocationService
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPlaceName
@@ -106,7 +109,11 @@ class PrayerTimeViewUseCase(
         val cacheKey = cacheKeyFor(city, school, year, month)
         val todayFromCache = findTodayInCache(cacheKey, currentDate, prefs)
         if (todayFromCache != null) {
-            val data = updateCurrentPrayer(todayFromCache)
+            var data = updateCurrentPrayer(todayFromCache)
+            // After midnight but before Fajr: Isha from yesterday is still active
+            val yesterday = now.date.plus(-1, DateTimeUnit.DAY)
+            val yCacheKey = cacheKeyFor(city, school, yesterday.year, yesterday.monthNumber)
+            data = applyAfterMidnightIshaFix(data) { date -> findTodayInCache(yCacheKey, date, prefs) }
             return if (locationUnavailable) {
                 val displayCity = addressInfo.city ?: addressInfo.district ?: "unknown"
                 flowOf(ResultState.Warning(data = data, message = displayCity))
@@ -199,8 +206,16 @@ class PrayerTimeViewUseCase(
                     cacheMonth(key, uiModels)
 
                     val today = uiModels.find { it.currentDateTime == currentDate }
-                    val result = today?.let { ResultState.Success(updateCurrentPrayer(it)) }
-                        ?: ResultState.Error("Prayer data not found for today")
+                    val result = if (today != null) {
+                        var data = updateCurrentPrayer(today)
+                        // After midnight but before Fajr: Isha from yesterday is still active
+                        data = applyAfterMidnightIshaFix(data) { date ->
+                            uiModels.find { it.currentDateTime == date }
+                        }
+                        ResultState.Success(data)
+                    } else {
+                        ResultState.Error("Prayer data not found for today")
+                    }
                     send(result)
 
                     // Fire off remaining 11 months in background (non-blocking)
@@ -414,6 +429,35 @@ class PrayerTimeViewUseCase(
     }
 
     // ── Update current prayer + notify flags ────────────────────────────
+
+    /**
+     * After midnight but before today's Fajr, the current Islamic "night" still belongs
+     * to yesterday's Isha. This fix detects that window and:
+     *  1. Sets [currentPrayer] to yesterday's Isha interval (endTimeInstant = today's Fajr)
+     *  2. Replaces [iftarTime] with yesterday's fasting window so Suhoor shows correctly.
+     *
+     * [findYesterday] is a lambda that receives yesterday's date string and returns the
+     * corresponding cached [PrayerTimeUiModel] if available.
+     */
+    private fun applyAfterMidnightIshaFix(
+        data: PrayerTimeUiModel,
+        findYesterday: (String) -> PrayerTimeUiModel?,
+    ): PrayerTimeUiModel {
+        if (data.currentPrayer != null) return data
+        val nowInstant = Clock.System.now()
+        val todayFajr = data.intervals
+            .firstOrNull { it.name == PrayerNameEnum.FAJR }?.startTimeInstant ?: return data
+        if (nowInstant >= todayFajr) return data           // Past Fajr — nothing to fix
+        val yesterdayModel = findYesterday(getYesterdayDateFormatted()) ?: return data
+        val ishaFromYesterday = yesterdayModel.intervals
+            .firstOrNull { it.name == PrayerNameEnum.ISHA } ?: return data
+        if (ishaFromYesterday.endTimeInstant == null || nowInstant >= ishaFromYesterday.endTimeInstant) return data
+        return data.copy(
+            currentPrayer = ishaFromYesterday,
+            iftarTime = yesterdayModel.iftarTime,   // Suhoor countdown uses yesterday's window
+            prayerImage = getImageByPrayerEnum(PrayerNameEnum.ISHA),
+        )
+    }
 
     private fun updateCurrentPrayer(uiModel: PrayerTimeUiModel): PrayerTimeUiModel {
         val now = Clock.System.now()

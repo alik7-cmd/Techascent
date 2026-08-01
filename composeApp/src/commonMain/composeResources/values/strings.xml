@@ -58,7 +58,7 @@
     <string name="title_tasbeeh_instruction">Swipe left to right anywhere on the screen to increment.</string>
 
     <string name="text_tasbeeh_set_complete">Set %1$d Complete. Total count: %2$d</string>
-    <string name="message_tasbeeh">The Prophet Muhammad ﷺ used to count tasbeeh on his right hand, encouraging us to do the same. He said, Count on your fingers, for they will be asked and will speak. (Abu Dawood) Let’s follow his Sunnah and remember Allah with our right hand daily. </string>
+    <string name="message_tasbeeh">The Prophet Muhammad ﷺ used to count tasbeeh on his right hand, encouraging us to do the same. He said, Count on your fingers, for they will be asked and will speak. (Abu Dawood) Let's follow his Sunnah and remember Allah with our right hand daily. </string>
     <string name="reset_warning_title">Reset Warning</string>
     <string name="reset_warning_message">This will reset all data. Continue?</string>
     <string name="reset_warning_confirm_text">Proceed</string>
@@ -66,6 +66,16 @@
     <string name="text_okay">Okay</string>
     <string name="text_reset_counter">Reset Counter</string>
     <string name="text_reset">Reset</string>
+
+    <string name="text_tasbeeh_sets">Sets</string>
+    <string name="text_tasbeeh_goal">Goal</string>
+    <string name="text_tasbeeh_total">Total</string>
+    <string name="text_tasbeeh_of_goal">of %1$s</string>
+    <string name="text_tasbeeh_subhanallah">SubhanAllah (Glory be to Allah)</string>
+    <string name="text_tasbeeh_alhamdulillah">Alhamdulillah (Praise be to Allah)</string>
+    <string name="text_tasbeeh_allahu_akbar">Allahu Akbar (Allah is Greatest)</string>
+    <string name="text_tasbeeh_la_ilaha">La ilaha illallah (None worthy of worship but Allah)</string>
+    <string name="text_tasbeeh_astaghfirullah">Astaghfirullah (I seek forgiveness from Allah)</string>
 
     <string name="title_quibla">Quibla</string>
     <string name="title_halal_scanner">Halal Scanner</string>

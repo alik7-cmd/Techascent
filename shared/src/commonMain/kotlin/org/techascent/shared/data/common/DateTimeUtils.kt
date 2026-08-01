@@ -1,10 +1,12 @@
 package org.techascent.shared.data.common
 
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 
@@ -55,6 +57,15 @@ fun getCurrentDateFormatted(): String {
     val day = now.dayOfMonth.toString().padStart(2, '0')
     val month = now.monthNumber.toString().padStart(2, '0')
     val year = now.year.toString()
+    return "$day-$month-$year"
+}
+
+fun getYesterdayDateFormatted(): String {
+    val yesterday = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        .plus(-1, DateTimeUnit.DAY)
+    val day = yesterday.dayOfMonth.toString().padStart(2, '0')
+    val month = yesterday.monthNumber.toString().padStart(2, '0')
+    val year = yesterday.year.toString()
     return "$day-$month-$year"
 }
 
