@@ -191,7 +191,7 @@ private fun ScrollDownIndicator(
     Box(
         modifier = modifier
             .padding(bottom = bottomPadding + 16.dp)
-            .size(40.dp)
+            .size(25.dp)
             .graphicsLayer { this.alpha = alpha }
             .background(
                 color = Color.Black.copy(alpha = 0.25f),
@@ -199,7 +199,7 @@ private fun ScrollDownIndicator(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(modifier = Modifier.size(16.dp)) {
+        Canvas(modifier = Modifier.size(ComposaSpacing.Medium)) {
             val w = size.width
             val h = size.height
             val path = androidx.compose.ui.graphics.Path().apply {
@@ -366,7 +366,16 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
         uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.FAJR }?.startTimeInstant
     val ishaStart =
         uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.startTimeInstant
-    val ishaEnd = uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.endTimeInstant
+    // For the NIGHT arc: prefer currentPrayer instants when it's Isha so the after-midnight
+    // case (currentPrayer = yesterday's Isha) gives a meaningful progress value.
+    val ishaEnd = if (uiModel.currentPrayer?.name == PrayerNameEnum.ISHA)
+        uiModel.currentPrayer?.endTimeInstant
+    else
+        uiModel.intervals.firstOrNull { it.name == PrayerNameEnum.ISHA }?.endTimeInstant
+    val nightIshaStart = if (uiModel.currentPrayer?.name == PrayerNameEnum.ISHA)
+        uiModel.currentPrayer?.startTimeInstant ?: ishaStart
+    else
+        ishaStart
 
     // ── Determine phase ──────────────────────────────────────────────
     val phase = remember(now, sunriseInstant, sunsetInstant, fajrStart, ishaStart) {
@@ -429,9 +438,9 @@ private fun SunProgressCard(uiModel: PrayerTimeUiModel) {
         }
 
         DayPhase.NIGHT -> {
-            if (ishaStart != null && ishaEnd != null && ishaEnd > ishaStart) {
-                val total = (ishaEnd - ishaStart).inWholeMilliseconds.toFloat()
-                val elapsed = (now - ishaStart).inWholeMilliseconds.toFloat()
+            if (nightIshaStart != null && ishaEnd != null && ishaEnd > nightIshaStart) {
+                val total = (ishaEnd - nightIshaStart).inWholeMilliseconds.toFloat()
+                val elapsed = (now - nightIshaStart).inWholeMilliseconds.toFloat()
                 (elapsed / total).coerceIn(0f, 1f)
             } else 0.5f
         }
@@ -609,7 +618,7 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
         while (true) {
             val d = end - Clock.System.now()
             remaining = if (d.isPositive()) d else Duration.ZERO
-            delay(1000)
+            delay(1000.milliseconds)
         }
     }
     val progress = remember(remaining) {
@@ -709,7 +718,7 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
 
             val d = resolved.instant - now
             remaining = if (d.isPositive()) d else Duration.ZERO
-            delay(1000)
+            delay(1000.milliseconds)
         }
     }
 
@@ -797,7 +806,7 @@ private fun PrayerTimesCard(
         val visible =
             uiModel.intervals.filter { it.name != PrayerNameEnum.SALAT_UD_DUHA }
         visible.forEachIndexed { idx, interval ->
-            val isCurrent = interval.startTimeInstant == uiModel.currentPrayer?.startTimeInstant
+            val isCurrent = interval.name == uiModel.currentPrayer?.name
             var notify by remember { mutableStateOf(interval.shouldNotify) }
 
             CompactPrayerRow(
