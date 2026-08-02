@@ -25,8 +25,7 @@ fun ProductUiState.toHistoryItem(
 
 fun ScanHistoryItem.toProductUiState(): ProductUiState {
     val ingredientsList = ingredientsText?.let {
-        val parts = it.split(",")
-        parts.chunked(3).map { chunk -> chunk.joinToString(",") }
+        it.split(",").map { part -> part.trim() }.filter { part -> part.isNotEmpty() }
     }
     // Use stored flagged ingredients, or re-compute from raw text for backward compat
     val resolved = flaggedIngredients.ifEmpty {

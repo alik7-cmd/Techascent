@@ -37,6 +37,8 @@ import org.techascent.composa.button.primary.ComposaButton
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.halalscanner.state.ProductUiState
+import org.techascent.shared.data.mapper.FlaggedIngredient
+import org.techascent.shared.data.mapper.FlagType
 import org.techascent.shared.data.mapper.HalalStatus
 
 @Composable
@@ -74,7 +76,10 @@ internal fun InformationContentV2(
         // ── Ingredients Section ─────────────────────────────────────────────────
         if (!productUiState.ingredientsText.isNullOrEmpty()) {
             Spacer(modifier = Modifier.height(ComposaSpacing.Medium))
-            IngredientsSection(ingredients = productUiState.ingredientsText)
+            IngredientsSection(
+                ingredients = productUiState.ingredientsText,
+                flaggedIngredients = productUiState.flaggedIngredients,
+            )
         }
 
         // ── Labels / Tags ───────────────────────────────────────────────────────
@@ -234,8 +239,19 @@ private fun VerdictCard(
 
 // ─── Ingredients Section ────────────────────────────────────────────────────────
 
+private fun ingredientFlagType(
+    ingredient: String,
+    flaggedIngredients: List<FlaggedIngredient>,
+): FlagType? {
+    val lower = ingredient.lowercase()
+    return flaggedIngredients.firstOrNull { lower.contains(it.name.lowercase()) }?.type
+}
+
 @Composable
-private fun IngredientsSection(ingredients: List<String>) {
+private fun IngredientsSection(
+    ingredients: List<String>,
+    flaggedIngredients: List<FlaggedIngredient> = emptyList(),
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -256,26 +272,56 @@ private fun IngredientsSection(ingredients: List<String>) {
                 .background(ComposaTheme.color.strokeNeutralSubtle.copy(alpha = 0.15f)),
         ) {
             ingredients.forEachIndexed { index, ingredient ->
+                val flagType = ingredientFlagType(ingredient, flaggedIngredients)
+                val rowBg = when (flagType) {
+                    FlagType.NON_HALAL -> Color(0xFFC62828).copy(alpha = 0.08f)
+                    FlagType.DOUBTFUL  -> Color(0xFFEF6C00).copy(alpha = 0.08f)
+                    null               -> Color.Transparent
+                }
+                val bulletColor = when (flagType) {
+                    FlagType.NON_HALAL -> Color(0xFFC62828)
+                    FlagType.DOUBTFUL  -> Color(0xFFEF6C00)
+                    null               -> ComposaTheme.color.textNeutralSubtle
+                }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .background(rowBg)
                         .padding(
                             horizontal = ComposaSpacing.Medium,
                             vertical = 12.dp,
                         ),
-                    verticalAlignment = Alignment.Top,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = spacedBy(ComposaSpacing.Small),
                 ) {
                     Text(
                         text = "•",
                         style = ComposaTheme.typography.body,
-                        color = ComposaTheme.color.textNeutralSubtle,
+                        color = bulletColor,
                     )
                     Text(
                         text = ingredient.trim(),
                         style = ComposaTheme.typography.footnote,
                         color = ComposaTheme.color.textNeutral.copy(alpha = 0.85f),
+                        modifier = Modifier.weight(1f),
                     )
+                    if (flagType != null) {
+                        val badgeColor = bulletColor
+                        val badgeLabel = when (flagType) {
+                            FlagType.NON_HALAL -> "❌ Haram"
+                            FlagType.DOUBTFUL  -> "⚠️ Doubtful"
+                        }
+                        Text(
+                            text = badgeLabel,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(badgeColor.copy(alpha = 0.15f))
+                                .padding(horizontal = 8.dp, vertical = 3.dp),
+                            style = ComposaTheme.typography.caption,
+                            color = badgeColor,
+                        )
+                    }
                 }
                 if (index < ingredients.lastIndex) {
                     HorizontalDivider(
