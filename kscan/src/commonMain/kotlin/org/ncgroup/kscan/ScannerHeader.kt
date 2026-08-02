@@ -1,9 +1,5 @@
 package org.ncgroup.kscan
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.FlashOff
-import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,47 +39,32 @@ internal fun ScannerHeader(
 ) {
     CenterAlignedTopAppBar(
         title = {
-            Text(
-                text = title,
-            )
+            Text(text = title)
         },
         navigationIcon = {
-            IconButton(
-                onClick = {
-                    onCancel()
-                },
-            ) {
+            IconButton(onClick = { onCancel() }) {
                 Icon(
-                    imageVector = Icons.Default.Cancel,
+                    imageVector = ScannerIcons.Close,
                     contentDescription = null,
                 )
             }
         },
         actions = {
             if (showTorch) {
-                IconButton(
-                    onClick = {
-                        if (torchEnabled) {
-                            onTorchEnabled(false)
-                        } else {
-                            onTorchEnabled(true)
-                        }
-                    },
-                ) {
+                IconButton(onClick = { onTorchEnabled(!torchEnabled) }) {
                     Icon(
-                        imageVector = if (torchEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff,
+                        imageVector = if (torchEnabled) ScannerIcons.FlashOn else ScannerIcons.FlashOff,
                         contentDescription = null,
                     )
                 }
             }
         },
-        colors =
-            TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = containerColor,
-                navigationIconContentColor = navigationIconColor,
-                titleContentColor = titleColor,
-                actionIconContentColor = actionIconColor,
-            ),
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = containerColor,
+            navigationIconContentColor = navigationIconColor,
+            titleContentColor = titleColor,
+            actionIconContentColor = actionIconColor,
+        ),
         modifier = modifier,
     )
 }

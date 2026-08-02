@@ -58,7 +58,6 @@ kotlin {
     
     sourceSets {
         androidMain.dependencies {
-            implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.lifecycle)
             implementation(libs.androidx.lifecycle.runtimeCompose)
@@ -66,11 +65,8 @@ kotlin {
             implementation("com.google.android.gms:play-services-location:21.0.1")
 
 
-            // WorkManager for scheduling notifications
+            // WorkManager — work-runtime-ktx already includes work-runtime transitively
             implementation("androidx.work:work-runtime-ktx:2.8.1")
-
-            // Coroutine support for WorkManager
-            implementation("androidx.work:work-runtime:2.8.1")
             implementation(libs.androidx.appcompat)
 
             // Glance for App Widgets
@@ -83,7 +79,7 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            // uiToolingPreview ships only in debug — moved to debugImplementation below
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(projects.shared)
@@ -126,6 +122,9 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/*.kotlin_module"
+            excludes += "META-INF/versions/**"
+            excludes += "DebugProbesKt.bin"
         }
     }
     buildTypes {
@@ -139,6 +138,19 @@ android {
             )
         }
     }
+    // ABI splits — only applies when publishing an APK.
+    // Prefer publishing an AAB (./gradlew bundleRelease) to Play Store instead:
+    // AAB lets Google deliver only the device-specific ABI, saving ~30-40% on
+    // apps with native libs (CameraX, ML Kit). These splits are a fallback for
+    // direct APK distribution.
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a")
+            isUniversalApk = false
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -150,6 +162,7 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    debugImplementation(compose.components.uiToolingPreview)
 }
 
 

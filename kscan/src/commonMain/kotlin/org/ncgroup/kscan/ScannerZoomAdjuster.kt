@@ -4,9 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -58,7 +55,7 @@ internal fun ScannerZoomAdjuster(
                 },
             ) {
                 Icon(
-                    imageVector = Icons.Default.Remove,
+                    imageVector = ScannerIcons.Remove,
                     contentDescription = "Zoom Out",
                     tint = contentColor,
                 )
@@ -72,7 +69,7 @@ internal fun ScannerZoomAdjuster(
                 },
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    imageVector = ScannerIcons.Add,
                     contentDescription = "Zoom In",
                     tint = contentColor,
                 )
