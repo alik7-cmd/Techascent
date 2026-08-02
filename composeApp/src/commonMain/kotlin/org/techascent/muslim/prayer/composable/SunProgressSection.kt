@@ -138,7 +138,6 @@ internal fun SunProgressSection(uiModel: PrayerTimeUiModel) {
                             style = ComposaTheme.typography.titleLarge,
                             color = textOnSky,
                         )
-                        Spacer(Modifier.height(4.dp))
                         Text(
                             text = "${it.displayableStartTime} – ${it.displayableEndTime}".localizeTime(),
                             style = ComposaTheme.typography.footnote,
@@ -147,7 +146,6 @@ internal fun SunProgressSection(uiModel: PrayerTimeUiModel) {
                         )
                     }
                 }
-                Spacer(Modifier.height(2.dp))
                 Text(
                     text = buildString {
                         append(
