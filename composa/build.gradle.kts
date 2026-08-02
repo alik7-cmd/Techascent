@@ -1,4 +1,5 @@
 
+import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.libs
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -35,7 +36,7 @@ kotlin {
                 implementation(compose.material3)
                 implementation(compose.ui)
                 implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
+                // uiToolingPreview must not ship in release — added to androidMain debug below
                 implementation(libs.androidx.lifecycle)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(libs.coil.compose)
@@ -83,3 +84,11 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
 }
+
+// debugImplementation must live in the top-level dependencies block,
+// not inside kotlin { sourceSets { ... } } which only accepts KMP scopes.
+dependencies {
+    debugImplementation(compose.components.uiToolingPreview)
+    debugImplementation(compose.uiTooling)
+}
+

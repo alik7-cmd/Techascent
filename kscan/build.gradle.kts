@@ -37,7 +37,8 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
+            // compose.materialIconsExtended removed — it bundles ~950 icons (~8-10 MB).
+            // Import only the specific icons you use directly in your composables instead.
         }
     }
 }

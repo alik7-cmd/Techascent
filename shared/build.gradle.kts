@@ -33,8 +33,8 @@ kotlin {
                 implementation(libs.ktor.ktor.client.content.negotiation)
                 implementation(libs.ktor.ktor.client.logging)
                 implementation(libs.ktor.ktor.serialization.kotlinx.json)
+                // Single source of truth for serialization version — via libs.versions.toml
                 implementation(libs.kotlinx.serialization.json)
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
                 // Koin Core for Multiplatform
                 implementation(libs.koin.core)
