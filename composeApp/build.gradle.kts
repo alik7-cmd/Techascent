@@ -116,8 +116,8 @@ android {
         applicationId = "org.techascent.muslim"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 31
-        versionName = "2.10.0"
+        versionCode = 32
+        versionName = "2.11.0"
     }
     packaging {
         resources {
@@ -136,19 +136,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-        }
-    }
-    // ABI splits — only applies when publishing an APK.
-    // Prefer publishing an AAB (./gradlew bundleRelease) to Play Store instead:
-    // AAB lets Google deliver only the device-specific ABI, saving ~30-40% on
-    // apps with native libs (CameraX, ML Kit). These splits are a fallback for
-    // direct APK distribution.
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("arm64-v8a", "armeabi-v7a")
-            isUniversalApk = false
         }
     }
     compileOptions {

@@ -11,8 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.method.state.MethodUiState
@@ -31,22 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.techascent.muslim.method.state.toStringRes
 import org.techascent.shared.data.enum.School
-
-@OptIn(KoinExperimentalAPI::class)
-@Composable
-@Preview
-fun MethodSelectionView() {
-    val viewModel = koinViewModel<MethodViewModel>()
-
-    ComposaTheme {
-        MethodSelectionScreen(
-            viewModel = viewModel
-        )
-    }
-}
 
 @Composable
 private fun MethodSelectionScreen(
