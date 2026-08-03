@@ -85,9 +85,9 @@ internal fun SunProgressSection(uiModel: PrayerTimeUiModel) {
 
     // Text colours adapt to dark/light sky
     val textOnSky = if (isNight || isDusk || isDawn)
-        Color.White.copy(alpha = 0.9f) else ComposaTheme.color.textNeutral
+        ComposaTheme.color.textNeutralOnDark else ComposaTheme.color.textNeutral
     val subtleOnSky = if (isNight || isDusk || isDawn)
-        Color.White.copy(alpha = 0.6f) else ComposaTheme.color.textNeutralSubtle
+        ComposaTheme.color.textNeutralOnDark.copy(alpha = 0.6f) else ComposaTheme.color.textNeutralSubtle
 
     // ── Sunrise/sunset labels fade in after a brief delay ───────────────
     var showSunTimes by remember { mutableStateOf(false) }

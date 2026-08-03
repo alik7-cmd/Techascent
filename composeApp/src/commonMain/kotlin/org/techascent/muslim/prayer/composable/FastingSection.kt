@@ -35,7 +35,7 @@ import org.techascent.muslim.common.localizeTime
 internal fun FastingSection(sahri: String?, iftar: String?) {
     // TODO: add fastingCardAccent to ComposaTheme.color.prayer for full theme support
     val sahriAccent = ComposaTheme.color.prayer.fastingAccent
-    val iftarAccent = Color(0xFFE65100) // deep orange — move to theme token
+    val iftarAccent = ComposaTheme.color.prayer.iftarAccent
 
     Column(
         modifier = Modifier

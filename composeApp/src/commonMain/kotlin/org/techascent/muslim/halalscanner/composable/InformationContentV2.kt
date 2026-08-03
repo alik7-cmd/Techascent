@@ -274,13 +274,13 @@ private fun IngredientsSection(
             ingredients.forEachIndexed { index, ingredient ->
                 val flagType = ingredientFlagType(ingredient, flaggedIngredients)
                 val rowBg = when (flagType) {
-                    FlagType.NON_HALAL -> Color(0xFFC62828).copy(alpha = 0.08f)
-                    FlagType.DOUBTFUL  -> Color(0xFFEF6C00).copy(alpha = 0.08f)
+                    FlagType.NON_HALAL -> ComposaTheme.color.halal.statusNotHalal.copy(alpha = 0.08f)
+                    FlagType.DOUBTFUL  -> ComposaTheme.color.halal.statusDoubtful.copy(alpha = 0.08f)
                     null               -> Color.Transparent
                 }
                 val bulletColor = when (flagType) {
-                    FlagType.NON_HALAL -> Color(0xFFC62828)
-                    FlagType.DOUBTFUL  -> Color(0xFFEF6C00)
+                    FlagType.NON_HALAL -> ComposaTheme.color.halal.statusNotHalal
+                    FlagType.DOUBTFUL  -> ComposaTheme.color.halal.statusDoubtful
                     null               -> ComposaTheme.color.textNeutralSubtle
                 }
 
@@ -400,11 +400,11 @@ private fun TagChip(tag: String) {
 @Composable
 private fun statusColor(status: HalalStatus): Color {
     return when (status) {
-        HalalStatus.HALAL_CERTIFIED -> Color(0xFF2E7D32)   // deep green
-        HalalStatus.HALAL_POSSIBLE -> Color(0xFF558B2F)    // olive green
-        HalalStatus.HALAL_DOUBTFUL -> Color(0xFFEF6C00)    // amber
-        HalalStatus.NOT_HALAL -> Color(0xFFC62828)         // red
-        HalalStatus.UNKNOWN -> Color(0xFF757575)           // grey
+        HalalStatus.HALAL_CERTIFIED -> ComposaTheme.color.halal.statusCertified   // deep green
+        HalalStatus.HALAL_POSSIBLE -> ComposaTheme.color.halal.statusPossible    // olive green
+        HalalStatus.HALAL_DOUBTFUL -> ComposaTheme.color.halal.statusDoubtful    // amber
+        HalalStatus.NOT_HALAL -> ComposaTheme.color.halal.statusNotHalal         // red
+        HalalStatus.UNKNOWN -> ComposaTheme.color.halal.statusUnknown           // grey
     }
 }
 

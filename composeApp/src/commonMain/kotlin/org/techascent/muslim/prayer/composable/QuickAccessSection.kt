@@ -45,22 +45,21 @@ internal fun QuickAccessSection(
 ) {
     if (features.isEmpty()) return
 
-    val sahriAccent = ComposaTheme.color.prayer.scannerAccent
-    // Accent used for the emoji bubble in the header — purple feels right for "shortcuts"
-    val headerAccent = Color(0xFF7B1FA2)
+    val sahriAccent = ComposaTheme.color.prayer.quickAccessAccent
+    val sectionAccent = ComposaTheme.color.prayer.quickAccessAccent
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = ComposaSpacing.Medium)
             .clip(RoundedCornerShape(20.dp))
-            .background(sahriAccent.copy(alpha = 0.06f)),
+            .background(ComposaTheme.color.prayer.cardBg),
     ) {
         // ── Header ──────────────────────────────────────────────────────────────
         Cell(
             leftSlot = LeftSlot.Emoji(
                 emoji = "⚡",
-                accentColor = headerAccent.copy(alpha = 0.12f),
+                accentColor = sectionAccent.copy(alpha = 0.12f),
                 size = 34.dp,
                 fontSize = 18,
             ),

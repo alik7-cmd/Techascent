@@ -125,28 +125,52 @@ data class ComposaColor(
     val textWarningBold: Color,
     val textWarningBoldAlternative: Color,
 
-    // Prayer screen semantic colours (grouped to avoid DEX register limit)
+    // Domain semantic colours (grouped to avoid DEX register limit)
     val prayer: PrayerColors = PrayerColors(),
+    val halal: HalalColors = HalalColors(),
 )
 
 data class PrayerColors(
+    // ── Scenic / sky ────────────────────────────────────────────────────────────
     val skyStart: Color = Color.Transparent,
     val skyEnd: Color = Color.Transparent,
     val sunBody: Color = Color.Transparent,
     val sunGlow: Color = Color.Transparent,
     val horizon: Color = Color.Transparent,
+    // ── Timer ────────────────────────────────────────────────────────────────────
     val timerAccent: Color = Color.Transparent,
     val timerTrack: Color = Color.Transparent,
+    // ── Fasting — Suhoor / Iftar ─────────────────────────────────────────────────
     val fastingAccent: Color = Color.Transparent,
     val fastingSubtle: Color = Color.Transparent,
+    val iftarAccent: Color = Color.Transparent,
+    // ── Quick Access section ─────────────────────────────────────────────────────
+    val quickAccessAccent: Color = Color.Transparent,
+    // ── Current waqt highlight ───────────────────────────────────────────────────
     val currentWaqtBg: Color = Color.Transparent,
     val currentWaqtText: Color = Color.Transparent,
+    // ── Halal scanner ────────────────────────────────────────────────────────────
     val scannerAccent: Color = Color.Transparent,
     val scannerSubtle: Color = Color.Transparent,
+    // ── Announcement banner ──────────────────────────────────────────────────────
     val announcementBg: Color = Color.Transparent,
     val announcementAccent: Color = Color.Transparent,
+    // ── Generic card background ──────────────────────────────────────────────────
     val cardBg: Color = Color.Transparent,
-    // Night / moon / twilight colours
+    // ── Quran reader ─────────────────────────────────────────────────────────────
+    val quranPlayingAccent: Color = Color.Transparent,
+    // ── Prayer calendar ──────────────────────────────────────────────────────────
+    val calendarFridayAccent: Color = Color.Transparent,
+    val calendarCardAccent: Color = Color.Transparent,
+    val calendarWarmAccent: Color = Color.Transparent,
+    // ── Compass ──────────────────────────────────────────────────────────────────
+    val compassQiblaAccent: Color = Color.Transparent,
+    val compassNorthAccent: Color = Color.Transparent,
+    // ── Tasbeeh bead colors ──────────────────────────────────────────────────────
+    val tasbeehInactive: Color = Color.Transparent,
+    val tasbeehActive: Color = Color.Transparent,
+    val tasbeehHighlight: Color = Color.Transparent,
+    // ── Night / moon / twilight ──────────────────────────────────────────────────
     val nightSkyStart: Color = Color(0xFF0D1B2A),
     val nightSkyEnd: Color = Color(0xFF1B2838),
     val moonBody: Color = Color(0xFFF5F5DC),
@@ -157,4 +181,18 @@ data class PrayerColors(
     val twilightSkyEnd: Color = Color(0xFFFF8A65),
     val dawnSkyStart: Color = Color(0xFF283593),
     val dawnSkyEnd: Color = Color(0xFFFFAB91),
+)
+
+/**
+ * Semantic colour tokens for the Halal Scanner and related features.
+ *
+ * Status colours are intentionally distinct: certified/possible are green shades,
+ * doubtful is amber, not-halal is red, unknown is neutral grey.
+ */
+data class HalalColors(
+    val statusCertified: Color = Color.Transparent,   // HALAL_CERTIFIED → deep green
+    val statusPossible: Color = Color.Transparent,    // HALAL_POSSIBLE  → medium green
+    val statusDoubtful: Color = Color.Transparent,    // HALAL_DOUBTFUL  → amber
+    val statusNotHalal: Color = Color.Transparent,    // NOT_HALAL       → red
+    val statusUnknown: Color = Color.Transparent,     // UNKNOWN         → neutral grey
 )

@@ -127,22 +127,33 @@ val composaLightTheme = ComposaColor(
 
     // Prayer screen
     prayer = PrayerColors(
-        skyStart = Color(0xFFE3F2FD),
-        skyEnd = Color(0xFFFFF8E1),
-        sunBody = Color(0xFFFFA726),
-        sunGlow = Color(0xFFFFF3E0),
-        horizon = Color(0xFFBCAAA4),
+        skyStart = Color(0xFFE3F2FD),          // custom: no palette match for pale sky blue
+        skyEnd = Color(0xFFFFF8E1),            // custom: warm cream sky
+        sunBody = Color(0xFFFFA726),           // custom: amber sun
+        sunGlow = Color(0xFFFFF3E0),           // custom: warm sun glow
+        horizon = Color(0xFFBCAAA4),           // custom: blue-grey horizon
         timerAccent = ComposaBlue700,
         timerTrack = ComposaGrey300,
-        fastingAccent = ComposaOrange700,
-        fastingSubtle = Color(0xFFFFF3E0),
-        currentWaqtBg = Color(0xFFE8EAF6),
+        fastingAccent = ComposaOrange700,       // Suhoor — warm orange
+        fastingSubtle = ComposaYellow50,        // was Color(0xFFFFF3E0)
+        iftarAccent = Color(0xFFE65100),        // Iftar — deep burnt orange, no palette match
+        quickAccessAccent = ComposaPurple700,
+        currentWaqtBg = ComposaPurple100,       // was Color(0xFFE8EAF6) — indigo-50 tint
         currentWaqtText = ComposaBlue700,
         scannerAccent = ComposaGreen600,
         scannerSubtle = ComposaGreen50,
         announcementBg = ComposaYellow50,
         announcementAccent = ComposaYellow800,
         cardBg = ComposaGrey0,
+        calendarFridayAccent = ComposaBlue700,
+        calendarCardAccent = ComposaPurple700,
+        calendarWarmAccent = Color(0xFFF57F17), // custom: Material Orange 800, no palette match
+        compassQiblaAccent = ComposaGreen700,
+        compassNorthAccent = ComposaRed700,
+        tasbeehInactive = ComposaGrey400,
+        tasbeehActive = ComposaGreen600,
+        tasbeehHighlight = ComposaYellow600,
+        quranPlayingAccent = ComposaGreen700,
         nightSkyStart = Color(0xFF0D1B2A),
         nightSkyEnd = Color(0xFF1B2838),
         moonBody = Color(0xFFF5F5DC),
@@ -153,5 +164,12 @@ val composaLightTheme = ComposaColor(
         twilightSkyEnd = Color(0xFFFF8A65),
         dawnSkyStart = Color(0xFF283593),
         dawnSkyEnd = Color(0xFFFFAB91),
+    ),
+    halal = HalalColors(
+        statusCertified = ComposaGreen700,
+        statusPossible = ComposaGreen600,
+        statusDoubtful = ComposaYellow600,
+        statusNotHalal = ComposaRed700,
+        statusUnknown = ComposaGrey500,
     ),
 )

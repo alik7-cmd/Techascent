@@ -25,6 +25,15 @@ import apphub.composeapp.generated.resources.text_category_faith_knowledge
 import apphub.composeapp.generated.resources.text_category_daily_tools
 import apphub.composeapp.generated.resources.text_category_more
 import org.jetbrains.compose.resources.StringResource
+import org.techascent.composa.theming.color.ComposaBlue500
+import org.techascent.composa.theming.color.ComposaBlue700
+import org.techascent.composa.theming.color.ComposaGreen500
+import org.techascent.composa.theming.color.ComposaGreen600
+import org.techascent.composa.theming.color.ComposaGreen700
+import org.techascent.composa.theming.color.ComposaOrange500
+import org.techascent.composa.theming.color.ComposaOrange700
+import org.techascent.composa.theming.color.ComposaPurple600
+import org.techascent.composa.theming.color.ComposaPurple700
 
 data class UtilityUiState(
     @Stable
@@ -41,35 +50,35 @@ data class FeatureItem(
     val descriptionRes: StringResource? = null,
     val tint: Color = Color.Unspecified,
     val emoji: String = "",
-    val accentColor: Color = Color(0xFF4CAF50),
+    val accentColor: Color = ComposaGreen600, // default uses palette constant, not hex
 )
 
 // ── Faith & Knowledge: Halal-related + Quran ────────────────────────────────────
+// Accent colors mirror FeatureId.accentColor — keep them in sync with FeatureId.kt.
 private val faithAndKnowledgeItems = listOf(
     FeatureItem(
         titleRes = Res.string.title_halal_scanner,
         descriptionRes = Res.string.text_utility_desc_halal,
-        tint = Color.Green,
         emoji = "🔍",
-        accentColor = Color(0xFF4CAF50),
+        accentColor = ComposaGreen600,
     ),
     FeatureItem(
         titleRes = Res.string.title_manual_halal_check,
         descriptionRes = Res.string.text_utility_desc_manual_halal,
         emoji = "✍️",
-        accentColor = Color(0xFF00897B),
+        accentColor = ComposaGreen500,
     ),
     FeatureItem(
         titleRes = Res.string.title_scan_history,
         descriptionRes = Res.string.text_utility_desc_scan_history,
         emoji = "📋",
-        accentColor = Color(0xFF5E35B1),
+        accentColor = ComposaPurple600,
     ),
     FeatureItem(
         titleRes = Res.string.title_quran,
         descriptionRes = Res.string.text_utility_desc_quran,
         emoji = "📖",
-        accentColor = Color(0xFF1565C0),
+        accentColor = ComposaBlue700,
     ),
 )
 
@@ -79,19 +88,19 @@ private val dailyToolsItems = listOf(
         titleRes = Res.string.title_quibla,
         descriptionRes = Res.string.text_utility_desc_qibla,
         emoji = "🧭",
-        accentColor = Color(0xFF00838F),
+        accentColor = ComposaBlue500,
     ),
     FeatureItem(
         titleRes = Res.string.title_tasbeeh,
         descriptionRes = Res.string.text_utility_desc_tasbeeh,
         emoji = "📿",
-        accentColor = Color(0xFF7B1FA2),
+        accentColor = ComposaPurple700,
     ),
     FeatureItem(
         titleRes = Res.string.title_nearby_mosque,
         descriptionRes = Res.string.text_utility_desc_mosque,
         emoji = "🕌",
-        accentColor = Color(0xFFE65100),
+        accentColor = ComposaOrange700,
     ),
 )
 
@@ -101,13 +110,13 @@ private val planAndExploreItems = listOf(
         titleRes = Res.string.title_prayer_calendar,
         descriptionRes = Res.string.text_utility_desc_calendar,
         emoji = "🗓️",
-        accentColor = Color(0xFFD84315),
+        accentColor = ComposaOrange500,
     ),
     FeatureItem(
         titleRes = Res.string.title_zakat_calculator,
         descriptionRes = Res.string.text_utility_desc_zakat,
         emoji = "💰",
-        accentColor = Color(0xFF2E7D32),
+        accentColor = ComposaGreen700,
     ),
 )
 

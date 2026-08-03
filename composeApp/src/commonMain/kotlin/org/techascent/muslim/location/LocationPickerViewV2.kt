@@ -11,7 +11,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +58,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.button.primary.ComposaButton
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.composa.theming.color.ComposaGreen500
+import org.techascent.composa.theming.color.ComposaPurple700
+import org.techascent.composa.theming.color.ComposaYellow600
 import org.techascent.muslim.location.state.LocationPickerUiState
 
 // ═════════════════════════════════════════════════════════════════════════════════
@@ -408,7 +410,7 @@ private fun FeatureHighlights(accent: Color) {
             emoji = "🧭",
             title = "Qibla Direction",
             subtitle = "Find the direction to Makkah",
-            accent = Color(0xFF00897B),
+            accent = ComposaGreen500,
         )
 
         ThinDivider()
@@ -417,7 +419,7 @@ private fun FeatureHighlights(accent: Color) {
             emoji = "🌅",
             title = "Sunrise & Sunset",
             subtitle = "Exact times for your location",
-            accent = Color(0xFFFF8F00),
+            accent = ComposaYellow600,
         )
 
         ThinDivider()
@@ -426,7 +428,7 @@ private fun FeatureHighlights(accent: Color) {
             emoji = "🍽️",
             title = "Iftar & Suhur",
             subtitle = "Fasting times during Ramadan",
-            accent = Color(0xFF7B1FA2),
+            accent = ComposaPurple700,
         )
     }
 }

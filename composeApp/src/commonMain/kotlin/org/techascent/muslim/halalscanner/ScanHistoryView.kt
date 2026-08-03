@@ -146,7 +146,7 @@ private fun HistoryListScreen(
                     onClearHistory()
                     showClearDialog = false
                 }) {
-                    Text("Yes", color = Color(0xFFC62828))
+                    Text("Yes", color = ComposaTheme.color.halal.statusNotHalal)
                 }
             },
             dismissButton = {
@@ -387,13 +387,14 @@ private fun formatTimestamp(epochMillis: Long): String {
     }
 }
 
+@Composable
 private fun statusColorForHistory(status: HalalStatus): Color {
     return when (status) {
-        HalalStatus.HALAL_CERTIFIED -> Color(0xFF2E7D32)
-        HalalStatus.HALAL_POSSIBLE -> Color(0xFF558B2F)
-        HalalStatus.HALAL_DOUBTFUL -> Color(0xFFEF6C00)
-        HalalStatus.NOT_HALAL -> Color(0xFFC62828)
-        HalalStatus.UNKNOWN -> Color(0xFF757575)
+        HalalStatus.HALAL_CERTIFIED -> ComposaTheme.color.halal.statusCertified
+        HalalStatus.HALAL_POSSIBLE -> ComposaTheme.color.halal.statusPossible
+        HalalStatus.HALAL_DOUBTFUL -> ComposaTheme.color.halal.statusDoubtful
+        HalalStatus.NOT_HALAL -> ComposaTheme.color.halal.statusNotHalal
+        HalalStatus.UNKNOWN -> ComposaTheme.color.halal.statusUnknown
     }
 }
 
