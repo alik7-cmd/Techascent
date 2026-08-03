@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
@@ -153,6 +152,12 @@ fun LazyListScope.parabolicTasbeeh(
                         .height(200.dp), // Give the canvas a fixed height
                     contentAlignment = Alignment.Center,
                 ) {
+                    // Capture theme colors here — Canvas DrawScope is not a composable context
+                    val beadStringColor = ComposaTheme.color.prayer.tasbeehInactive
+                    val beadInactiveColor = ComposaTheme.color.prayer.tasbeehInactive
+                    val beadActiveColor = ComposaTheme.color.prayer.tasbeehActive
+                    val beadHighlightColor = ComposaTheme.color.prayer.tasbeehHighlight
+
                     Canvas(modifier = Modifier.fillMaxSize()) {
                         val centerX = size.width / 2
                         // Your canvas drawing logic remains the same...
@@ -198,13 +203,13 @@ fun LazyListScope.parabolicTasbeeh(
                                 for (p in allBeads.drop(1)) lineTo(p.x, p.y)
                             }
                             drawPath(path,
-                                Color.Gray, style = Stroke(width = 1f)
+                                beadStringColor, style = Stroke(width = 1f)
                             )
                         }
 
-                        leftBeads.forEach { drawCircle(Color(0xFFAAAAAA), beadRadius, it) }
-                        rightBeads.forEach { drawCircle(Color(0xFF4CAF50), beadRadius, it) }
-                        movingBead?.let { drawCircle(Color.Yellow, beadRadius + 6f, it) }
+                        leftBeads.forEach { drawCircle(beadInactiveColor, beadRadius, it) }
+                        rightBeads.forEach { drawCircle(beadActiveColor, beadRadius, it) }
+                        movingBead?.let { drawCircle(beadHighlightColor, beadRadius + 6f, it) }
                     }
                 }
 

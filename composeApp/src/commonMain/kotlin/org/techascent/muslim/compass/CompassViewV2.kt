@@ -73,7 +73,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 // ── Qibla-green accent ──────────────────────────────────────────────────────────
-private val QiblaGreen = Color(0xFF2E7D32)
+// ComposaTheme.color.prayer.compassQiblaAccent removed — use ComposaTheme.color.prayer.compassQiblaAccent in composables
 
 // ── Threshold in degrees to consider "aligned" ──────────────────────────────────
 private const val ALIGNED_THRESHOLD = 8f
@@ -176,7 +176,7 @@ private fun QiblaCompassDial(
     val compassSize = responsiveDp(fraction = 0.72f)
 
     val accentColor by animateColorAsState(
-        targetValue = if (isAligned) QiblaGreen else ComposaTheme.color.textNeutralSubtle,
+        targetValue = if (isAligned) ComposaTheme.color.prayer.compassQiblaAccent else ComposaTheme.color.textNeutralSubtle,
         animationSpec = tween(400),
         label = "accentColor",
     )
@@ -185,6 +185,7 @@ private fun QiblaCompassDial(
     val tickColor = ComposaTheme.color.textNeutralSubtle
     val cardinalColor = ComposaTheme.color.textNeutral
     val bgColor = ComposaTheme.color.backgroundAppBackground
+    val northAccentColor = ComposaTheme.color.prayer.compassNorthAccent
 
     // Pulsing glow when aligned
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -239,6 +240,7 @@ private fun QiblaCompassDial(
                         tickColor = tickColor,
                         cardinalColor = cardinalColor,
                         accentColor = accentColor,
+                        northAccentColor = northAccentColor,
                         isAligned = isAligned,
                         pulseAlpha = pulseAlpha,
                     )
@@ -270,6 +272,7 @@ private fun DrawScope.drawCompassFace(
     tickColor: Color,
     cardinalColor: Color,
     accentColor: Color,
+    northAccentColor: Color,
     isAligned: Boolean,
     pulseAlpha: Float,
 ) {
@@ -332,7 +335,7 @@ private fun DrawScope.drawCompassFace(
             val innerY = cy - (tickRadius - len) * cos(angleRad)
 
             val color = when {
-                deg == 0 -> Color(0xFFEF5350)  // North → red
+                deg == 0 -> northAccentColor  // North → red
                 isCardinal -> cardinalColor
                 isMajor -> tickColor.copy(alpha = 0.6f)
                 else -> tickColor.copy(alpha = 0.25f)
@@ -364,7 +367,7 @@ private fun DrawScope.drawCompassFace(
 
             // Small dot for cardinal positions
             drawCircle(
-                color = if (isNorth) Color(0xFFEF5350) else cardinalColor.copy(alpha = 0.7f),
+                color = if (isNorth) northAccentColor else cardinalColor.copy(alpha = 0.7f),
                 radius = if (isNorth) 6f else 4f,
                 center = Offset(lx, ly),
             )
@@ -410,13 +413,13 @@ private fun DrawScope.drawCompassFace(
 @Composable
 private fun AlignmentIndicator(isAligned: Boolean, degrees: Float) {
     val bgColor by animateColorAsState(
-        targetValue = if (isAligned) QiblaGreen.copy(alpha = 0.12f)
+        targetValue = if (isAligned) ComposaTheme.color.prayer.compassQiblaAccent.copy(alpha = 0.12f)
         else ComposaTheme.color.strokeNeutralSubtle.copy(alpha = 0.18f),
         animationSpec = tween(400),
         label = "indicatorBg",
     )
     val textColor by animateColorAsState(
-        targetValue = if (isAligned) QiblaGreen else ComposaTheme.color.textNeutral,
+        targetValue = if (isAligned) ComposaTheme.color.prayer.compassQiblaAccent else ComposaTheme.color.textNeutral,
         animationSpec = tween(400),
         label = "indicatorText",
     )
@@ -435,13 +438,13 @@ private fun AlignmentIndicator(isAligned: Boolean, degrees: Float) {
                 text = "✓",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = QiblaGreen,
+                color = ComposaTheme.color.prayer.compassQiblaAccent,
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = stringResource(Res.string.text_qibla_aligned),
                 style = ComposaTheme.typography.subheadEmphasized,
-                color = QiblaGreen,
+                color = ComposaTheme.color.prayer.compassQiblaAccent,
             )
         } else {
             Text(

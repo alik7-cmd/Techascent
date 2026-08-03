@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.techascent.muslim.datastore.DataStoreKey
+import org.techascent.muslim.utility.FeatureUsageRepository
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
@@ -30,7 +31,8 @@ import kotlin.time.ExperimentalTime
 class PrayerTimeViewModel(
     private val prayerTimeUseCase: PrayerTimeViewUseCase,
     private val prayerNotificationUseCase: PrayerNotificationUseCase,
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val featureUsageRepository: FeatureUsageRepository,
 ) : ViewModel() {
 
     /** Raw prayer data — always stored in 24hr format (cache-friendly). */
@@ -42,18 +44,26 @@ class PrayerTimeViewModel(
         .map { prefs -> prefs[booleanPreferencesKey(DataStoreKey.IS_24_HOUR_FORMAT)] ?: false }
 
     /**
-     * Public UI state: combines raw prayer data with is24HourFormat
-     * so the UI updates instantly when the user toggles the setting,
-     * without re-fetching or clearing cache.
+     * Public UI state: combines raw prayer data, the 24-hr format preference, and the
+     * top-features usage data into a single emission so the UI always stays consistent.
+     *
+     * - Time format toggle → re-formats times instantly without a network call.
+     * - Feature usage update → Quick Access section updates reactively on the same state.
      */
-    val uiState = combine(_rawState, is24HourFormat) { state, format ->
+    val uiState = combine(
+        _rawState,
+        is24HourFormat,
+        featureUsageRepository.getTopFeatures(),
+    ) { state, format, features ->
         when (state) {
             is PrayerTimeUiState.Success -> PrayerTimeUiState.Success(
-                data = state.data.formatForDisplay(format)
+                data = state.data.formatForDisplay(format),
+                topFeatures = features,
             )
             is PrayerTimeUiState.SuccessWithWarning -> PrayerTimeUiState.SuccessWithWarning(
                 data = state.data.formatForDisplay(format),
-                cityName = state.cityName
+                cityName = state.cityName,
+                topFeatures = features,
             )
             else -> state
         }
@@ -62,11 +72,12 @@ class PrayerTimeViewModel(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = PrayerTimeUiState.Loading
+        initialValue = PrayerTimeUiState.Loading,
     )
 
     private val _event: Channel<PrayerTimeEvent> = Channel()
     val event: Flow<PrayerTimeEvent> = _event.receiveAsFlow()
+
 
     @OptIn(ExperimentalTime::class)
     internal fun getMonthlyPrayerTimes() = viewModelScope.launch {

@@ -1,9 +1,6 @@
 package org.techascent.muslim.settings
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,16 +20,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,6 +54,9 @@ import org.techascent.composa.cell.left.LeftSlot
 import org.techascent.composa.cell.right.RightSlot
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
+import org.techascent.composa.theming.color.ComposaBlue500
+import org.techascent.composa.theming.color.ComposaBlue700
+import org.techascent.composa.theming.color.ComposaPurple700
 import org.techascent.muslim.AppLang
 import org.techascent.muslim.rememberUrlLauncher
 import org.techascent.muslim.common.toTextRes
@@ -84,7 +80,7 @@ internal fun SettingsScreenV2(
     onUpdateAdhanNotification: (Boolean) -> Unit,
     onUpdateTimePreference: (Boolean) -> Unit,
     onUpdateHaptic: (Boolean) -> Unit,
-    onUpdateLanguage: (String) -> Unit,
+    onUpdateLanguage: (String) -> Unit,   // reserved for future in-app language picker
     onHandleEvent: (SettingsEvent) -> Unit,
     onNavigateAbout: () -> Unit,
     innerPadding: PaddingValues,
@@ -116,7 +112,7 @@ internal fun SettingsScreenV2(
                     emoji = "🕌",
                     title = stringResource(Res.string.text_settings_prayer),
                     subtitle = stringResource(Res.string.text_settings_prayer_desc),
-                    accentColor = Color(0xFF1565C0),
+                    accentColor = ComposaBlue700,
                 ) {
                     Cell(
                         leftSlot = LeftSlot.Emoji(emoji = "🔊"),
@@ -192,7 +188,7 @@ internal fun SettingsScreenV2(
                     emoji = "✨",
                     title = stringResource(Res.string.text_settings_experience),
                     subtitle = stringResource(Res.string.text_settings_experience_desc),
-                    accentColor = Color(0xFF7B1FA2),
+                    accentColor = ComposaPurple700,
                 ) {
                     Cell(
                         leftSlot = LeftSlot.Emoji(emoji = "📳"),
@@ -232,7 +228,7 @@ internal fun SettingsScreenV2(
                     emoji = "ℹ️",
                     title = stringResource(Res.string.text_settings_about),
                     subtitle = null,
-                    accentColor = Color(0xFF00838F),
+                    accentColor = ComposaBlue500,
                 ) {
                     // About This App row
                     Cell(
@@ -257,7 +253,7 @@ internal fun SettingsScreenV2(
                             centerSlot = if (item.subtitle != null) {
                                 CenterSlot.TitleWithLabel(
                                     title = stringResource(item.title),
-                                    label = stringResource(item.subtitle!!),
+                                    label = stringResource(item.subtitle),
                                 )
                             } else {
                                 CenterSlot.Title(

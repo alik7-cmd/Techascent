@@ -159,7 +159,7 @@ fun AboutScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xFF1565C0).copy(alpha = 0.08f))
+                    .background(ComposaTheme.color.prayer.calendarFridayAccent.copy(alpha = 0.08f))
                     .padding(ComposaSpacing.Medium),
             ) {
                 Text(

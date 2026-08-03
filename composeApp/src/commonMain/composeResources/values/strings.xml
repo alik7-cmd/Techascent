@@ -259,5 +259,7 @@ There isn’t enough reliable information about this product’s ingredients or 
     <string name="about_section_growing_body">This app is still growing. I continue to improve it gradually, refining features, fixing issues, and adding what feels genuinely useful. It may never be perfect, but it is built with sincerity and care.</string>
     <string name="about_closing_note">More than anything, Muslim – Namaz &amp; Halal Scanner is intended to be a quiet companion in your daily life—a tool that helps you stay consistent in prayer, conscious in your choices, and connected to your faith wherever you are.</string>
 
+    <!-- Prayer screen – Quick Access section -->
+    <string name="text_frequently_used">Frequently Used</string>
 
 </resources>

@@ -302,7 +302,7 @@ private fun CalendarCard(
                     textAlign = TextAlign.Center,
                     style = ComposaTheme.typography.caption,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (dow == "Fr") Color(0xFF1565C0) else ComposaTheme.color.textNeutralSubtle,
+                    color = if (dow == "Fr") ComposaTheme.color.prayer.calendarFridayAccent else ComposaTheme.color.textNeutralSubtle,
                 )
             }
         }
@@ -340,7 +340,7 @@ private fun CalendarCard(
                                 else -> Color.Transparent
                             }
                             val textColor = when {
-                                isSelected -> Color.White
+                                isSelected -> ComposaTheme.color.textNeutralInverse
                                 !hasData -> ComposaTheme.color.textNeutralSubtle.copy(alpha = 0.35f)
                                 isToday -> ComposaTheme.color.backgroundAction
                                 else -> ComposaTheme.color.textNeutral
@@ -492,7 +492,7 @@ private fun PrayerTimesCard(intervals: List<PrayerTimeIntervalModel>) {
         Cell(
             leftSlot = LeftSlot.Emoji(
                 emoji = "🕋",
-                accentColor = Color(0xFF1565C0),
+                accentColor = ComposaTheme.color.prayer.calendarFridayAccent,
                 size = 32.dp,
                 fontSize = 16,
             ),
@@ -544,7 +544,7 @@ private fun FastingCard(sahri: String?, iftar: String?) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(Color(0xFF4A148C).copy(alpha = 0.06f)),
+            .background(ComposaTheme.color.prayer.calendarCardAccent.copy(alpha = 0.06f)),
     ) {
         // Section header
         Row(
@@ -557,7 +557,7 @@ private fun FastingCard(sahri: String?, iftar: String?) {
                 Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF4A148C).copy(alpha = 0.12f)),
+                    .background(ComposaTheme.color.prayer.calendarCardAccent.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center,
             ) {
                 Text("🌙", fontSize = 16.sp)
@@ -573,7 +573,7 @@ private fun FastingCard(sahri: String?, iftar: String?) {
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
             thickness = 0.5.dp,
-            color = Color(0xFF4A148C).copy(alpha = 0.10f),
+            color = ComposaTheme.color.prayer.calendarCardAccent.copy(alpha = 0.10f),
         )
 
         Row(
@@ -587,7 +587,7 @@ private fun FastingCard(sahri: String?, iftar: String?) {
                     emoji = "🍽️",
                     label = stringResource(Res.string.text_calendar_sahri),
                     value = it,
-                    accentColor = Color(0xFF4A148C),
+                    accentColor = ComposaTheme.color.prayer.calendarCardAccent,
                 )
             }
             iftar?.let {
@@ -595,7 +595,7 @@ private fun FastingCard(sahri: String?, iftar: String?) {
                     emoji = "🌅",
                     label = stringResource(Res.string.text_iftar),
                     value = it,
-                    accentColor = Color(0xFFE65100),
+                    accentColor = ComposaTheme.color.prayer.iftarAccent,
                 )
             }
         }
@@ -640,7 +640,7 @@ private fun SunCard(sunrise: String, sunset: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(Color(0xFFF57F17).copy(alpha = 0.06f)),
+            .background(ComposaTheme.color.prayer.calendarWarmAccent.copy(alpha = 0.06f)),
     ) {
         Row(
             modifier = Modifier
@@ -652,7 +652,7 @@ private fun SunCard(sunrise: String, sunset: String) {
                 Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFF57F17).copy(alpha = 0.12f)),
+                    .background(ComposaTheme.color.prayer.calendarWarmAccent.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center,
             ) {
                 Text("☀️", fontSize = 16.sp)
@@ -668,7 +668,7 @@ private fun SunCard(sunrise: String, sunset: String) {
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = ComposaSpacing.Medium),
             thickness = 0.5.dp,
-            color = Color(0xFFF57F17).copy(alpha = 0.10f),
+            color = ComposaTheme.color.prayer.calendarWarmAccent.copy(alpha = 0.10f),
         )
 
         Row(
@@ -688,7 +688,7 @@ private fun SunTimeChip(emoji: String, label: String, value: String) {
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFF57F17).copy(alpha = 0.06f))
+            .background(ComposaTheme.color.prayer.calendarWarmAccent.copy(alpha = 0.06f))
             .padding(horizontal = 20.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

@@ -9,6 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import androidx.compose.ui.platform.LocalUriHandler
+import org.techascent.muslim.openNearbyMosques
+import org.techascent.muslim.utility.FeatureId
 import org.techascent.muslim.calendar.PrayerCalendarView
 import org.techascent.muslim.compass.CompassViewV2
 import org.techascent.muslim.halalscanner.HalalScannerView
@@ -153,9 +156,23 @@ fun NavGraphBuilder.mainNavGraph(
         route = Screen.HomeGraph.route
     ) {
         composable(route = Screen.PrayerView.route) {
+            val uriHandler = LocalUriHandler.current
             PrayerView(
                 innerPadding = innerPadding,
-                onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) }
+                onNavigateHalalScanner = { rootNavController.navigate(Screen.HalalScannerView.route) },
+                onNavigateToFeature = { featureId ->
+                    when (featureId) {
+                        FeatureId.HALAL_SCANNER -> rootNavController.navigate(Screen.HalalScannerView.route)
+                        FeatureId.MANUAL_HALAL_CHECK -> rootNavController.navigate(Screen.ManualHalalCheckView.route)
+                        FeatureId.SCAN_HISTORY -> rootNavController.navigate(Screen.ScanHistoryView.route)
+                        FeatureId.QURAN -> rootNavController.navigate(Screen.SurahListView.route)
+                        FeatureId.QIBLA -> rootNavController.navigate(Screen.CompassView.route)
+                        FeatureId.TASBEEH -> rootNavController.navigate(Screen.TasbeehView.route)
+                        FeatureId.PRAYER_CALENDAR -> rootNavController.navigate(Screen.CalendarView.route)
+                        FeatureId.NEARBY_MOSQUE -> openNearbyMosques()
+                        FeatureId.ZAKAT_CALCULATOR -> uriHandler.openUri("https://idrf.ca/zakat-calculator/")
+                    }
+                },
             )
         }
         composable(route = Screen.UtilityView.route) {

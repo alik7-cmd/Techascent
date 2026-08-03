@@ -167,7 +167,7 @@ private fun SurahHeader(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1B5E20).copy(alpha = 0.1f)
+            containerColor = ComposaTheme.color.prayer.quranPlayingAccent.copy(alpha = 0.1f)
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -205,7 +205,7 @@ private fun AyahCard(
     onPlayPause: () -> Unit,
 ) {
     val bgColor by animateColorAsState(
-        targetValue = if (ayah.isPlaying) Color(0xFF1B5E20).copy(alpha = 0.08f)
+        targetValue = if (ayah.isPlaying) ComposaTheme.color.prayer.quranPlayingAccent.copy(alpha = 0.08f)
         else ComposaTheme.color.backgroundAppBackground
     )
 
@@ -247,7 +247,7 @@ private fun AyahCard(
                             .size(36.dp)
                             .clip(CircleShape)
                             .background(
-                                if (ayah.isPlaying) Color(0xFF1B5E20).copy(alpha = 0.15f)
+                                if (ayah.isPlaying) ComposaTheme.color.prayer.quranPlayingAccent.copy(alpha = 0.15f)
                                 else ComposaTheme.color.strokeNeutralSubtle.copy(alpha = 0.5f)
                             )
                             .clickable(onClick = onPlayPause),
@@ -255,7 +255,7 @@ private fun AyahCard(
                     ) {
                         Text(
                             text = if (ayah.isPlaying) "⏸" else "▶",
-                            color = if (ayah.isPlaying) Color(0xFF1B5E20) else ComposaTheme.color.textNeutral,
+                            color = if (ayah.isPlaying) ComposaTheme.color.prayer.quranPlayingAccent else ComposaTheme.color.textNeutral,
                             style = ComposaTheme.typography.bodyEmphasized,
                         )
                     }

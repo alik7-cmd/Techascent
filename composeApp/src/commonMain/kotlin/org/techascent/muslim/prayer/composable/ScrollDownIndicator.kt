@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.techascent.composa.common.ComposaSpacing
+import org.techascent.composa.theming.ComposaTheme
 
 @Composable
 internal fun ScrollDownIndicator(
@@ -32,6 +33,8 @@ internal fun ScrollDownIndicator(
             .background(color = Color.Black.copy(alpha = 0.25f), shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
+        // Capture theme color before entering DrawScope (Canvas is not a composable context)
+        val arrowColor = ComposaTheme.color.textNeutralOnDark
         Canvas(modifier = Modifier.size(ComposaSpacing.Medium)) {
             val w = size.width
             val h = size.height
@@ -42,7 +45,7 @@ internal fun ScrollDownIndicator(
             }
             drawPath(
                 path = path,
-                color = Color.White,
+                color = arrowColor,
                 style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round),
             )
         }

@@ -19,6 +19,7 @@ import org.techascent.muslim.provideDataStore
 import org.techascent.muslim.quran.QuranViewModel
 import org.techascent.muslim.settings.SettingsViewModel
 import org.techascent.muslim.tasbeeh.TasbeehViewModel
+import org.techascent.muslim.utility.FeatureUsageRepository
 import org.techascent.muslim.utility.UtilityViewModel
 import org.techascent.shared.di.prayerModule
 
@@ -27,7 +28,10 @@ val appModule = module {
     single { PrayerTimeViewUseCase(repository = get(), dataStore = get(), locationService = get()) }
     single { PrayerNotificationUseCase(dataStore = get()) }
     single<LocationService> { getPlatformLocationService() }
-    viewModel { PrayerTimeViewModel(prayerTimeUseCase = get(), prayerNotificationUseCase = get(), dataStore = get()) }
+    // ── Feature usage tracking: singleton so both UtilityViewModel and
+    //    PrayerTimeViewModel share the same DataStore reads/writes.
+    single { FeatureUsageRepository(dataStore = get()) }
+    viewModel { PrayerTimeViewModel(prayerTimeUseCase = get(), prayerNotificationUseCase = get(), dataStore = get(), featureUsageRepository = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }
     viewModel { SettingsViewModel(dataStore = get(), prayerTimeUseCase = get()) }
@@ -35,7 +39,7 @@ val appModule = module {
     viewModel { CompassViewModel() }
     viewModel { CityPickerViewModel() }
     viewModel { HalalScannerViewModel(repository = get()) }
-    viewModel { UtilityViewModel() }
+    viewModel { UtilityViewModel(usageRepository = get()) }
     viewModel { QuranViewModel(repository = get()) }
     viewModel { CalendarViewModel(prayerTimeUseCase = get(), dataStore = get()) }
 }

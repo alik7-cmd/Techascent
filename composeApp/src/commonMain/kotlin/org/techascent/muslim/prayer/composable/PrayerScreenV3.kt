@@ -21,6 +21,7 @@ import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.state.PrayerTimeUiState
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
+import org.techascent.muslim.utility.FeatureId
 
 // ═════════════════════════════════════════════════════════════════════════════════
 //  PUBLIC ENTRY — orchestrates the screen, delegates all UI to component files
@@ -33,6 +34,7 @@ internal fun PrayerContentV3(
     onNavigateHalalScanner: () -> Unit,
     onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
     innerPadding: PaddingValues,
+    onNavigateToFeature: (FeatureId) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     val showScrollIndicator by remember { derivedStateOf { listState.canScrollForward } }
@@ -64,12 +66,14 @@ internal fun PrayerContentV3(
                     is PrayerTimeUiState.Success -> prayerBody(
                         uiState = uiState,
                         onUpdateNotification = onUpdateNotification,
+                        onNavigateToFeature = onNavigateToFeature,
                     )
                     is PrayerTimeUiState.SuccessWithWarning -> {
                         item { LocationWarningBanner(cityName = uiState.cityName) }
                         prayerBody(
                             uiState = uiState,
                             onUpdateNotification = onUpdateNotification,
+                            onNavigateToFeature = onNavigateToFeature,
                         )
                     }
                     is PrayerTimeUiState.Error -> errorContent(onRetry = onFetchPrayers)
@@ -94,6 +98,7 @@ internal fun PrayerContentV3(
 private fun LazyListScope.prayerBody(
     uiState: PrayerTimeUiState,
     onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
+    onNavigateToFeature: (FeatureId) -> Unit,
 ) {
     val uiModel = when (uiState) {
         is PrayerTimeUiState.Success -> uiState.data
@@ -101,9 +106,27 @@ private fun LazyListScope.prayerBody(
         else -> return
     }
 
+    // topFeatures lives inside uiState — no extra parameter needed
+    val topFeatures = when (uiState) {
+        is PrayerTimeUiState.Success -> uiState.topFeatures
+        is PrayerTimeUiState.SuccessWithWarning -> uiState.topFeatures
+        else -> emptyList()
+    }
+
     item { SunProgressSection(uiModel) }
     item { CountdownSection(uiModel) }
     item { PrayerTimesSection(uiModel, onUpdateNotification) }
+
+    // ── Quick Access: top 3 most-used Explore features ───────────────────────────
+    // Hidden automatically when topFeatures is empty (fresh install / no usage yet).
+    if (topFeatures.isNotEmpty()) {
+        item(key = "quick_access") {
+            QuickAccessSection(
+                features = topFeatures,
+                onNavigate = onNavigateToFeature,
+            )
+        }
+    }
 
     uiModel.iftarTime?.let { iftar ->
         if (iftar.lastTimeOfSahri != null || iftar.iftarStartTime != null) {
