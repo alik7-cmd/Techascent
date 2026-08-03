@@ -123,6 +123,7 @@ internal fun UtilityScreenV2(
                                     onNavigateManualHalalCheck = onNavigateManualHalalCheck,
                                     onNavigateScanHistory = onNavigateScanHistory,
                                     onNavigateToCalendar = onNavigateToCalendar,
+                                    onRecordUsage = viewModel::recordUsage,
                                 )
                                 FeatureCardCompact(
                                     emoji = item.emoji,
@@ -182,6 +183,7 @@ private fun rememberFeatureClickHandler(
     onNavigateManualHalalCheck: () -> Unit,
     onNavigateScanHistory: () -> Unit,
     onNavigateToCalendar: () -> Unit,
+    onRecordUsage: (FeatureId) -> Unit,
 ): () -> Unit {
     val coroutineScope = rememberCoroutineScope()
     val factory = rememberPermissionsControllerFactory()
@@ -195,6 +197,21 @@ private fun rememberFeatureClickHandler(
 
     return remember(item.titleRes) {
         {
+            // Map StringResource → FeatureId for usage tracking (null = unmapped / external)
+            val featureId: FeatureId? = when (item.titleRes) {
+                Res.string.title_halal_scanner -> FeatureId.HALAL_SCANNER
+                Res.string.title_manual_halal_check -> FeatureId.MANUAL_HALAL_CHECK
+                Res.string.title_scan_history -> FeatureId.SCAN_HISTORY
+                Res.string.title_quran -> FeatureId.QURAN
+                Res.string.title_quibla -> FeatureId.QIBLA
+                Res.string.title_tasbeeh -> FeatureId.TASBEEH
+                Res.string.title_nearby_mosque -> FeatureId.NEARBY_MOSQUE
+                Res.string.title_prayer_calendar -> FeatureId.PRAYER_CALENDAR
+                Res.string.title_zakat_calculator -> FeatureId.ZAKAT_CALCULATOR
+                else -> null
+            }
+            featureId?.let { onRecordUsage(it) }
+
             when (item.titleRes) {
                 Res.string.title_quran -> onNavigateToQuran()
                 Res.string.title_tasbeeh -> onNavigateToTasbeeh()
