@@ -110,14 +110,14 @@ kotlin {
 
 android {
     namespace = "org.techascent.muslim"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "org.techascent.muslim"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 32
-        versionName = "2.11.0"
+        versionCode = 33
+        versionName = "2.12.0"
     }
     packaging {
         resources {
