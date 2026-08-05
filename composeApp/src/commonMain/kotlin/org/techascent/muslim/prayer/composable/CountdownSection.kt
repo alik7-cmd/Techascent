@@ -2,9 +2,9 @@ package org.techascent.muslim.prayer.composable
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,7 +50,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-internal fun CountdownSection(uiModel: PrayerTimeUiModel) {
+internal fun CountdownSection(uiModel: PrayerTimeUiModel, modifier: Modifier = Modifier) {
     val hasWaqt = uiModel.currentPrayer?.startTimeInstant != null
             && uiModel.currentPrayer.endTimeInstant != null
     val hasFasting = uiModel.iftarTime != null
@@ -58,28 +58,23 @@ internal fun CountdownSection(uiModel: PrayerTimeUiModel) {
 
     if (!hasWaqt && !hasFasting) return
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = ComposaSpacing.Medium),
-        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(ComposaSpacing.Small),
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = spacedBy(ComposaSpacing.Small),
     ) {
         if (hasWaqt) {
-            Box(modifier = Modifier.weight(1f)) {
-                WaqtCountdown(uiModel.currentPrayer!!)
-            }
+            WaqtCountdown(uiModel.currentPrayer!!, modifier = Modifier.weight(1f))
         }
         if (hasFasting) {
-            Box(modifier = Modifier.weight(1f)) {
-                FastingCountdown(uiModel.iftarTime!!)
-            }
-        }    }
+            FastingCountdown(uiModel.iftarTime!!, modifier = Modifier.weight(1f))
+        }
+    }
 }
 
 // ─── Waqt (prayer time) countdown ───────────────────────────────────────────────
 
 @Composable
-private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
+private fun WaqtCountdown(prayer: PrayerTimeIntervalModel, modifier: Modifier = Modifier) {
     val end = prayer.endTimeInstant!!
     val total = (end - prayer.startTimeInstant!!).coerceAtLeast(Duration.ZERO)
     val accent = ComposaTheme.color.prayer.timerAccent
@@ -100,7 +95,7 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(accent.copy(alpha = 0.08f))
@@ -143,7 +138,7 @@ private fun WaqtCountdown(prayer: PrayerTimeIntervalModel) {
 // ─── Fasting (Sahri / Iftar) countdown ─────────────────────────────────────────
 
 @Composable
-private fun FastingCountdown(iftar: IftarTimeUiModel) {
+private fun FastingCountdown(iftar: IftarTimeUiModel, modifier: Modifier = Modifier) {
     val accent = ComposaTheme.color.prayer.fastingAccent
     val iftarInstant = iftar.iftarInstant
     val sahriInstant = iftar.sahriInstant
@@ -177,7 +172,7 @@ private fun FastingCountdown(iftar: IftarTimeUiModel) {
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(accent.copy(alpha = 0.08f))

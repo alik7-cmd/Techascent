@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +35,6 @@ import org.techascent.composa.cell.Cell
 import org.techascent.composa.cell.center.CenterSlot
 import org.techascent.composa.cell.left.LeftSlot
 import org.techascent.composa.cell.right.RightSlot
-import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
 import org.techascent.composa.theming.ComposaTheme
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
@@ -49,6 +47,7 @@ import org.techascent.muslim.showNativeResetDialog as showPermissionRationalDial
 internal fun PrayerTimesSection(
     uiModel: PrayerTimeUiModel,
     onUpdateNotification: (Boolean, PrayerNameEnum) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
     val factory = rememberPermissionsControllerFactory()
@@ -64,13 +63,12 @@ internal fun PrayerTimesSection(
     val cardBg = ComposaTheme.color.prayer.cardBg
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = ComposaSpacing.Medium)
             .clip(RoundedCornerShape(20.dp))
             .background(cardBg),
     ) {
-        Cell(
+        /*Cell(
             leftSlot = LeftSlot.Emoji(
                 emoji = "🕌",
                 accentColor = currentWaqtText,
@@ -85,7 +83,7 @@ internal fun PrayerTimesSection(
             Modifier.padding(horizontal = 12.dp),
             0.5.dp,
             ComposaTheme.color.strokeNeutralSubtle.copy(0.4f),
-        )
+        )*/
 
         val intervals = uiModel.intervals.filter { it.name != PrayerNameEnum.SALAT_UD_DUHA }
         intervals.forEachIndexed { idx, interval ->

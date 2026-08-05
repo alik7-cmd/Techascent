@@ -49,6 +49,7 @@ fun FeatureCardCompact(
     description: String? = null,
     accentColor: Color,
     modifier: Modifier = Modifier,
+    isFromQuickAccess: Boolean = false,
     onClick: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -59,6 +60,8 @@ fun FeatureCardCompact(
         label = "compactScale",
     )
 
+    val horizontalAlignment = if (isFromQuickAccess) Alignment.CenterHorizontally else Alignment.Start
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -67,7 +70,7 @@ fun FeatureCardCompact(
             .background(accentColor.copy(alpha = 0.06f))
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
             .padding(ComposaSpacing.Medium),
-        horizontalAlignment = Alignment.Start,
+        horizontalAlignment = horizontalAlignment,
     ) {
         // Emoji circle
         Box(
