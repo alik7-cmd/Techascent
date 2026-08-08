@@ -3,6 +3,7 @@ package org.techascent.muslim.service
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import org.techascent.muslim.common.location.Location
 import org.techascent.muslim.common.location.LocationService
 import platform.CoreLocation.CLLocation
@@ -12,13 +13,15 @@ import platform.Foundation.NSError
 import platform.darwin.NSObject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import kotlin.time.Duration.Companion.milliseconds
 
 class IOSLocationService : LocationService {
     private val locationManager = CLLocationManager()
     private var continuation: Continuation<Location?>? = null
 
-    override suspend fun getCurrentLocation(): Location? {
-        return suspendCancellableCoroutine { cont ->
+    // Cap GPS wait at 3 seconds; returns null on timeout → falls back to cache.
+    override suspend fun getCurrentLocation(): Location? = withTimeoutOrNull(3_000L.milliseconds) {
+        suspendCancellableCoroutine { cont ->
             continuation = cont
 
             // Set up delegate
@@ -55,3 +58,4 @@ class IOSLocationService : LocationService {
         }
     }
 }
+
