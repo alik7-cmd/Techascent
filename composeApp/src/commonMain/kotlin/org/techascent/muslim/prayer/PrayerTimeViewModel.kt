@@ -97,8 +97,7 @@ class PrayerTimeViewModel(
     @OptIn(ExperimentalTime::class)
     internal fun getMonthlyPrayerTimes() {
         val now = Clock.System.now().toEpochMilliseconds()
-        // Only skip if we already have GPS-confirmed clean data — never skip for Warning/Error/Loading
-        if (now - lastFetchTimestamp < 60_000L && _rawState.value is PrayerTimeUiState.Success) return
+        if (now - lastFetchTimestamp < 60_000L && _rawState.value !is PrayerTimeUiState.Error) return
         lastFetchTimestamp = now
         viewModelScope.launch {
             prayerTimeUseCase.getMonthlyPrayerTimes().collect {
