@@ -14,6 +14,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.getPrayerNotificationService
+import org.techascent.muslim.prayer.cache.PrayerTimeCache
 import org.techascent.muslim.prayer.uimodel.PrayerNameEnum
 import org.techascent.muslim.prayer.uimodel.PrayerTimeIntervalModel
 import org.techascent.muslim.prayer.uimodel.PrayerTimeUiModel
@@ -22,7 +23,8 @@ import kotlin.time.Duration.Companion.minutes
 const val AZAN_AUDIO_FILE = "azan.mp3"
 
 class PrayerNotificationUseCase(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val prayerCache: PrayerTimeCache,
 ) {
 
     companion object {
@@ -93,9 +95,8 @@ class PrayerNotificationUseCase(
     }
 
     /**
-     * Looks in the DataStore monthly cache for tomorrow's prayer data
-     * and schedules notifications for those prayers too.
-     * This ensures notifications fire the next day even if the app isn't opened.
+     * Uses [PrayerTimeCache] to look up tomorrow's prayer data and pre-schedule
+     * notifications — no direct DataStore/JSON parsing needed here.
      */
     private suspend fun scheduleNextDayPrayers(
         notifyList: List<PrayerNameEnum>,
@@ -104,38 +105,25 @@ class PrayerNotificationUseCase(
         if (notifyList.isEmpty()) return
 
         try {
-            val allPrefs = dataStore.data.first()
             val tomorrowDate = getTomorrowDateFormatted()
             val notificationService = getPrayerNotificationService()
 
-            // Search through all cache keys to find tomorrow's data
-            for ((key, value) in allPrefs.asMap()) {
-                if (key.name.startsWith(DataStoreKey.MONTHLY_PRAYER_INITIAL) && value is String) {
-                    try {
-                        val cachedList = Json.decodeFromString<List<PrayerTimeUiModel>>(value)
-                        val tomorrowData = cachedList.find { it.currentDateTime == tomorrowDate }
-                        if (tomorrowData != null) {
-                            // Schedule tomorrow's prayers with "NEXT_" prefix to avoid conflicts
-                            tomorrowData.intervals
-                                .filter { notifyList.contains(it.name) && it.startTimeInstant != null }
-                                .forEach { interval ->
-                                    interval.startTimeInstant?.let { instant ->
-                                        notificationService.scheduleNotification(
-                                            prayerName = "NEXT_${interval.name.name}",
-                                            scheduledTime = instant,
-                                            title = "🔔 Prayer Time",
-                                            message = "Time for ${interval.name.name.lowercase().replaceFirstChar { it.uppercase() }}",
-                                            audioFile = audioFile
-                                        )
-                                    }
-                                }
-                            break // Found tomorrow's data, no need to search more
-                        }
-                    } catch (_: Exception) {
-                        // Not a valid prayer cache, skip
+            // Ask the cache for every cached day — O(1) for the in-memory path
+            val tomorrowData: PrayerTimeUiModel = prayerCache.getAllData()[tomorrowDate] ?: return
+
+            tomorrowData.intervals
+                .filter { notifyList.contains(it.name) && it.startTimeInstant != null }
+                .forEach { interval ->
+                    interval.startTimeInstant?.let { instant ->
+                        notificationService.scheduleNotification(
+                            prayerName = "NEXT_${interval.name.name}",
+                            scheduledTime = instant,
+                            title = "🔔 Prayer Time",
+                            message = "Time for ${interval.name.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                            audioFile = audioFile
+                        )
                     }
                 }
-            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

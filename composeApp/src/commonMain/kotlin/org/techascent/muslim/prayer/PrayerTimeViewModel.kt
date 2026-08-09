@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.utility.FeatureUsageRepository
 import org.techascent.muslim.prayer.event.PrayerTimeEvent
@@ -49,10 +51,13 @@ class PrayerTimeViewModel(
      *
      * - Time format toggle → re-formats times instantly without a network call.
      * - Feature usage update → Quick Access section updates reactively on the same state.
+     *
+     * Fix 6: distinctUntilChanged on _rawState and is24HourFormat so that formatForDisplay
+     * is NOT re-run when only topFeatures changes.
      */
     val uiState = combine(
-        _rawState,
-        is24HourFormat,
+        _rawState,                              // StateFlow — already distinctUntilChanged by design
+        is24HourFormat.distinctUntilChanged(),  // plain Flow — skip formatForDisplay when unchanged
         featureUsageRepository.getTopFeatures(),
     ) { state, format, features ->
         when (state) {
@@ -78,38 +83,49 @@ class PrayerTimeViewModel(
     private val _event: Channel<PrayerTimeEvent> = Channel()
     val event: Flow<PrayerTimeEvent> = _event.receiveAsFlow()
 
+    /**
+     * Timestamp of the last successful fetch initiation.
+     * Fix 4: Prevents GPS + geocoder from re-running when the user briefly
+     * navigates away and back (WhileSubscribed resubscription window).
+     */
+    private var lastFetchTimestamp: Long = 0L
 
     @OptIn(ExperimentalTime::class)
-    internal fun getMonthlyPrayerTimes() = viewModelScope.launch {
-        prayerTimeUseCase.getMonthlyPrayerTimes().collect {
-            when (it) {
-                is ResultState.Success -> {
-                    schedulePrayerNotifications(it.data)
-                    _rawState.emit(
-                        value = PrayerTimeUiState.Success(data = it.data)
-                    )
-                    // Refresh home-screen widget with latest prayer data
-                    refreshHomeWidgets()
-                }
+    internal fun getMonthlyPrayerTimes() {
+        val now = Clock.System.now().toEpochMilliseconds()
+        if (now - lastFetchTimestamp < 60_000L && _rawState.value !is PrayerTimeUiState.Error) return
+        lastFetchTimestamp = now
+        viewModelScope.launch {
+            prayerTimeUseCase.getMonthlyPrayerTimes().collect {
+                when (it) {
+                    is ResultState.Success -> {
+                        schedulePrayerNotifications(it.data)
+                        _rawState.emit(
+                            value = PrayerTimeUiState.Success(data = it.data)
+                        )
+                        // Refresh home-screen widget with latest prayer data
+                        refreshHomeWidgets()
+                    }
 
-                is ResultState.Warning -> {
-                    schedulePrayerNotifications(it.data)
-                    _rawState.emit(
-                        value = PrayerTimeUiState.SuccessWithWarning(
-                            data = it.data,
-                            cityName = it.message
+                    is ResultState.Warning -> {
+                        schedulePrayerNotifications(it.data)
+                        _rawState.emit(
+                            value = PrayerTimeUiState.SuccessWithWarning(
+                                data = it.data,
+                                cityName = it.message
+                            )
+                        )
+                        refreshHomeWidgets()
+                    }
+
+                    is ResultState.Error -> _rawState.emit(
+                        value = PrayerTimeUiState.Error(
+                            message = it.message ?: ""
                         )
                     )
-                    refreshHomeWidgets()
+
+                    is ResultState.Loading -> _rawState.emit(value = PrayerTimeUiState.Loading)
                 }
-
-                is ResultState.Error -> _rawState.emit(
-                    value = PrayerTimeUiState.Error(
-                        message = it.message ?: ""
-                    )
-                )
-
-                is ResultState.Loading -> _rawState.emit(value = PrayerTimeUiState.Loading)
             }
         }
     }

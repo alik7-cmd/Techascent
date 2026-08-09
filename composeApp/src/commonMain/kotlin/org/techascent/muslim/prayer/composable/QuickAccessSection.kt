@@ -37,6 +37,9 @@ import apphub.composeapp.generated.resources.text_frequently_used
  *
  * Returns immediately (renders nothing) when [features] is empty — no UI on fresh install.
  */
+
+private const val MAX_FEATURES = 3
+
 @Composable
 internal fun QuickAccessSection(
     features: List<FeatureId>,
@@ -44,8 +47,6 @@ internal fun QuickAccessSection(
     modifier: Modifier = Modifier,
 ) {
     if (features.isEmpty()) return
-
-    val sahriAccent = ComposaTheme.color.prayer.quickAccessAccent
     val sectionAccent = ComposaTheme.color.prayer.quickAccessAccent
 
     Column(
@@ -88,6 +89,7 @@ internal fun QuickAccessSection(
                         title = stringResource(feature.titleRes),
                         accentColor = feature.accentColor,
                         onClick = { onNavigate(feature) },
+                        isFromQuickAccess = true
                     )
                 }
             }
@@ -100,4 +102,4 @@ internal fun QuickAccessSection(
     }
 }
 
-private const val MAX_FEATURES = 3
+

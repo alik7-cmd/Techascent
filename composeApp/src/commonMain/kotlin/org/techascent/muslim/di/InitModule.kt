@@ -13,7 +13,13 @@ import org.techascent.muslim.getPlatformLocationService
 import org.techascent.muslim.halalscanner.HalalScannerViewModel
 import org.techascent.muslim.method.MethodViewModel
 import org.techascent.muslim.prayer.PrayerTimeViewModel
+import org.techascent.muslim.prayer.cache.PrayerTimeCache
+import org.techascent.muslim.prayer.cache.PrayerTimeCacheImpl
+import org.techascent.muslim.prayer.location.AddressResolver
+import org.techascent.muslim.prayer.location.AddressResolverImpl
+import org.techascent.muslim.prayer.usecase.GetCachedPrayerDataUseCase
 import org.techascent.muslim.prayer.usecase.PrayerNotificationUseCase
+import org.techascent.muslim.prayer.usecase.PrayerSettingsUseCase
 import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
 import org.techascent.muslim.provideDataStore
 import org.techascent.muslim.quran.QuranViewModel
@@ -25,23 +31,39 @@ import org.techascent.shared.di.prayerModule
 
 val appModule = module {
     single<DataStore<Preferences>> { provideDataStore() }
-    single { PrayerTimeViewUseCase(repository = get(), dataStore = get(), locationService = get()) }
-    single { PrayerNotificationUseCase(dataStore = get()) }
     single<LocationService> { getPlatformLocationService() }
-    // ── Feature usage tracking: singleton so both UtilityViewModel and
-    //    PrayerTimeViewModel share the same DataStore reads/writes.
     single { FeatureUsageRepository(dataStore = get()) }
+
+    // ── Prayer data layer ────────────────────────────────────────────────
+    single<PrayerTimeCache> { PrayerTimeCacheImpl(dataStore = get()) }
+    single<AddressResolver> { AddressResolverImpl(dataStore = get()) }
+
+    // ── Prayer use-cases ─────────────────────────────────────────────────
+    single {
+        PrayerTimeViewUseCase(
+            repository = get(),
+            dataStore = get(),
+            locationService = get(),
+            prayerCache = get(),
+            addressResolver = get(),
+        )
+    }
+    single { PrayerNotificationUseCase(dataStore = get(), prayerCache = get()) }
+    single { PrayerSettingsUseCase(prayerCache = get(), addressResolver = get()) }
+    single { GetCachedPrayerDataUseCase(prayerCache = get()) }
+
+    // ── ViewModels ────────────────────────────────────────────────────────
     viewModel { PrayerTimeViewModel(prayerTimeUseCase = get(), prayerNotificationUseCase = get(), dataStore = get(), featureUsageRepository = get()) }
     viewModel { TasbeehViewModel(dataStore = get()) }
     viewModel { MethodViewModel() }
-    viewModel { SettingsViewModel(dataStore = get(), prayerTimeUseCase = get()) }
+    viewModel { SettingsViewModel(dataStore = get(), prayerSettingsUseCase = get()) }
     /*viewModel { LocationPickerViewModel(controller = get ()) }*/
     viewModel { CompassViewModel() }
     viewModel { CityPickerViewModel() }
     viewModel { HalalScannerViewModel(repository = get()) }
     viewModel { UtilityViewModel(usageRepository = get()) }
     viewModel { QuranViewModel(repository = get()) }
-    viewModel { CalendarViewModel(prayerTimeUseCase = get(), dataStore = get()) }
+    viewModel { CalendarViewModel(getCachedPrayerData = get(), dataStore = get()) }
 }
 
 private var koinStarted = false

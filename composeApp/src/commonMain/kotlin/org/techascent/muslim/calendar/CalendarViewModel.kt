@@ -17,13 +17,13 @@ import kotlinx.datetime.plus
 import org.techascent.muslim.calendar.state.CalendarUiState
 import org.techascent.muslim.datastore.DataStoreKey
 import org.techascent.muslim.prayer.uimodel.formatForDisplay
-import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
+import org.techascent.muslim.prayer.usecase.GetCachedPrayerDataUseCase
 import org.techascent.shared.data.common.currentDate
 import org.techascent.shared.data.common.parseDateKey
 import org.techascent.shared.data.common.toDayMonthYearString
 
 class CalendarViewModel(
-    private val prayerTimeUseCase: PrayerTimeViewUseCase,
+    private val getCachedPrayerData: GetCachedPrayerDataUseCase,
     private val dataStore: DataStore<Preferences>,
 ) : ViewModel() {
 
@@ -38,7 +38,7 @@ class CalendarViewModel(
         try {
             val prefs = dataStore.data.first()
             val is24Hour = prefs[booleanPreferencesKey(DataStoreKey.IS_24_HOUR_FORMAT)] ?: false
-            val allData = prayerTimeUseCase.getAllCachedPrayerData()
+            val allData = getCachedPrayerData()
                 .mapValues { (_, model) -> model.formatForDisplay(is24Hour) }
             val today = currentDate
             val todayKey = today.toDayMonthYearString()

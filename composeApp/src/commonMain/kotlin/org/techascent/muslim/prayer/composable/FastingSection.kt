@@ -33,7 +33,6 @@ import org.techascent.muslim.common.localizeTime
 
 @Composable
 internal fun FastingSection(sahri: String?, iftar: String?) {
-    // TODO: add fastingCardAccent to ComposaTheme.color.prayer for full theme support
     val sahriAccent = ComposaTheme.color.prayer.fastingAccent
     val iftarAccent = ComposaTheme.color.prayer.iftarAccent
 
@@ -42,7 +41,7 @@ internal fun FastingSection(sahri: String?, iftar: String?) {
             .fillMaxWidth()
             .padding(horizontal = ComposaSpacing.Medium)
             .clip(RoundedCornerShape(20.dp))
-            .background(sahriAccent.copy(alpha = 0.06f)),
+            .background(ComposaTheme.color.prayer.cardBg),
     ) {
         Cell(
             leftSlot = LeftSlot.Emoji(
@@ -78,7 +77,7 @@ internal fun FastingSection(sahri: String?, iftar: String?) {
             }
             iftar?.let {
                 FastingTimeChip(
-                    emoji = "🌅",
+                    emoji = "🥣",
                     label = stringResource(Res.string.text_iftar),
                     value = it,
                     accentColor = iftarAccent,
