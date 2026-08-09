@@ -85,15 +85,20 @@ class PrayerTimeViewModel(
 
     /**
      * Timestamp of the last successful fetch initiation.
-     * Fix 4: Prevents GPS + geocoder from re-running when the user briefly
-     * navigates away and back (WhileSubscribed resubscription window).
+     * Prevents GPS + geocoder from re-running when the user briefly navigates
+     * away and back — but ONLY when we already have a clean [PrayerTimeUiState.Success].
+     *
+     * [PrayerTimeUiState.SuccessWithWarning] is intentionally excluded from the guard
+     * so that the app retries immediately when the user returns to the screen after
+     * enabling GPS, clearing the location banner as soon as a fix is obtained.
      */
     private var lastFetchTimestamp: Long = 0L
 
     @OptIn(ExperimentalTime::class)
     internal fun getMonthlyPrayerTimes() {
         val now = Clock.System.now().toEpochMilliseconds()
-        if (now - lastFetchTimestamp < 60_000L && _rawState.value !is PrayerTimeUiState.Error) return
+        // Only skip if we already have GPS-confirmed clean data — never skip for Warning/Error/Loading
+        if (now - lastFetchTimestamp < 60_000L && _rawState.value is PrayerTimeUiState.Success) return
         lastFetchTimestamp = now
         viewModelScope.launch {
             prayerTimeUseCase.getMonthlyPrayerTimes().collect {
