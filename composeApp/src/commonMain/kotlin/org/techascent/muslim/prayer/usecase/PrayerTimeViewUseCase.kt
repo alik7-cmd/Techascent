@@ -146,24 +146,6 @@ class PrayerTimeViewUseCase(
         }
     }
 
-    /** Used by CalendarViewModel. */
-    suspend fun getAllCachedPrayerData(): Map<String, PrayerTimeUiModel> =
-        prayerCache.getAllData()
-
-    /** Used by PrayerNotificationUseCase. */
-    suspend fun getCachedMonthlyPrayerTimes(cacheKey: String): List<PrayerTimeUiModel>? =
-        prayerCache.getForKey(cacheKey)
-
-    /**
-     * Clears all caches (prayer data + address).
-     * Call when the user changes their calculation school setting.
-     */
-    suspend fun invalidateCache() {
-        prayerCache.invalidate()
-        addressResolver.clearCache()
-        notifyListCache = null
-    }
-
     // ── Network fetching ────────────────────────────────────────────────
 
     private fun fetchAndCacheYear(

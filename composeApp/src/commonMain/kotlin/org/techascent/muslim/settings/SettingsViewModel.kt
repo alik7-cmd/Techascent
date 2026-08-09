@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import org.techascent.muslim.AppLang
 import org.techascent.muslim.changeAppLocale
 import org.techascent.muslim.datastore.DataStoreKey
-import org.techascent.muslim.prayer.usecase.PrayerTimeViewUseCase
+import org.techascent.muslim.prayer.usecase.PrayerSettingsUseCase
 import org.techascent.muslim.settings.event.SettingsEvent
 import org.techascent.muslim.settings.state.SettingsUiState
 import org.techascent.muslim.settings.state.getSettingsUiState
@@ -28,7 +28,7 @@ import org.techascent.shared.data.enum.School
 
 class SettingsViewModel(
     private val dataStore: DataStore<Preferences>,
-    private val prayerTimeUseCase: PrayerTimeViewUseCase
+    private val prayerSettingsUseCase: PrayerSettingsUseCase,
 ) : ViewModel() {
 
     val schoolPreference: StateFlow<Int> = dataStore.data
@@ -94,7 +94,7 @@ class SettingsViewModel(
                 preferences[intPreferencesKey(DataStoreKey.SCHOOL_PREFERENCE)] = isChecked
             }
             // School change invalidates all cached prayer data
-            prayerTimeUseCase.invalidateCache()
+            prayerSettingsUseCase.invalidateCache()
         }
     }
 
