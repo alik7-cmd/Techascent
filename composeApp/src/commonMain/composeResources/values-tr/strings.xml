@@ -1,0 +1,255 @@
+<resources>
+    <string name="app_name">Muslim – Namaz ve Helal Tarayıcı</string>
+
+    <string name="en">English</string>
+    <string name="bn">Bengalce</string>
+    <string name="tr">Türkçe</string>
+
+    <string name="title_home">Namaz Vakitleri</string>
+    <string name="title_calendar">Takvim</string>
+    <string name="title_settings">Ayarlar</string>
+
+    <!-- Bottom tab labels -->
+    <string name="tab_prayer">Namaz</string>
+    <string name="tab_explore">Keşfet</string>
+    <string name="tab_settings">Ayarlar</string>
+    <string name="text_try_again">Tekrar Dene</string>
+
+    <string name="title_error">Hata Oluştu!</string>
+    <string name="message_error">İsteğiniz işlenirken bir hata oluştu. Üzerinde çalışıyoruz! Bu sırada internet bağlantınızın stabil olduğundan emin olun ve kısa süre içinde tekrar deneyin.</string>
+    <string name="button_text_error">Yeniden Dene</string>
+
+    <string name="text_sunset">Gün Batımı</string>
+    <string name="text_sunrise">Gün Doğumu</string>
+    <string name="text_fajr">Sabah</string>
+    <string name="text_salat_ud_duha">Kuşluk Namazı</string>
+    <string name="text_dhuhr">Öğle</string>
+    <string name="text_asr">İkindi</string>
+    <string name="text_maghrib">Akşam</string>
+    <string name="text_isha">Yatsı</string>
+    <string name="text_iftar">İftar</string>
+    <string name="text_suhur">Sahur</string>
+    <string name="text_remaining_time">Kalan süre</string>
+    <string name="text_am">ÖÖ</string>
+    <string name="text_pm">ÖS</string>
+
+    <string name="warning_prayer_time">Namaz vakitleriniz %1$s mezhebine göre hesaplanmaktadır. Bunu istediğiniz zaman ayarlardan değiştirebilirsiniz.</string>
+
+    <string name="text_scan_promotion_title">Helal mi kontrol et</string>
+    <string name="text_halal_promotion">Güvenle alışveriş yapın.\nBir ürünün barkodunu tarayarak anında helal olup olmadığını öğrenin — hızlı, net ve zahmetsiz.</string>
+    <string name="text_halal_scan_action">Barkod Tara</string>
+    <string name="text_halal_quick_desc">Bir ürünün helal olup olmadığını kontrol edin</string>
+
+    <string name="text_prayer_current_waqt">Şu Anki Vakit</string>
+    <string name="text_prayer_all_times">Bugünün Namaz Vakitleri</string>
+    <string name="text_prayer_fasting">Oruç</string>
+    <string name="text_prayer_announcement">Duyurular</string>
+    <string name="text_prayer_data_announcement">🚀 BÜYÜK GÜNCELLEME: Namaz Vakti Widget\'ı tanıtıyoruz — ana ekranınızdan namaz vakitlerinize anında erişin ve artık hiçbir namazı kaçırmayın!\n\nGizliliğinize değer veriyoruz — bu uygulama hiçbir kişisel veriyi toplamaz, depolamaz veya işlemez. Tüm bilgiler cihazınızda kalır.</string>
+    <string name="text_prayer_no_announcement">Şu an herhangi bir duyuru yok.</string>
+    <string name="text_prayer_next_fast">Bir Sonraki Oruç Vakti</string>
+    <string name="text_prayer_sun_progress">Güneş İlerlemesi</string>
+
+    <string name="title_location_picker">Neden Konum İznine İhtiyaç Duyuyoruz</string>
+    <string name="message_location_picker">Namaz vakitleri güneşin konumuna göre belirlenir ve bu konum dünyanın neresinde olduğunuza göre değişir. Konumunuza erişerek uygulama, yerel saat diliminize, enlem ve boylamınıza göre Sabah, Öğle, İkindi, Akşam ve Yatsı vakitlerini hassas şekilde hesaplayabilir.</string>
+    <string name="button_text_location_picker">Konuma izin ver</string>
+    <string name="button_open_settings">Ayarları Aç</string>
+    <string name="text_compass_suggestion">Doğru kıble yönünü bulmak için konum hizmetlerinizin etkin olduğundan emin olun. Telefonu düz tutun ve ekrandaki oku takip edin; ok Mekke\'deki Kâbe\'yi gösterir.\n\nEn iyi doğruluk için yakınlarda metal nesnelerden kaçının ve gerekirse cihazınızı sekiz (8) şeklinde hareket ettirerek pusulanızı kalibre edin.</string>
+
+    <string name="title_tasbeeh">Tesbih</string>
+    <string name="title_tasbeeh_instruction">Sayımı artırmak için ekranın herhangi bir yerinde soldan sağa kaydırın.</string>
+
+    <string name="text_tasbeeh_set_complete">%1$d. Set Tamamlandı. Toplam sayı: %2$d</string>
+    <string name="message_tasbeeh">Hz. Muhammed ﷺ tesbihi sağ eliyle çeker ve bizi de aynısını yapmaya teşvik ederdi. "Parmaklarınızla sayın, zira onlar sorgulanacak ve konuşacaktır." buyurdu. (Ebu Davud)</string>
+
+    <string name="reset_warning_title">Sıfırlama Uyarısı</string>
+    <string name="reset_warning_message">Bu işlem tüm verileri sıfırlayacak. Devam edilsin mi?</string>
+    <string name="reset_warning_confirm_text">Devam Et</string>
+    <string name="reset_warning_cancel_text">İptal</string>
+
+    <string name="text_okay">Tamam</string>
+    <string name="text_reset_counter">Sayacı Sıfırla</string>
+    <string name="text_reset">Sıfırla</string>
+
+    <string name="text_tasbeeh_sets">Setler</string>
+    <string name="text_tasbeeh_goal">Hedef</string>
+    <string name="text_tasbeeh_total">Toplam</string>
+    <string name="text_tasbeeh_of_goal">/ %1$s</string>
+    <string name="text_tasbeeh_subhanallah">Sübhanallah (Allah\'ı tenzih ederim)</string>
+    <string name="text_tasbeeh_alhamdulillah">Elhamdülillah (Hamd Allah\'a aittir)</string>
+    <string name="text_tasbeeh_allahu_akbar">Allahu Ekber (Allah en büyüktür)</string>
+    <string name="text_tasbeeh_la_ilaha">Lâ ilâhe illallah (Allah\'tan başka ilah yoktur)</string>
+    <string name="text_tasbeeh_astaghfirullah">Estağfirullah (Allah\'tan af dilerim)</string>
+
+    <string name="title_quibla">Kıble</string>
+    <string name="title_halal_scanner">Helal Tarayıcı</string>
+    <string name="title_nearby_mosque">Yakın Camiler</string>
+    <string name="title_zakat_calculator">Zekât Hesapla</string>
+
+    <string name="text_permission_title">İzin Gerekli</string>
+    <string name="text_permission_description">Helal Tarayıcı\'yı kullanmak için kamera izni gereklidir. Lütfen uygulama ayarlarından etkinleştirin.</string>
+    <string name="text_notification_permission_description">Namaz vakitlerinde zamanında bildirim almak için bildirimleri etkinleştirin. İzin verildikten sonra sizi tam zamanında bilgilendireceğiz.</string>
+
+    <string name="title_appearance">Görünüm</string>
+    <string name="title_widgets">Widget\'lar</string>
+    <string name="sub_title_widgets">Cihaz ayarlarına yönlendirir</string>
+    <string name="title_language">Dil</string>
+    <string name="title_about_us">Hakkımızda</string>
+    <string name="title_rate_us">Bizi Değerlendir</string>
+    <string name="sub_title_rate_us">Yapıcı geri bildiriminiz gelişmemize yardımcı olur</string>
+
+    <string name="text_halal_certified">Helal Sertifikalı</string>
+    <string name="text_halal_possible">Muhtemelen Helal</string>
+    <string name="text_halal_doubtful">Şüpheli</string>
+    <string name="text_not_halal">Helal Değil</string>
+    <string name="text_unknown_status">Bilinmiyor</string>
+
+    <string name="text_verdict">Karar</string>
+    <string name="text_labels">Etiketler</string>
+    <string name="text_ingredients">İçindekiler</string>
+
+    <string name="text_cancel">İptal</string>
+    <string name="text_scan_again">Tekrar Tara</string>
+    <string name="text_done">Tamam</string>
+
+    <string name="text_product_not_found">Bu ürünü bulamadık veya OpenFoodFacts\'tan helal durumunu alamadık. Lütfen ürün bilgilerini kontrol edin veya daha sonra tekrar deneyin.</string>
+
+    <string name="text_information">Bilgi</string>
+    <string name="text_see_api_title">Namaz vakitlerini nereden alıyoruz</string>
+    <string name="text_see_api_sub_title">aladhan.com</string>
+
+    <string name="text_school_of">Mezhep</string>
+    <string name="text_hanafi">Hanefi</string>
+    <string name="text_shafi">Şafii</string>
+    <string name="text_school_suggestion">Hanefi mezhebini takip etmek için açık bırakın, Şafii mezhebi için kapatın — hangisini seçeceğinizden emin değilseniz açık bırakmak Hanefi görüşüne uygun olacaktır.</string>
+
+    <string name="text_adhan_notification">Namaz Vaktinde Ezan Çal</string>
+    <string name="text_adhan_notification_desc">Etkinleştirildiğinde namaz vaktinde ezan çalar. Devre dışı bırakıldığında yalnızca sessiz bildirim alırsınız.</string>
+
+    <string name="haptic_title">Dokunsal Geri Bildirim</string>
+    <string name="haptic_label">Tesbih sayarken titreşim geri bildirimi sağla</string>
+    <string name="text_language">Dil</string>
+    <string name="text_language_desc">Tercih ettiğiniz uygulama dilini seçin</string>
+    <string name="text_24_hr">24 Saatlik Zaman Biçimi Kullan</string>
+    <string name="text_24_hr_desc">Etkinleştirince namaz vakitleri 24 saat biçiminde gösterilir. Devre dışı bırakıldığında 12 saat (ÖÖ/ÖS) biçimi kullanılır.</string>
+
+    <string name="text_settings_prayer">Namaz</string>
+    <string name="text_settings_prayer_desc">Namaz hesaplama tercihlerinizi yapılandırın</string>
+    <string name="text_settings_experience">Deneyim</string>
+    <string name="text_settings_experience_desc">Uygulamanın hissini kişiselleştirin</string>
+    <string name="text_settings_about">Hakkında</string>
+    <string name="text_settings_about_this_app">Bu Uygulama Hakkında</string>
+    <string name="text_our_mission">Misyonumuz, gizlilik ve özellikler</string>
+
+    <string name="text_rate_us_title">Bizi Değerlendir</string>
+
+    <string name="title_quran">Kur\'an-ı Kerim</string>
+
+    <string name="text_utility_desc_halal">Herhangi bir ürünün barkodunu tarayarak helal durumunu kontrol edin</string>
+    <string name="text_utility_desc_quran">Kur\'an-ı Kerim\'i okuyun, dinleyin ve keşfedin</string>
+    <string name="text_utility_desc_tasbeeh">Günlük zikir için dijital sayaç</string>
+    <string name="text_utility_desc_qibla">Kâbe\'nin yönünü bulun</string>
+    <string name="text_utility_desc_mosque">Konumunuza yakın camileri keşfedin</string>
+    <string name="text_utility_desc_zakat">Zekâtınızı hesaplayın</string>
+    <string name="text_utility_greeting">Esselâmü Aleyküm</string>
+    <string name="text_utility_subtitle">Günlük ibadetinizi zenginleştirmek için araçları keşfedin</string>
+
+    <string name="text_category_faith_knowledge">İman ve Bilgi</string>
+    <string name="text_category_daily_tools">Günlük Araçlar</string>
+    <string name="text_category_more">Planla ve Keşfet</string>
+
+    <string name="text_qibla_direction">Kıble Yönü</string>
+    <string name="text_qibla_subtitle">Mekke\'deki Kâbe\'ye yönelin</string>
+    <string name="text_qibla_degree">%1$.0f°</string>
+    <string name="text_qibla_aligned">Kıble yönüne bakıyorsunuz</string>
+    <string name="text_qibla_tip_title">Nasıl Kullanılır</string>
+    <string name="text_qibla_tip">Telefonunuzu düz tutun ve ok Kâbe\'yi gösterene kadar döndürün. En iyi doğruluk için telefonunuzu sekiz şeklinde hareket ettirerek kalibre edin.</string>
+    <string name="text_north">K</string>
+    <string name="text_south">G</string>
+    <string name="text_east">D</string>
+    <string name="text_west">B</string>
+
+    <string name="text_halal_scanner_more">Helal Tarayıcı ve Daha Fazlası</string>
+
+    <string name="text_halal_certified_reason">Bu ürün, tanınmış bir kurum veya kuruluş tarafından resmi olarak helal sertifikası almış ya da helal olarak etiketlenmiştir. İçerikleri ve üretim süreci helal standartlarına uygundur.</string>
+    <string name="text_halal_possible_reason">Bu üründe haram veya şüpheli içerik bulunamadı. Ancak resmi bir helal sertifikası etiketi taşımadığından helal statüsü tam olarak garanti edilemez.</string>
+    <string name="text_halal_doubtful_reason">Bu ürün, E471 veya E472 gibi hayvansal kaynaklardan gelebilecek bir veya daha fazla içerik veya katkı maddesi içermektedir. Bu maddelerin tam kaynağı belirsiz olduğundan helal statüsü kesin değildir.</string>
+    <string name="text_not_halal_reason">Bu ürün domuz eti, alkol veya türevleri gibi açıkça helal olmayan içerikler barındırmaktadır. Helal gıda tüketenlerin bu üründen kaçınması gerekmektedir.</string>
+    <string name="text_unknown_status_reason">Bu ürünün helal statüsünü belirlemek için içerikleri veya üretim süreci hakkında yeterli güvenilir bilgi bulunmamaktadır. Ek veri veya doğrulama gerekebilir.</string>
+
+    <!-- Manual Halal Check -->
+    <string name="title_manual_halal_check">Manuel Kontrol</string>
+    <string name="text_utility_desc_manual_halal">Helal durumunu kontrol etmek için barkod veya içerik girin</string>
+    <string name="text_manual_check_barcode_hint">Barkod numarası girin</string>
+    <string name="text_manual_check_ingredients_hint">İçerikleri girin (virgülle ayırın)</string>
+    <string name="text_manual_check_barcode_title">Barkod ile Kontrol</string>
+    <string name="text_manual_check_ingredients_title">İçerik ile Kontrol</string>
+    <string name="text_manual_check_button">Helal Durumunu Kontrol Et</string>
+    <string name="text_manual_check_or">VEYA</string>
+    <string name="text_manual_check_subtitle">Veritabanında aramak için barkod girin veya helal durumunu analiz etmek için içerikleri yapıştırın</string>
+
+    <!-- Scan History -->
+    <string name="title_scan_history">Tarama Geçmişi</string>
+    <string name="text_utility_desc_scan_history">Daha önce kontrol edilen ürünleri görüntüleyin</string>
+    <string name="text_scan_history_empty">Henüz tarama geçmişi yok</string>
+    <string name="text_scan_history_empty_subtitle">Taranan veya manuel olarak kontrol edilen ürünler burada görünecek</string>
+    <string name="text_scan_history_clear">Geçmişi Temizle</string>
+    <string name="text_scan_history_clear_confirm">Tüm tarama geçmişini silmek istediğinizden emin misiniz?</string>
+
+    <!-- Prayer Calendar -->
+    <string name="title_prayer_calendar">Namaz Takvimi</string>
+    <string name="text_utility_desc_calendar">Tüm yılın namaz vakitlerini görüntüleyin</string>
+    <string name="text_calendar_loading">Namaz verileri yükleniyor…</string>
+    <string name="text_calendar_empty_title">Henüz önbelleğe alınmış namaz verisi yok</string>
+    <string name="text_calendar_empty_subtitle">Veri yüklemek için önce Namaz ekranına gidin</string>
+    <string name="text_calendar_no_data_for_date">Bu tarih için namaz verisi mevcut değil</string>
+    <string name="text_calendar_sahri">Sahur</string>
+    <string name="text_calendar_error">Takvim verileri yüklenirken bir sorun oluştu</string>
+    <string name="text_calendar_prayer_times">Namaz Vakitleri</string>
+    <string name="text_calendar_fasting">Oruç</string>
+    <string name="text_calendar_sun">Güneş</string>
+
+    <!-- Surah List -->
+    <string name="text_ayahs">Ayetler</string>
+
+    <!-- Surah Details -->
+    <string name="text_loading">Yükleniyor...</string>
+
+    <!-- Qibla -->
+    <string name="text_qibla_degrees_to">Kıbleye %1$d°</string>
+
+    <!-- Location Permission -->
+    <string name="text_location_denied_permanently">⚠️  Konum izni kalıcı olarak reddedildi.\nLütfen cihaz ayarlarınızdan etkinleştirin.</string>
+
+    <!-- Location Warning Banner -->
+    <string name="warning_location_gps_off">Konum kapalı. Son bilinen konumunuz (%1$s) için önbelleğe alınmış namaz vakitleri gösteriliyor. Yeni bir şehre seyahat edip etmediğinizi uygulamanın algılaması için GPS\'i açık tutun.</string>
+
+    <!-- Manual Halal Check Result -->
+    <string name="text_check_result">Kontrol Sonucu</string>
+    <string name="text_check_another">Başka Bir Kontrol Yap</string>
+
+    <!-- About Screen -->
+    <string name="about_section_intention_title">Kişisel Bir Niyet</string>
+    <string name="about_section_intention_body">Muslim – Namaz ve Helal Tarayıcı\'yı sessiz sedasız, sorumluluklarımın arasındaki boşluklarda — düzenli profesyonel çalışmam ve aile hayatımın dışında — geliştirdim. Bu uygulama bir şirketin yol haritasının veya ticari bir stratejinin ürünü değil, kişisel bir niyetin sonucudur: tek bir kişi bile gerçekten kullansa da faydalı bir şey yaratmak. Bu uygulama tek bir bireyin imanıyla bağını sürdürmesine yardımcı olsa bile bu benim için yeterli olacaktır. Bunu Müslüman ümmetine küçük bir katkı olarak görüyorum ve bu hayatın ötesinde değer taşımasını umuyorum.</string>
+    <string name="about_section_privacy_title">Reklamsız ve Gizlilik Öncelikli</string>
+    <string name="about_section_privacy_body">Başından itibaren uygulamayı tamamen reklamsız tutma kararı aldım. Dikkat dağıtıcı hiçbir şey, gizli gündem yok ve kullanıcı deneyimi söz konusu olduğunda hiçbir uzlaşma yok. Bir o kadar önemli olan gizliliktir — bu uygulama kişisel verilerinizi toplamaz, depolamaz veya işlemez. Her şey cihazınızda, sizin kontrolünüzde kalır.</string>
+    <string name="about_section_prayer_title">Namaz Vakitleri ve Ezan</string>
+    <string name="about_section_prayer_body">Özünde uygulama, günlük İslami pratiği sorunsuz ve düşünceli bir şekilde desteklemek için tasarlanmıştır. Konumunuza göre beş vakit namaz — Sabah, Öğle, İkindi, Akşam ve Yatsı — için hassas vakitler sunar; ayarları manuel olarak düzenleme seçeneğiyle birlikte. Ezan, nerede olursanız olun namazlarınızda düzenli kalmanıza yardımcı olan nazik bir hatırlatıcı görevi görür.</string>
+    <string name="about_section_qibla_title">Kıble Pusulası</string>
+    <string name="about_section_qibla_body">Kıble pusulası, evde olun ya da tanımadık bir yerde seyahat ediyor olun, Kâbe\'nin yönünü anında bulmanızı sağlar.</string>
+    <string name="about_section_ramadan_title">Ramazan Desteği</string>
+    <string name="about_section_ramadan_body">Ramazan ayında uygulama daha da kullanışlı hale gelir; orucunuzu güvenle sürdürebilmeniz için Sahur ve İftar için net bir zaman çizelgesi sunar.</string>
+    <string name="about_section_quran_title">Kur\'an Okuyucu</string>
+    <string name="about_section_quran_body">Dahil etmeyi özellikle önemli bulduğum özelliklerden biri, Kur\'an\'ı doğrudan uygulama içinde okuyabilmektir. Günün herhangi bir saatinde Allah\'ın kelamı üzerinde tefekkür edebileceğiniz temiz, dikkat dağıtıcı olmayan bir arayüzle tasarlanmıştır.</string>
+    <string name="about_section_halal_title">Helal Tarayıcı</string>
+    <string name="about_section_halal_body">Namaz ve tefekkürün ötesinde uygulama, Helal Tarayıcısı aracılığıyla bilinçli yaşamı da destekler. Ürün barkodlarını tarayarak bir ürünün helal, haram veya şüpheli olup olmadığını hızlıca öğrenebilirsiniz. Uygulama, tükettiğiniz konusunda daha bilinçli seçimler yapmanıza yardımcı olmak için OpenFoodFacts\'ın kamuya açık verilerini kullanır.</string>
+    <string name="about_section_tools_title">Pratik Araçlar</string>
+    <string name="about_section_tools_body">Namazlar arasındaki zamanı takip etmek için geri sayım sayacı ve zikir için dijital tesbih sayacı gibi küçük, pratik araçlar da yerleşik olarak sunulmaktadır. Her özellik, kullanıcıyı bunaltmadan net bir amaca hizmet etmek üzere tasarım gereği basit tutulmuştur.</string>
+    <string name="about_section_growing_title">Sürekli Gelişiyor</string>
+    <string name="about_section_growing_body">Bu uygulama hâlâ büyümektedir. Özellikleri geliştirerek, sorunları gidererek ve gerçekten faydalı bulduğum şeyleri ekleyerek yavaş yavaş geliştirmeye devam ediyorum. Hiçbir zaman mükemmel olmayabilir ama samimi ve özenle inşa edilmiştir.</string>
+    <string name="about_closing_note">Her şeyden önce Muslim – Namaz ve Helal Tarayıcı, günlük hayatınızda sessiz bir yoldaş olmayı amaçlamaktadır — namazda tutarlı, seçimlerinizde bilinçli ve nerede olursanız olun imanınızla bağlantılı kalmanıza yardımcı olan bir araç.</string>
+
+    <!-- Prayer screen – Quick Access section -->
+    <string name="text_frequently_used">Sık Kullanılanlar</string>
+
+</resources>
+
