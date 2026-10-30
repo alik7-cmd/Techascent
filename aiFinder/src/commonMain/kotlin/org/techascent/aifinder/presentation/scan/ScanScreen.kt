@@ -31,17 +31,25 @@ fun ScanScreen(state: ScanUiState, onAnalyze: () -> Unit, onBack: () -> Unit, on
         when (state) {
             is ScanUiState.Loading -> items(listOf(0)) { _ -> LoadingContent() }
             is ScanUiState.Error -> items(listOf(0)) { _ -> ErrorContent(state.message, onRetry) }
-            is ScanUiState.Success -> ScanContent(state.data, onAnalyze,)
+            is ScanUiState.Success -> ScanContent(state.data, onAnalyze)
         }
     }
 }
 
-private fun androidx.compose.foundation.lazy.LazyListScope.ScanContent(data: ScanContent, onAnalyze: () -> Unit) {
-    items(listOf(0)) { _ -> Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-    SectionTitle("Scan a space"); Text("Take a clear photo of what you store.", color = AiFinderPalette.Muted)
-    Box(Modifier.fillMaxWidth().height(310.dp).background(AiFinderPalette.Mint, RoundedCornerShape(24.dp)), contentAlignment = Alignment.Center) { Text("▣  Camera preview", color = AiFinderPalette.Teal) }
-    InfoCard("Save into", data.selectedLocation)
-    Text("Mockup only — image recognition is simulated.", color = AiFinderPalette.Muted)
-    PrimaryAction("Analyze photo", onAnalyze)
-} }
+private fun androidx.compose.foundation.lazy.LazyListScope.ScanContent(
+    data: ScanContent,
+    onAnalyze: () -> Unit
+) {
+    items(listOf(0)) { _ ->
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            SectionTitle("Scan a space"); Text(
+            "Take a clear photo of what you store.",
+            color = AiFinderPalette.Muted
+        )
+            ScanCameraCard()
+            InfoCard("Save into", data.selectedLocation)
+            Text("Mockup only — image recognition is simulated.", color = AiFinderPalette.Muted)
+            PrimaryAction("Analyze photo", onAnalyze)
+        }
+    }
 }
