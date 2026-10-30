@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Muslim – Namaz &amp; Halal Scanner</string>
+
+    <string name="welcome_title">Never lose track of your things again.</string>
+    <string name="welcome_description">Take a photo. Let AI remember where everything is.</string>
+    <string name="get_started">Get started</string>
+    <string name="welcome_tagline">Your home, searchable.</string>
+
+    <string name="home_title">Where Did I Put It?</string>
+    <string name="home_greeting">Good morning! Find anything in seconds.</string>
+    <string name="home_search_hint">Where is my HDMI cable?</string>
+    <string name="home_scan_title">Make your home\nsearchable</string>
+    <string name="home_scan_description">Snap a drawer or box and let AI\ncatalog the things inside.</string>
+    <string name="home_scan_action">Scan a space</string>
+    <string name="home_spaces_title">Your spaces</string>
+    <string name="home_see_all">See all</string>
+    <string name="home_space_summary">%1$d spaces • %2$d items</string>
+    <string name="home_box_summary">%1$d boxes • %2$d items</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_scan">Scan</string>
+    <string name="nav_spaces">Spaces</string>
+    <string name="search_title">Search your home</string>
+    <string name="search_one_found">%1$d item found</string>
+    <string name="search_items_found">%1$d items found</string>
+    <string name="search_view_location">View item location</string>
+    <string name="search_tip">Tip: Search for objects, not just categories.</string>
+    <string name="details_title">Item details</string>
+    <string name="details_not_found">Item not found</string>
+    <string name="details_hdmi_preview">HDMI cable</string>
+    <string name="details_last_location">LAST KNOWN LOCATION</string>
+    <string name="details_move">Move item</string>
+    <string name="details_edit">Edit item</string>
+    <string name="details_actions_unavailable">Moving and editing items are not available in this mockup yet.</string>
+    <string name="review_title">Review detected items</string>
+    <string name="back">‹ Back</string>
+    <string name="review_items_found">✓ %1$d potential items found</string>
+    <string name="review_check_items">Check before adding to your inventory.</string>
+    <string name="review_save_items">Save %1$d items</string>
+    <string name="review_detection_confidence">%1$s · AI %2$d%%</string>
+    <string name="review_detection_suggestion">%1$s · AI suggestion</string>
+
+</resources>

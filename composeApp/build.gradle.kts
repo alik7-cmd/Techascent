@@ -1,10 +1,7 @@
-
 import org.gradle.kotlin.dsl.implementation
 import org.gradle.kotlin.dsl.libs
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -36,26 +33,6 @@ kotlin {
         }
     }
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        moduleName = "composeApp"
-        browser {
-            val rootDirPath = project.rootDir.path
-            val projectDirPath = project.projectDir.path
-            commonWebpackConfig {
-                outputFileName = "composeApp.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(rootDirPath)
-                        add(projectDirPath)
-                    }
-                }
-            }
-        }
-        binaries.executable()
-    }
-    
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
@@ -72,6 +49,8 @@ kotlin {
             // Glance for App Widgets
             implementation("androidx.glance:glance-appwidget:1.1.1")
             implementation("androidx.glance:glance-material3:1.1.1")
+            implementation(libs.moko.permissions)
+            implementation(libs.moko.permissions.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -98,8 +77,10 @@ kotlin {
 
             /*implementation(libs.lifecycle.viewmodel)
             implementation(libs.lifecycle.viewmodel.compose)*/
-            api(libs.moko.permissions)
-            api(libs.moko.permissions.compose)
+        }
+        iosMain.dependencies {
+            implementation(libs.moko.permissions)
+            implementation(libs.moko.permissions.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -151,6 +132,3 @@ dependencies {
     debugImplementation(compose.uiTooling)
     debugImplementation(compose.components.uiToolingPreview)
 }
-
-
-
