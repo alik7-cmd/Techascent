@@ -1,7 +1,12 @@
 package org.techascent.aifinder.domain.model
 
 data class Household(val id: String, val name: String, val memberIds: List<String> = emptyList())
-enum class LocationType { HOME, ROOM, CABINET, SHELF, DRAWER, BOX }
+enum class LocationType { HOME, AREA, ROOM, CONTAINER, CABINET, SHELF, DRAWER, BOX }
+data class CreateLocationRequest(
+    val name: String,
+    val type: LocationType,
+    val parentId: String? = null
+)
 data class StorageLocation(
     val id: String,
     val name: String,

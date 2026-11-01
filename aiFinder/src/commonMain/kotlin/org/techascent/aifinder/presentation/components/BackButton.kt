@@ -7,8 +7,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.graphics.Color
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.back
+import apphub.aifinder.generated.resources.box_lid
+import apphub.aifinder.generated.resources.ic_back
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.composa.button.text.ComposaButtonText
+import org.techascent.composa.common.DrawableData
 
 @Composable
 fun BackButton(onBack: () -> Unit, contentColor: Color? = Color.Black) {
@@ -23,6 +26,10 @@ fun BackButton(onBack: () -> Unit, contentColor: Color? = Color.Black) {
     }
     ComposaButtonText(
         text = stringResource(Res.string.back),
+        leftIcon = DrawableData(
+            imageRes = Res.drawable.ic_back,
+            tint = Color.Black
+        ),
         onClick = onBack
     )
 }

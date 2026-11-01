@@ -1,5 +1,26 @@
 This is a Kotlin Multiplatform project targeting Android, iOS, Web.
 
+* `/aiFinder` is the Android/iOS inventory finder. Android system Back follows the
+  screen's toolbar back action; Welcome and Home retain normal system exit behavior.
+  Its isolated Koin context survives activity recreation, while screen ViewModels
+  preserve in-memory state across rotation.
+* `/aiFinder` currently uses offline sample scan results: no photo uploads or Vertex API calls
+  are made. Review cards support renaming and removing items with Material dialogs on Android
+  and native alerts on iOS.
+  Edits are retained in memory across rotation. Tap "Save into" on Scan or Review to select a
+  location, search by its path, and confirm with "Save location"; dismissing cancels selection.
+  Create one with a name, Area/Room/Container type and optional parent. Paths are
+  derived from parent IDs. Saving adds the edited items to the selected location and makes them
+  searchable. Locations and inventory are in-memory only and reset on process restart.
+  To restore live analysis, replace the `MockPhotoAnalyzer` binding in `AiFinderModule`
+  with `VertexGeminiPhotoAnalyzer` and its HTTP client/config dependencies, and update the
+  demo notices in Scan and Review.
+* The retained live photo analyzer uses Gemini on Vertex AI (express mode) through one shared
+  Ktor client for Android and iOS. Add the key to the git-ignored `local.properties`:
+  `VERTEX_API_KEY=...` (optional: `VERTEX_MODEL=gemini-2.5-flash`), then rebuild.
+  The key ships inside the app, so use it for development only; production should call
+  Vertex AI through a backend.
+
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
   - `commonMain` is for code that’s common for all targets.

@@ -50,19 +50,23 @@ import org.techascent.aifinder.presentation.theme.AiFinderPalette
 private enum class CameraAccess { Checking, Granted, Denied, DeniedAlways, Unavailable }
 
 @Composable
-fun ScanCameraCard(modifier: Modifier = Modifier) {
+fun ScanCameraCard(
+    controller: CameraCaptureController,
+    isAnalyzing: Boolean,
+    modifier: Modifier = Modifier
+) {
     val factory = rememberPermissionsControllerFactory()
-    val controller = remember(factory) { factory.createPermissionsController() }
-    BindEffect(controller)
+    val permissions = remember(factory) { factory.createPermissionsController() }
+    BindEffect(permissions)
 
     val scope = rememberCoroutineScope()
     var access by remember { mutableStateOf(CameraAccess.Checking) }
 
-    LaunchedEffect(controller) {
-        access = when (controller.getPermissionState(Permission.CAMERA)) {
+    LaunchedEffect(permissions) {
+        access = when (permissions.getPermissionState(Permission.CAMERA)) {
             PermissionState.Granted -> CameraAccess.Granted
             PermissionState.DeniedAlways -> CameraAccess.DeniedAlways
-            else -> controller.request()
+            else -> permissions.request()
         }
     }
 
@@ -75,22 +79,26 @@ fun ScanCameraCard(modifier: Modifier = Modifier) {
         when (access) {
             CameraAccess.Checking -> CircularProgressIndicator(color = AiFinderPalette.Teal)
             CameraAccess.Granted -> {
-                CameraPreview(Modifier.fillMaxSize(), onUnavailable = { access = CameraAccess.Unavailable })
-                ViewfinderOverlay()
+                CameraPreview(
+                    controller = controller,
+                    modifier = Modifier.fillMaxSize(),
+                    onUnavailable = { access = CameraAccess.Unavailable }
+                )
+                if (isAnalyzing) AnalyzingOverlay() else ViewfinderOverlay()
             }
             CameraAccess.Denied -> CameraMessage(
                 icon = Icons.Outlined.CameraAlt,
                 title = "Camera access needed",
                 body = "Allow camera access to take a photo of your space.",
                 action = "Allow camera",
-                onAction = { scope.launch { access = controller.request() } }
+                onAction = { scope.launch { access = permissions.request() } }
             )
             CameraAccess.DeniedAlways -> CameraMessage(
                 icon = Icons.Outlined.NoPhotography,
                 title = "Camera access is off",
                 body = "Turn on camera access in Settings to scan your space.",
                 action = "Open settings",
-                onAction = controller::openAppSettings
+                onAction = permissions::openAppSettings
             )
             CameraAccess.Unavailable -> CameraMessage(
                 icon = Icons.Outlined.NoPhotography,
@@ -110,6 +118,18 @@ private suspend fun PermissionsController.request(): CameraAccess = try {
     CameraAccess.Denied
 } catch (_: RequestCanceledException) {
     CameraAccess.Denied
+}
+
+@Composable
+private fun AnalyzingOverlay() {
+    Column(
+        Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Text("Finding items…", color = Color.White, fontWeight = FontWeight.Medium)
+    }
 }
 
 @Composable

@@ -1,6 +1,9 @@
 package org.techascent.aifinder.presentation.scan
 
-data class ScanContent(val selectedLocation: String = "Living room › TV cabinet › Drawer 2")
+data class ScanContent(
+    val isAnalyzing: Boolean = false,
+    val errorMessage: String? = null
+)
 
 sealed interface ScanUiState {
     data object Loading : ScanUiState

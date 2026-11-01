@@ -1,11 +1,45 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinSerialization)
+}
+
+// Vertex AI settings come from the git-ignored local.properties so the key is never committed.
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
+}
+val vertexApiKey = localProperties.getProperty("VERTEX_API_KEY").orEmpty()
+val vertexModel = localProperties.getProperty("VERTEX_MODEL")?.takeIf { it.isNotBlank() } ?: "gemini-2.5-flash"
+val vertexConfigDir = layout.buildDirectory.dir("generated/vertexConfig/commonMain/kotlin")
+
+val generateVertexConfig by tasks.registering {
+    val apiKey = vertexApiKey
+    val model = vertexModel
+    val outputDir = vertexConfigDir
+    inputs.property("apiKey", apiKey)
+    inputs.property("model", model)
+    outputs.dir(outputDir)
+    doLast {
+        fun String.quoted() = "\"" + replace("\\", "\\\\").replace("\"", "\\\"").replace("$", "\\$") + "\""
+        val file = outputDir.get().file("org/techascent/aifinder/config/VertexAiConfig.kt").asFile
+        file.parentFile.mkdirs()
+        file.writeText(
+            """
+            |package org.techascent.aifinder.config
+            |
+            |internal object VertexAiConfig {
+            |    const val API_KEY: String = ${apiKey.quoted()}
+            |    const val MODEL: String = ${model.quoted()}
+            |}
+            |""".trimMargin()
+        )
+    }
 }
 
 kotlin {
@@ -35,11 +69,22 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.moko.permissions)
             implementation(libs.moko.permissions.compose)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.ktor.client.content.negotiation)
+            implementation(libs.ktor.ktor.serialization.kotlinx.json)
+            implementation(libs.kotlinx.serialization.json)
+        }
+        commonMain {
+            kotlin.srcDir(generateVertexConfig)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
 
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.bundles.camera)
+            implementation(libs.ktor.client.okhttp)
         }
 
         iosMain.dependencies {
@@ -50,6 +95,7 @@ kotlin {
             implementation(compose.ui)
             implementation(projects.composa)
             implementation(libs.androidx.lifecycle)
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

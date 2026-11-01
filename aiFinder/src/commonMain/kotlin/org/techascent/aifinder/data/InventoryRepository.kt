@@ -8,27 +8,83 @@ interface InventoryRepository {
     fun items(): List<LocatedItem>
     fun search(query: String): List<LocatedItem>
     fun detections(): List<ItemDetection>
+    fun locations(): List<StorageLocation>
+    fun locationPath(id: String): String
+    fun createLocation(request: CreateLocationRequest): StorageLocation
+    fun saveDetections(locationId: String, detections: List<ItemDetection>)
 }
 
 class MockInventoryRepository : InventoryRepository {
-    private val locations = listOf(
-        StorageLocation("living", "Living room", LocationType.ROOM, spaceCount = 4, itemCount = 23),
-        StorageLocation("bed", "Bedroom", LocationType.ROOM, spaceCount = 3, itemCount = 15),
-        StorageLocation("storage", "Storage room", LocationType.ROOM, itemCount = 48, boxCount = 6),
-        StorageLocation("drawer", "Drawer 2", LocationType.DRAWER, "living")
+    private val locations = mutableListOf(
+        StorageLocation("home", "Home", LocationType.HOME),
+        StorageLocation("living", "Living room", LocationType.ROOM, "home"),
+        StorageLocation("bed", "Bedroom", LocationType.ROOM, "home"),
+        StorageLocation("storage", "Storage room", LocationType.ROOM, "home"),
+        StorageLocation("cabinet", "TV cabinet", LocationType.CABINET, "living"),
+        StorageLocation("drawer", "Drawer 2", LocationType.DRAWER, "cabinet")
     )
-    private val inventory = listOf(
+    private val inventory = mutableListOf(
         LocatedItem(InventoryItem("hdmi", "Spare HDMI cable", "Electronics", listOf("cable", "video", "adapter")), locations.last(), "Living room › TV cabinet › Drawer 2"),
         LocatedItem(InventoryItem("usb", "USB-C adapter", "Electronics"), locations.last(), "Living room › TV cabinet › Drawer 2"),
         LocatedItem(InventoryItem("remote", "TV remote", "Electronics"), locations.last(), "Living room › TV cabinet › Drawer 2"),
         LocatedItem(InventoryItem("charge", "Charging cable", "Electronics"), locations.last(), "Living room › TV cabinet › Drawer 2"),
         LocatedItem(InventoryItem("power", "Power adapter", "Electronics"), locations.last(), "Living room › TV cabinet › Drawer 2")
     )
-    override fun spaces() = locations.take(3)
+    override fun spaces() = locations.filter { it.parentId == "home" || (it.parentId == null && it.type != LocationType.HOME) }
+        .map { location ->
+            val descendants = locations.filter { candidate ->
+                var parent = candidate.parentId
+                while (parent != null && parent != location.id) {
+                    parent = locations.firstOrNull { it.id == parent }?.parentId
+                }
+                parent == location.id
+            }
+            val ids = descendants.map { it.id }.toSet() + location.id
+            location.copy(spaceCount = descendants.size, itemCount = inventory.count { it.location.id in ids })
+        }
     override fun items() = inventory
     override fun search(query: String): List<LocatedItem> = if (query.isBlank()) inventory else inventory.filter { entry ->
         val terms = query.lowercase().split(" ").filter { it.length > 2 && it !in listOf("where", "what", "did", "put", "my", "the", "is", "find") }
         terms.any { entry.item.name.lowercase().contains(it) || entry.item.tags.any { tag -> tag.contains(it) } }
     }
     override fun detections() = inventory.mapIndexed { index, record -> ItemDetection("mock-photo", record.item, (0.94f - index * 0.03f)) }
+
+    override fun locations(): List<StorageLocation> = locations.toList()
+
+    override fun locationPath(id: String): String {
+        val segments = mutableListOf<String>()
+        var current = locations.firstOrNull { it.id == id } ?: error("Location not found.")
+        while (true) {
+            segments.add(0, current.name)
+            current = current.parentId?.let { parentId -> locations.first { it.id == parentId } } ?: break
+        }
+        return segments.joinToString(" › ")
+    }
+
+    override fun createLocation(request: CreateLocationRequest): StorageLocation {
+        val name = request.name.trim()
+        require(name.isNotEmpty()) { "Enter a location name." }
+        require(request.type in listOf(LocationType.AREA, LocationType.ROOM, LocationType.CONTAINER)) {
+            "Choose Area, Room or Container."
+        }
+        require(request.parentId == null || locations.any { it.id == request.parentId }) { "Parent location not found." }
+        require(locations.none { it.parentId == request.parentId && it.name.equals(name, ignoreCase = true) }) {
+            "A location with this name already exists here."
+        }
+        return StorageLocation(
+            id = "location-${locations.size}",
+            name = name,
+            type = request.type,
+            parentId = request.parentId
+        ).also { locations.add(it) }
+    }
+
+    override fun saveDetections(locationId: String, detections: List<ItemDetection>) {
+        val location = locations.firstOrNull { it.id == locationId } ?: error("Choose a valid location.")
+        require(detections.isNotEmpty()) { "There are no items to save." }
+        detections.forEach { detection ->
+            inventory.removeAll { it.item.id == detection.item.id }
+            inventory.add(LocatedItem(detection.item, location, locationPath(locationId)))
+        }
+    }
 }
