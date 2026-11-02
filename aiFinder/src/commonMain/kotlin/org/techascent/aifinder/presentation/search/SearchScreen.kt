@@ -96,6 +96,18 @@ private fun LazyListScope.searchContent(
             modifier = Modifier.padding(vertical = 8.dp)
         )
     }
+    if (data.results.isEmpty()) {
+        item(key = "empty") {
+            Text(
+                if (data.hasItems) {
+                    stringResource(Res.string.search_no_results, data.query.trim())
+                } else {
+                    stringResource(Res.string.search_no_items)
+                },
+                color = AiFinderPalette.Ink
+            )
+        }
+    }
     items(data.results, key = { it.item.id }) { record ->
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -103,10 +115,11 @@ private fun LazyListScope.searchContent(
                 .padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Box(
+            ItemPhoto(
+                photoId = record.item.photoId,
+                contentDescription = record.item.name,
+                shape = RoundedCornerShape(18.dp),
                 modifier = Modifier.fillMaxWidth().height(180.dp)
-                    .background(AiFinderPalette.Mint, RoundedCornerShape(18.dp)),
-                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = if (record.item.name.contains("HDMI", ignoreCase = true)) {

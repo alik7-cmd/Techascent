@@ -49,10 +49,11 @@ fun DetailsScreen(state: DetailsUiState, onBack: () -> Unit, onRetry: () -> Unit
                     item { Text(stringResource(Res.string.details_not_found), color = AiFinderPalette.Muted) }
                 } else {
                     item(key = "preview") {
-                        Box(
+                        ItemPhoto(
+                            photoId = entry.item.photoId,
+                            contentDescription = entry.item.name,
+                            shape = RoundedCornerShape(24.dp),
                             modifier = Modifier.fillMaxWidth().height(280.dp)
-                                .background(AiFinderPalette.Mint, RoundedCornerShape(24.dp)),
-                            contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = if (entry.item.name.contains("HDMI", ignoreCase = true)) {

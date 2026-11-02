@@ -1,35 +1,28 @@
 package org.techascent.aifinder.presentation.components
 
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBackIos
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.back
-import apphub.aifinder.generated.resources.box_lid
-import apphub.aifinder.generated.resources.ic_back
 import org.jetbrains.compose.resources.stringResource
-import org.techascent.composa.button.text.ComposaButtonText
-import org.techascent.composa.common.DrawableData
+import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
+/** Shared top-bar back chevron; offset so the glyph lines up with the screen's content edge. */
 @Composable
-fun BackButton(onBack: () -> Unit, contentColor: Color? = Color.Black) {
-    if (contentColor != null) {
-        TextButton(
-            onClick = onBack,
-            colors = ButtonDefaults.textButtonColors(contentColor = contentColor)
-        ) {
-            Text(stringResource(Res.string.back))
-        }
-        return
+fun BackButton(onBack: () -> Unit, modifier: Modifier = Modifier) {
+    IconButton(onClick = onBack, modifier = modifier.offset(x = (-12).dp)) {
+        Icon(
+            Icons.AutoMirrored.Outlined.ArrowBackIos,
+            contentDescription = stringResource(Res.string.back),
+            tint = AiFinderPalette.Ink,
+            modifier = Modifier.size(20.dp)
+        )
     }
-    ComposaButtonText(
-        text = stringResource(Res.string.back),
-        leftIcon = DrawableData(
-            imageRes = Res.drawable.ic_back,
-            tint = Color.Black
-        ),
-        onClick = onBack
-    )
 }

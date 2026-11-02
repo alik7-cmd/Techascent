@@ -1,30 +1,19 @@
 package org.techascent.aifinder.presentation.home
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import org.techascent.aifinder.data.*
+import org.techascent.aifinder.domain.inventory.usecase.ObserveInventoryUseCase
+import org.techascent.aifinder.presentation.inventory.InventoryBackedViewModel
+import org.techascent.aifinder.presentation.inventory.InventoryLoad
 
-class HomeViewModel(private val repository: InventoryRepository = MockInventoryRepository()) :
-    ViewModel() {
-
-    private val _uiState: MutableStateFlow<HomeUiState> =
-        MutableStateFlow(HomeUiState.Loading)
-    val uiState = _uiState.onStart {
-        retry()
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        HomeUiState.Loading
-    )
-
-    fun retry() {
-        _uiState.update {
-            HomeUiState.Success(repository.spaces().let(::HomeContent))
+class HomeViewModel(observeInventory: ObserveInventoryUseCase) : InventoryBackedViewModel(observeInventory) {
+    val uiState = inventory.map { load ->
+        when (load) {
+            InventoryLoad.Loading -> HomeUiState.Loading
+            is InventoryLoad.Failed -> HomeUiState.Error(load.message)
+            is InventoryLoad.Ready -> HomeUiState.Success(HomeContent(load.snapshot.topLevelSpaces))
         }
-    }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeUiState.Loading)
 }

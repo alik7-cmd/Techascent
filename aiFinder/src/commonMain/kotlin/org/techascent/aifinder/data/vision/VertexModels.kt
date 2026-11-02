@@ -13,7 +13,7 @@ internal data class Candidate(val content: Content? = null, val finishReason: St
 internal data class Content(val parts: List<Part> = emptyList())
 
 @Serializable
-internal data class Part(val text: String? = null)
+internal data class Part(val text: String? = null, val thought: Boolean? = null)
 
 @Serializable
 internal data class DetectedItemsResponse(val items: List<DetectedItem> = emptyList())

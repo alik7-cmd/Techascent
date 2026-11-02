@@ -11,4 +11,5 @@ interface LocationRemoteDataSource {
 object RealtimeDatabasePaths {
     const val ROOT = "aifinder"
     fun locations(userId: String) = "$ROOT/users/$userId/locations"
+    fun items(userId: String) = "$ROOT/users/$userId/items"
 }

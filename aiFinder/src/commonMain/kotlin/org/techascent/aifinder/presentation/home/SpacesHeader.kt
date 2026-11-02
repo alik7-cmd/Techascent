@@ -14,19 +14,21 @@ import org.techascent.aifinder.presentation.components.SectionTitle
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @Composable
-internal fun SpacesHeader(onSeeAll: () -> Unit) {
+internal fun SpacesHeader(onSeeAll: () -> Unit, showSeeAll: Boolean = true) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         SectionTitle(stringResource(Res.string.home_spaces_title))
-        TextButton(onClick = onSeeAll) {
-            Text(
-                stringResource(Res.string.home_see_all),
-                color = AiFinderPalette.Teal,
-                fontWeight = FontWeight.Bold
-            )
+        if (showSeeAll) {
+            TextButton(onClick = onSeeAll) {
+                Text(
+                    stringResource(Res.string.home_see_all),
+                    color = AiFinderPalette.Teal,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

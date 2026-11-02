@@ -102,7 +102,17 @@ class LocationRepositoryImplTest {
         assertIs<LocationError.Remote>(error)
         assertEquals("Permission denied", error.message)
         assertTrue(local.isEmpty("uid"))
-        assertFailsWith<LocationError.Remote> { repo.observeLocations().first() }
+        // Offline-first: a failing Firebase read falls back to the (empty) cache instead of erroring.
+        assertTrue(repo.observeLocations().first().isEmpty())
+    }
+
+    @Test
+    fun cachedLocationsLoadWithoutFirebase() = runBlocking<Unit> {
+        val remote = FakeRemote()
+        val repo = LocationRepositoryImpl(remote, FakeLocal(), FakeAuth(user))
+        repo.createLocation(CreateLocationRequest("Garage", LocationType.AREA)).getOrThrow()
+        remote.failWith = IllegalStateException("offline")
+        assertEquals(listOf("Garage"), repo.observeLocations().first().map { it.name })
     }
 
     @Test

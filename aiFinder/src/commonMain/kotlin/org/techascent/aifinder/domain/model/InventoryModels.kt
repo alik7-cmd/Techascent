@@ -17,7 +17,7 @@ data class StorageLocation(
     val itemCount: Int = 0,
     val boxCount: Int? = null
 )
-data class InventoryItem(val id: String, val name: String, val category: String, val tags: List<String> = emptyList(), val description: String = "")
+data class InventoryItem(val id: String, val name: String, val category: String, val tags: List<String> = emptyList(), val description: String = "", val photoId: String? = null)
 data class ItemPlacement(val itemId: String, val locationId: String, val confirmedAt: String? = null)
 data class InventoryPhoto(val id: String, val locationId: String, val localUri: String, val capturedAt: String? = null)
 enum class DetectionStatus { SUGGESTED, CONFIRMED, REJECTED }

@@ -4,23 +4,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import org.techascent.aifinder.domain.inventory.usecase.SaveDetectionsUseCase
 import org.techascent.aifinder.domain.model.ItemDetection
-import org.techascent.aifinder.domain.model.StorageLocation
-import org.techascent.aifinder.data.InventoryRepository
-import org.techascent.aifinder.data.MockInventoryRepository
+import org.techascent.aifinder.domain.vision.CapturedPhoto
 
-class ReviewViewModel(private val repository: InventoryRepository = MockInventoryRepository()) : ViewModel() {
+class ReviewViewModel(private val saveDetections: SaveDetectionsUseCase) : ViewModel() {
     private var detections: List<ItemDetection> = emptyList()
+    private var photo: CapturedPhoto? = null
 
     var state: ReviewUiState by mutableStateOf(ReviewUiState.Success(ReviewContent(detections)))
         private set
 
-    fun show(newDetections: List<ItemDetection>) {
+    private val isSaving get() = (state as? ReviewUiState.Success)?.data?.isSaving == true
+
+    fun show(newDetections: List<ItemDetection>, newPhoto: CapturedPhoto? = null) {
         detections = newDetections
-        state = ReviewUiState.Success(ReviewContent(detections))
+        photo = newPhoto
+        publish()
     }
 
     fun rename(itemId: String, name: String) {
+        if (isSaving) return
         val trimmedName = name.trim()
         require(trimmedName.isNotEmpty()) { "Item name must not be blank." }
         detections = detections.map { detection ->
@@ -30,17 +36,34 @@ class ReviewViewModel(private val repository: InventoryRepository = MockInventor
                 detection
             }
         }
-        state = ReviewUiState.Success(ReviewContent(detections))
+        publish()
     }
 
     fun delete(itemId: String) {
+        if (isSaving) return
         detections = detections.filterNot { it.item.id == itemId }
-        state = ReviewUiState.Success(ReviewContent(detections))
+        publish()
     }
 
-    fun save(location: StorageLocation, path: String) {
-        repository.saveDetections(location, path, detections)
+    /** Saves the reviewed items into [locationId]; [onSaved] runs once they are in Firebase and the cache. */
+    fun save(locationId: String?, onSaved: () -> Unit) {
+        if (isSaving) return
+        publish(isSaving = true)
+        viewModelScope.launch {
+            saveDetections(locationId, detections, photo)
+                .onSuccess {
+                    detections = emptyList()
+                    photo = null
+                    publish()
+                    onSaved()
+                }
+                .onFailure { e -> publish(saveError = e.message ?: "Couldn't save your items.") }
+        }
     }
 
-    fun retry() { state = ReviewUiState.Success(ReviewContent(detections)) }
+    fun retry() = publish()
+
+    private fun publish(isSaving: Boolean = false, saveError: String? = null) {
+        state = ReviewUiState.Success(ReviewContent(detections, isSaving, saveError))
+    }
 }

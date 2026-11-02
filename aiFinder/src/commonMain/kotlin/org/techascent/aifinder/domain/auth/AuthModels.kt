@@ -5,6 +5,7 @@ data class AuthUser(
     val displayName: String?,
     val email: String?,
     val photoUrl: String?,
+    val provider: AuthProvider? = null,
 )
 
 enum class AuthProvider { Google, Apple }

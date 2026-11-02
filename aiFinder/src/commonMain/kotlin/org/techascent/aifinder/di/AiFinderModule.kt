@@ -2,9 +2,19 @@ package org.techascent.aifinder.di
 
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import org.techascent.aifinder.data.InventoryRepository
-import org.techascent.aifinder.data.MockInventoryRepository
-import org.techascent.aifinder.data.vision.MockPhotoAnalyzer
+import kotlinx.coroutines.Dispatchers
+import org.techascent.aifinder.config.VertexAiConfig
+import org.techascent.aifinder.data.inventory.InventoryRepositoryImpl
+import org.techascent.aifinder.data.inventory.ItemLocalDataSource
+import org.techascent.aifinder.data.inventory.RoomItemLocalDataSource
+import org.techascent.aifinder.data.vision.VertexGeminiPhotoAnalyzer
+import org.techascent.aifinder.data.vision.createAiHttpClient
+import org.techascent.aifinder.domain.inventory.InventoryRepository
+import org.techascent.aifinder.domain.inventory.usecase.ObserveInventoryUseCase
+import org.techascent.aifinder.domain.inventory.usecase.SaveDetectionsUseCase
+import org.techascent.aifinder.presentation.spaces.SpacesViewModel
+import org.techascent.aifinder.data.photo.ItemPhotoRepositoryImpl
+import org.techascent.aifinder.domain.photo.ItemPhotoRepository
 import org.techascent.aifinder.domain.vision.PhotoAnalyzer
 import org.techascent.aifinder.presentation.details.DetailsViewModel
 import org.techascent.aifinder.presentation.home.HomeViewModel
@@ -22,6 +32,7 @@ import org.techascent.aifinder.domain.auth.usecase.GetCurrentUserUseCase
 import org.techascent.aifinder.domain.auth.usecase.SignInUseCase
 import org.techascent.aifinder.domain.auth.usecase.SignOutUseCase
 import org.techascent.aifinder.presentation.login.LoginViewModel
+import org.techascent.aifinder.presentation.account.AccountViewModel
 import org.techascent.aifinder.data.location.LocationRepositoryImpl
 import org.techascent.aifinder.data.location.LocationLocalDataSource
 import org.techascent.aifinder.data.location.RoomLocationLocalDataSource
@@ -31,9 +42,14 @@ import org.techascent.aifinder.domain.location.usecase.CreateLocationUseCase
 import org.techascent.aifinder.domain.location.usecase.ObserveLocationsUseCase
 
 val aiFinderModule = module {
-    single<InventoryRepository> { MockInventoryRepository() }
-    // Keep VertexGeminiPhotoAnalyzer available, but don't create a network client in mock mode.
-    single<PhotoAnalyzer> { MockPhotoAnalyzer() }
+    single<PhotoAnalyzer> {
+        VertexGeminiPhotoAnalyzer(
+            client = createAiHttpClient(),
+            apiKey = VertexAiConfig.API_KEY,
+            model = VertexAiConfig.MODEL,
+            dispatcher = Dispatchers.Default,
+        )
+    }
     single<AuthRepository> { AuthRepositoryImpl(google = get()) }
     factory { SignInUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
@@ -42,14 +58,21 @@ val aiFinderModule = module {
     single<LocationRepository> { LocationRepositoryImpl(remote = get(), local = get(), auth = get()) }
     factory { ObserveLocationsUseCase(get()) }
     factory { CreateLocationUseCase(get()) }
+    single<ItemLocalDataSource> { RoomItemLocalDataSource(get<AiFinderDatabase>().itemDao()) }
+    single<InventoryRepository> { InventoryRepositoryImpl(remote = get(), local = get(), auth = get()) }
+    factory { ObserveInventoryUseCase(items = get(), locations = get()) }
+    single<ItemPhotoRepository> { ItemPhotoRepositoryImpl(remote = get(), local = get(), auth = get()) }
+    factory { SaveDetectionsUseCase(repository = get(), photos = get()) }
     single<WelcomeRepository> { RoomWelcomeRepository(get<AiFinderDatabase>().welcomePreferenceDao()) }
     factory { ResolveWelcomeDestinationUseCase(auth = get(), welcome = get()) }
     viewModel { WelcomeViewModel(resolveDestination = get()) }
     viewModel { LoginViewModel(signIn = get(), getCurrentUser = get()) }
-    viewModel { HomeViewModel(repository = get()) }
+    viewModel { AccountViewModel(getCurrentUser = get(), signOut = get()) }
+    viewModel { HomeViewModel(observeInventory = get()) }
     viewModel { ScanViewModel(analyzer = get()) }
-    viewModel { ReviewViewModel(repository = get()) }
+    viewModel { ReviewViewModel(saveDetections = get()) }
     viewModel { LocationViewModel(observeLocations = get(), createLocation = get()) }
-    viewModel { SearchViewModel(repository = get()) }
-    viewModel { DetailsViewModel(repository = get()) }
+    viewModel { SearchViewModel(observeInventory = get()) }
+    viewModel { DetailsViewModel(observeInventory = get()) }
+    viewModel { SpacesViewModel(observeInventory = get()) }
 }

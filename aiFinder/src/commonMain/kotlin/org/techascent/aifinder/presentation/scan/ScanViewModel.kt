@@ -11,19 +11,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.techascent.aifinder.domain.model.ItemDetection
+import org.techascent.aifinder.domain.vision.CapturedPhoto
 import org.techascent.aifinder.domain.vision.PhotoAnalyzer
 import org.techascent.aifinder.domain.vision.RecognizedObject
 import org.techascent.aifinder.domain.vision.toItemDetections
 import org.techascent.aifinder.util.logDebug
 import kotlin.math.roundToInt
 
+/** A photo and the items found in it, handed to Review. */
+class ScanResult(val photo: CapturedPhoto, val detections: List<ItemDetection>)
+
 class ScanViewModel(
     private val analyzer: PhotoAnalyzer
 ) : ViewModel() {
     private val _state = MutableStateFlow<ScanUiState>(ScanUiState.Success(ScanContent()))
     val state: StateFlow<ScanUiState> = _state.asStateFlow()
-    private val _detections = MutableStateFlow<List<ItemDetection>?>(null)
-    val detections: StateFlow<List<ItemDetection>?> = _detections.asStateFlow()
+    private val _detections = MutableStateFlow<ScanResult?>(null)
+    val detections: StateFlow<ScanResult?> = _detections.asStateFlow()
     private var analysisJob: Job? = null
 
     fun analyze(camera: CameraCaptureController) {
@@ -44,7 +48,7 @@ class ScanViewModel(
                     }
                 } else {
                     updateContent { it.copy(isAnalyzing = false) }
-                    _detections.value = detections
+                    _detections.value = ScanResult(photo, detections)
                 }
             } catch (e: CancellationException) {
                 throw e

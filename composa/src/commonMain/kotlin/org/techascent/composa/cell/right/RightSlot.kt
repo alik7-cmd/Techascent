@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,7 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.sp
+import apphub.composa.generated.resources.Res
+import apphub.composa.generated.resources.ic_navigation_external
+import apphub.composa.generated.resources.ic_navigation_internal
+import org.jetbrains.compose.resources.painterResource
 import org.techascent.composa.checkbox.ComposaCheckbox
 import org.techascent.composa.common.ComposaSpacing
 import org.techascent.composa.common.DrawableData
@@ -48,14 +53,10 @@ sealed interface RightSlot {
         val text: String
     ) : RightSlot
 
-    /**
-     * A navigation indicator text (e.g. "›" for internal, "↗" for external).
-     * Rendered in a muted style at the trailing edge.
-     */
-    data class Chevron(
-        val text: String = "›",
-        val fontSize: Int = 18,
-    ) : RightSlot
+    /** Trailing navigation indicator: a chevron for in-app screens, an open-in-new icon for external links. */
+    data class Navigation(val type: Type = Type.Internal) : RightSlot {
+        enum class Type { Internal, External }
+    }
 
     /**
      * Plain text with a configurable [TextStyle] and [Color].
@@ -93,7 +94,7 @@ internal fun RowScope.RightSlot(rightSlot: RightSlot, modifier: Modifier = Modif
             modifier = modifier
         )
 
-        is RightSlot.Chevron -> CellChevron(
+        is RightSlot.Navigation -> CellNavigation(
             rightSlot = rightSlot,
             modifier = modifier
         )
@@ -189,15 +190,19 @@ internal fun CellEmphasizedText(
 }
 
 @Composable
-internal fun CellChevron(
-    rightSlot: RightSlot.Chevron,
+internal fun CellNavigation(
+    rightSlot: RightSlot.Navigation,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        modifier = modifier,
-        text = rightSlot.text,
-        fontSize = rightSlot.fontSize.sp,
-        color = ComposaTheme.color.textNeutralSubtle,
+    val (icon, size) = when (rightSlot.type) {
+        RightSlot.Navigation.Type.Internal -> Res.drawable.ic_navigation_internal to ComposaSpacing.Large
+        RightSlot.Navigation.Type.External -> Res.drawable.ic_navigation_external to ComposaSpacing.Medium
+    }
+    Icon(
+        painter = painterResource(icon),
+        contentDescription = null,
+        tint = ComposaTheme.color.textNeutralSubtle,
+        modifier = modifier.size(size),
     )
 }
 

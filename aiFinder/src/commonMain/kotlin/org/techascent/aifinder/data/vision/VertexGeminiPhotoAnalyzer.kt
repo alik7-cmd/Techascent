@@ -61,7 +61,7 @@ class VertexGeminiPhotoAnalyzer(
 
         val result = response.body<GenerateContentResponse>()
         val candidate = result.candidates.firstOrNull()
-        val text = candidate?.content?.parts.orEmpty().mapNotNull { it.text }.joinToString("")
+        val text = candidate?.content?.parts.orEmpty().filter { it.thought != true }.mapNotNull { it.text }.joinToString("")
         logDebug(TAG, "Vertex AI raw response (finish=${candidate?.finishReason}): $text")
         if (text.isBlank()) {
             throw IllegalStateException("The AI couldn't analyze this photo. Please try another one.")

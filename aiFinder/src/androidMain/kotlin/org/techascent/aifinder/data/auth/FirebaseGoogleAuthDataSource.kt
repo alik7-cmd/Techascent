@@ -17,6 +17,7 @@ import kotlinx.coroutines.tasks.await
 import org.techascent.aifinder.R
 import org.techascent.aifinder.domain.auth.AuthError
 import org.techascent.aifinder.domain.auth.AuthException
+import org.techascent.aifinder.domain.auth.AuthProvider
 import org.techascent.aifinder.domain.auth.AuthUser
 
 class FirebaseGoogleAuthDataSource(
@@ -74,5 +75,12 @@ class FirebaseGoogleAuthDataSource(
         displayName = displayName,
         email = email,
         photoUrl = photoUrl?.toString(),
+        provider = providerData.firstNotNullOfOrNull {
+            when (it.providerId) {
+                "google.com" -> AuthProvider.Google
+                "apple.com" -> AuthProvider.Apple
+                else -> null
+            }
+        },
     )
 }

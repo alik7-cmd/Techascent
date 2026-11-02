@@ -13,17 +13,44 @@ Photograph a drawer, shelf or storage box. Confirm the objects recognized by AI.
 5. Move, edit, remove and manually add items.
 6. Store an offline inventory and basic usage accounting.
 
-**Current implementation:** camera capture, editable scan review, Android Google/Firebase authentication, and user-scoped Firebase locations with a persistent Room cache. Scan analysis remains mocked, and Home/search inventory remains in memory. iOS authentication and Firebase location access still need native integration.
+**Current implementation:** camera capture, editable scan review, Android Google/Firebase authentication, Gemini (Vertex AI) photo analysis, and user-scoped Firebase locations and items with a persistent Room cache. Home, spaces, search and item details read from that cache. iOS authentication and Firebase location/item access still need native integration.
 
 ## Location cache
 Room Multiplatform stores locations in `aifinder.db` on Android and iOS, using a shared entity/DAO and bundled SQLite driver. Rows are keyed by Firebase user ID and location ID. The repository reads Firebase only when that user's local cache is empty; subsequent reads observe Room. Creating a location writes Firebase first and then upserts Room. Remote failures are surfaced without inserting a local-only location.
 
 Room adopts the existing version-1 SQLite cache without deleting its records. KSP generates the platform database constructors; exported Room schemas live in `aiFinder/schemas`. Commit schema changes alongside future migrations.
 
-This is cache-first, not live cross-device synchronization: changes from other devices are not fetched while the cache contains locations. An empty cache triggers a Firebase read again when observation restarts.
+This is offline-first, not live cross-device synchronization:
+- Locations and items load from Room, with no network call, whenever the cache has data.
+- When the cache is empty, Firebase is read with a 10-second timeout. If that read fails or times out (for example offline), the app shows the empty cache instead of an error and tries Firebase again the next time it observes.
+- Changes from other devices are not fetched while the cache has data.
+
+Home shows a shimmer skeleton of the spaces list until the cache emits.
+
+## Inventory cache
+Scans are analyzed by `VertexGeminiPhotoAnalyzer` using `VERTEX_API_KEY` and `VERTEX_MODEL` from the git-ignored root `local.properties`. Reviewed items are saved to `aifinder/users/{uid}/items/{itemId}` in one atomic Realtime Database update (name, category, tags, locationId, photoId, confidence, createdAt), then upserted into the Room `CachedItem` table. Like locations, items are fetched from Firebase only when the user's item cache is empty. A failed save keeps the review results and shows the error.
+
+`ObserveInventoryUseCase` combines cached locations and items into an `InventorySnapshot`, which provides:
+- Home's top-level spaces, with descendant space and item counts.
+- See all, listing every location ordered by path.
+- Space details, showing items in a location and its nested locations.
+- Search over item name, category, tags and location path. Question words such as "where is my" are ignored.
+
+Room migration 3-to-4 adds `CachedItem`. Sign-out resets the inventory ViewModels; cached rows stay keyed by user ID.
+
+## Photo storage
+
+Each scan photo is uploaded to Firebase Storage at `aifinder/users/{uid}/photos/{photoId}.jpg`. The bucket is set by `FIREBASE_STORAGE_BUCKET` in `local.properties`, e.g. `gs://pmscs-a2eed.firebasestorage.app`. Items are saved only after the upload succeeds.
+
+The photo is also cached on the device for each user: in Android app files and in iOS Application Support. Search, space and item screens read the cache first. They download from Storage only when the local copy is missing, and the result is kept in a small in-memory cache. iOS can show cached photos but can't upload until the Firebase iOS SDK is added.
+
+You need Storage rules that allow `aifinder/users/{uid}/**` when `request.auth.uid == uid`.
 
 ## Startup routing
 Welcome checks the restored Firebase session and a device-local Room welcome flag while showing only the background (no content or spinner). Signed-in users go directly to Home. Signed-out users see welcome content once per app data installation; subsequent launches go directly to Login. The flag is saved before the first welcome content is shown. Continuing replaces Welcome with Login, and Login has no route back to Welcome. Room migration 2-to-3 adds the flag table without changing cached locations.
+
+## Account settings
+The account icon on Home opens `AccountScreen`. It shows the signed-in Firebase user's name, email, initial and sign-in provider (Google or Apple). The Subscription, Household & sharing and Privacy & data cells are placeholders for now. Log out asks for confirmation in a native dialog (Material `AlertDialog` on Android, `UIAlertController` on iOS). It then calls `SignOutUseCase`, clears the location state and returns to Login.
 
 ## Monetization proposal (hypotheses to validate)
 | Plan | Price hypothesis | Proposed limits |
@@ -49,24 +76,25 @@ Follow-on: QR box labels; shared households; cloud sync; moving mode; visual bou
 ```
 commonMain/kotlin/org/techascent/aifinder/
   domain/model/               # immutable models
-  data/                       # InventoryRepository + mock implementation
+  domain/inventory/ location/ # repository interfaces, rules and use cases
+  data/inventory/ location/   # Firebase + Room data sources and repositories
   presentation/
     components/               # small reusable Compose widgets
     theme/                    # feature-specific palette
-    navigation/               # temporary mock route coordinator
-    welcome/ home/ scan/ review/ search/ details/
+    navigation/               # string-based route coordinator
+    welcome/ home/ spaces/ scan/ review/ search/ details/
       <Screen>Screen.kt       # declarative view, LazyListScope
       <Screen>UiState.kt      # Loading/Success/Error
       <Screen>ViewModel.kt    # presentation state/actions only
 ```
 
-ViewModels do not own the inventory rules. Authentication and location operations use injected use cases and repository interfaces. The location repository combines Firebase access with a Room local data source. Inventory/search still use the mock repository. Navigation is currently minimal and has no deep links.
+ViewModels do not own the inventory rules. Authentication and location operations use injected use cases and repository interfaces. The location and inventory repositories combine Firebase access with Room local data sources. Navigation is currently minimal and has no deep links.
 
 `AiFinderApp` provides a shared Compose `KoinApplication` using `di/aiFinderModule`. Welcome is the first injected screen: `WelcomeScreen` resolves its lifecycle-managed `WelcomeViewModel` with `koinViewModel()` and collects its read-only `state` StateFlow with `collectAsState()`. Retry is handled by the injected ViewModel. Other screens still construct their ViewModels in the mock navigation coordinator.
 
 Uses `ComposaButton` from Composa; applies feature-local colors to avoid altering other Composa consumers. UI is shared between Android and iOS; no platform-specific UI dependencies have been introduced.
 
-Home uses a search shortcut, scan prompt and room summary cards. See all scrolls to the full spaces list. Search and Scan use the existing mock routes, and room cards currently open Search. Bottom navigation is currently removed. Scan, Review, Search and Details share a text-style Back button; Welcome and Home have none. Review retains its fixed Save action. Space/box and item counts are illustrative mock summary metadata, not totals derived from the small searchable fixture.
+Home uses a search shortcut, scan prompt and top-level space cards. Space cards open that space's items. See all opens every space. Bottom navigation is currently removed. Scan, Review, Search, Details, Spaces, Space and Account share the same Back button; Welcome and Home have none. Review retains its fixed Save action.
 
 ## UX and privacy
 - Start with one drawer, not an entire home.

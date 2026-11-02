@@ -1,6 +1,12 @@
 package org.techascent.aifinder.presentation.review
 
-data class ReviewContent(val detections: List<org.techascent.aifinder.domain.model.ItemDetection>)
+import org.techascent.aifinder.domain.model.ItemDetection
+
+data class ReviewContent(
+    val detections: List<ItemDetection>,
+    val isSaving: Boolean = false,
+    val saveError: String? = null,
+)
 
 sealed interface ReviewUiState {
     data object Loading : ReviewUiState

@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import apphub.aifinder.generated.resources.Res
-import apphub.aifinder.generated.resources.scan_mock_notice
+import apphub.aifinder.generated.resources.scan_ai_notice
 import apphub.aifinder.generated.resources.location_save_into
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.*
@@ -41,7 +41,12 @@ fun ScanScreen(
         when (state) {
             is ScanUiState.Loading -> items(listOf(0)) { _ -> LoadingContent() }
             is ScanUiState.Error -> items(listOf(0)) { _ -> ErrorContent(state.message, onRetry) }
-            is ScanUiState.Success -> ScanContent(state.data, camera, selectedLocation, onChooseLocation) { onAnalyze(camera) }
+            is ScanUiState.Success -> ScanContent(
+                state.data,
+                camera,
+                selectedLocation,
+                onChooseLocation
+            ) { onAnalyze(camera) }
         }
     }
 }
@@ -61,8 +66,12 @@ private fun androidx.compose.foundation.lazy.LazyListScope.ScanContent(
         )
             ScanCameraCard(camera, isAnalyzing = data.isAnalyzing)
             data.errorMessage?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            InfoCard(stringResource(Res.string.location_save_into), selectedLocation, onClick = onChooseLocation)
-            Text(stringResource(Res.string.scan_mock_notice), color = AiFinderPalette.Muted)
+            InfoCard(
+                stringResource(Res.string.location_save_into),
+                selectedLocation,
+                onClick = onChooseLocation
+            )
+            Text(stringResource(Res.string.scan_ai_notice), color = AiFinderPalette.Muted)
             PrimaryAction(
                 label = if (data.isAnalyzing) "Analyzing…" else "Analyze photo",
                 onClick = { if (!data.isAnalyzing) onAnalyze() },

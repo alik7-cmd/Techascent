@@ -1,15 +1,33 @@
 package org.techascent.aifinder.presentation.search
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import org.techascent.aifinder.data.*
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import org.techascent.aifinder.domain.inventory.usecase.ObserveInventoryUseCase
+import org.techascent.aifinder.presentation.inventory.InventoryBackedViewModel
+import org.techascent.aifinder.presentation.inventory.InventoryLoad
 
-class SearchViewModel(private val repository: InventoryRepository = MockInventoryRepository()) : ViewModel() {
-    var state: SearchUiState by mutableStateOf(SearchUiState.Success(SearchContent("", repository.items())))
-        private set
-    fun retry() { state = SearchUiState.Success(SearchContent("", repository.items())) }
+class SearchViewModel(observeInventory: ObserveInventoryUseCase) : InventoryBackedViewModel(observeInventory) {
+    private val query = MutableStateFlow("")
 
-    fun updateQuery(query: String) { state = SearchUiState.Success(SearchContent(query, repository.search(query))) }
+    val state = combine(inventory, query) { load, query ->
+        when (load) {
+            InventoryLoad.Loading -> SearchUiState.Loading
+            is InventoryLoad.Failed -> SearchUiState.Error(load.message)
+            is InventoryLoad.Ready -> SearchUiState.Success(
+                SearchContent(query, load.snapshot.search(query), hasItems = load.snapshot.items.isNotEmpty())
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, SearchUiState.Loading)
+
+    fun updateQuery(value: String) { query.value = value }
+
+    fun clearQuery() { query.value = "" }
+
+    override fun reset() {
+        super.reset()
+        clearQuery()
+    }
 }

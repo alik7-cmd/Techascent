@@ -41,6 +41,13 @@ class LocationViewModel(
         }
     }
 
+    /** Drops the previous user's locations after sign-out. */
+    fun reset() {
+        observeJob?.cancel()
+        observeJob = null
+        _state.value = LocationUiState()
+    }
+
     fun retry() {
         observeJob?.cancel()
         start()

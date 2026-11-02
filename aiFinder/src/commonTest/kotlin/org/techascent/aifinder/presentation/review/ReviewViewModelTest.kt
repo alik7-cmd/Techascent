@@ -4,6 +4,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlinx.coroutines.flow.emptyFlow
+import org.techascent.aifinder.domain.inventory.InventoryRepository
+import org.techascent.aifinder.domain.inventory.usecase.SaveDetectionsUseCase
 import org.techascent.aifinder.domain.model.InventoryItem
 import org.techascent.aifinder.domain.model.ItemDetection
 
@@ -18,7 +21,7 @@ class ReviewViewModelTest {
 
     @Test
     fun renameTrimsNameAndPreservesDetectionMetadataAndIdentity() {
-        val viewModel = ReviewViewModel()
+        val viewModel = newViewModel()
         viewModel.show(listOf(first, second))
         viewModel.rename(first.item.id, "  Running medal  ")
         assertEquals(
@@ -31,7 +34,7 @@ class ReviewViewModelTest {
 
     @Test
     fun blankNamesAreRejectedWithoutChangingResults() {
-        val viewModel = ReviewViewModel()
+        val viewModel = newViewModel()
         viewModel.show(listOf(first))
         assertFailsWith<IllegalArgumentException> { viewModel.rename(first.item.id, "  ") }
         assertEquals(listOf(first), viewModel.items())
@@ -39,7 +42,7 @@ class ReviewViewModelTest {
 
     @Test
     fun deleteRemovesOnlySelectedItemAndRetryDoesNotRestoreIt() {
-        val viewModel = ReviewViewModel()
+        val viewModel = newViewModel()
         viewModel.show(listOf(first, second))
         viewModel.delete(first.item.id)
         viewModel.retry()
@@ -50,13 +53,22 @@ class ReviewViewModelTest {
 
     @Test
     fun newScanReplacesPreviouslyEditedResults() {
-        val viewModel = ReviewViewModel()
+        val viewModel = newViewModel()
         viewModel.show(listOf(first))
         viewModel.rename(first.item.id, "My medal")
         viewModel.delete(first.item.id)
         viewModel.show(listOf(second))
         assertEquals(listOf(second), viewModel.items())
     }
+
+    private fun newViewModel() = ReviewViewModel(SaveDetectionsUseCase(object : InventoryRepository {
+        override fun observeItems() = emptyFlow<List<org.techascent.aifinder.domain.inventory.StoredItem>>()
+        override suspend fun saveDetections(locationId: String, detections: List<ItemDetection>) =
+            Result.success(emptyList<org.techascent.aifinder.domain.inventory.StoredItem>())
+    }, object : org.techascent.aifinder.domain.photo.ItemPhotoRepository {
+        override suspend fun save(photoId: String, jpegBytes: ByteArray) = Result.success(Unit)
+        override suspend fun load(photoId: String): ByteArray? = null
+    }))
 
     private fun ReviewViewModel.items() = (state as ReviewUiState.Success).data.detections
 }

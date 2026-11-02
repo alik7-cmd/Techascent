@@ -23,6 +23,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.domain.auth.AuthProvider
 import org.techascent.aifinder.presentation.components.SectionTitle
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
+import org.techascent.aifinder.util.Platform
 
 @Composable
 fun LoginScreen(
@@ -83,17 +84,19 @@ private fun LoginContent(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(36.dp))
-            ProviderButton(
-                label = stringResource(Res.string.login_continue_apple),
-                icon = painterResource(Res.drawable.ic_apple),
-                containerColor = Color.Black,
-                contentColor = Color.White,
-                border = null,
-                isLoading = state.loadingProvider == AuthProvider.Apple,
-                enabled = !state.isLoading,
-                onClick = { onSignIn(AuthProvider.Apple) }
-            )
-            Spacer(Modifier.height(16.dp))
+            if(state.platform == Platform.IOS){
+                ProviderButton(
+                    label = stringResource(Res.string.login_continue_apple),
+                    icon = painterResource(Res.drawable.ic_apple),
+                    containerColor = Color.Black,
+                    contentColor = Color.White,
+                    border = null,
+                    isLoading = state.loadingProvider == AuthProvider.Apple,
+                    enabled = !state.isLoading,
+                    onClick = { onSignIn(AuthProvider.Apple) }
+                )
+                Spacer(Modifier.height(16.dp))
+            }
             ProviderButton(
                 label = stringResource(Res.string.login_continue_google),
                 icon = painterResource(Res.drawable.ic_google),

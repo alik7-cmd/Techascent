@@ -215,7 +215,7 @@ internal fun SettingsScreenV2(
                             title = stringResource(Res.string.text_language),
                             label = stringResource(selectedLang.stringRes),
                         ),
-                        rightSlot = RightSlot.Chevron(),
+                        rightSlot = RightSlot.Navigation(),
                         backgroundColor = Color.Transparent,
                         onClick = { urlLauncher.openLanguageSettings() },
                     )
@@ -237,7 +237,7 @@ internal fun SettingsScreenV2(
                             title = stringResource(Res.string.text_settings_about_this_app),
                             label = stringResource(Res.string.text_our_mission),
                         ),
-                        rightSlot = RightSlot.Chevron(),
+                        rightSlot = RightSlot.Navigation(),
                         backgroundColor = Color.Transparent,
                         onClick = onNavigateAbout,
                     )
@@ -260,8 +260,9 @@ internal fun SettingsScreenV2(
                                     title = stringResource(item.title),
                                 )
                             },
-                            rightSlot = RightSlot.Chevron(
-                                text = if (isExternal) "↗" else "›",
+                            rightSlot = RightSlot.Navigation(
+                                type = if (isExternal) RightSlot.Navigation.Type.External
+                                else RightSlot.Navigation.Type.Internal,
                             ),
                             backgroundColor = Color.Transparent,
                             onClick = {

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withTimeoutOrNull
 import org.techascent.aifinder.domain.auth.AuthRepository
 import org.techascent.aifinder.domain.location.LocationError
 import org.techascent.aifinder.domain.location.LocationRepository
@@ -15,7 +16,8 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 /**
- * Cache-first: reads always come from [local]. Firebase is only read when the user's cache is empty,
+ * Offline-first: reads always come from [local]. Firebase is only read when the user's cache is empty,
+ * and a failed or slow read (e.g. offline) falls back to the cache instead of failing,
  * and every create writes to Firebase first, then to the cache.
  */
 class LocationRepositoryImpl(
@@ -23,13 +25,12 @@ class LocationRepositoryImpl(
     private val local: LocationLocalDataSource,
     private val auth: AuthRepository,
     private val now: () -> Long = ::currentTimeMillis,
+    private val remoteTimeoutMillis: Long = REMOTE_TIMEOUT_MILLIS,
 ) : LocationRepository {
 
     override fun observeLocations(): Flow<List<StorageLocation>> = flow {
         val userId = auth.currentUser?.id ?: throw LocationError.NotSignedIn
-        if (local.isEmpty(userId)) {
-            local.replaceAll(userId, remote.fetchAll(userId))
-        }
+        if (local.isEmpty(userId)) syncFromRemote(userId)
         emitAll(local.observe(userId).map { nodes -> nodes.map { (id, dto) -> dto.toDomain(id) } })
     }.catch { throw it.asLocationError() }
 
@@ -47,8 +48,21 @@ class LocationRepositoryImpl(
         }
     }
 
+    private suspend fun syncFromRemote(userId: String) {
+        val nodes = try {
+            withTimeoutOrNull(remoteTimeoutMillis) { remote.fetchAll(userId) }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        } ?: return
+        local.replaceAll(userId, nodes)
+    }
+
     private fun Throwable.asLocationError() = this as? LocationError ?: LocationError.Remote(message)
 }
+
+private const val REMOTE_TIMEOUT_MILLIS = 10_000L
 
 @OptIn(ExperimentalTime::class)
 private fun currentTimeMillis(): Long = Clock.System.now().toEpochMilliseconds()

@@ -1,6 +1,8 @@
 package org.techascent.aifinder.presentation.search
 
-data class SearchContent(val query: String, val results: List<org.techascent.aifinder.domain.model.LocatedItem>)
+import org.techascent.aifinder.domain.model.LocatedItem
+
+data class SearchContent(val query: String, val results: List<LocatedItem>, val hasItems: Boolean = results.isNotEmpty())
 
 sealed interface SearchUiState {
     data object Loading : SearchUiState

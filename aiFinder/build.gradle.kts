@@ -22,6 +22,8 @@ val vertexModel = localProperties.getProperty("VERTEX_MODEL")?.takeIf { it.isNot
 // Override with FIREBASE_DATABASE_URL in local.properties to point at another instance.
 val firebaseDatabaseUrl = localProperties.getProperty("FIREBASE_DATABASE_URL")?.trim()?.takeIf { it.isNotEmpty() }
     ?: ""
+// Firebase Storage bucket for scan photos, e.g. gs://<project>.firebasestorage.app.
+val firebaseStorageBucket = localProperties.getProperty("FIREBASE_STORAGE_BUCKET")?.trim().orEmpty()
 val vertexConfigDir = layout.buildDirectory.dir("generated/vertexConfig/commonMain/kotlin")
 
 val generateVertexConfig by tasks.registering {
@@ -87,6 +89,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
         androidUnitTest.dependencies {
             implementation(libs.robolectric)
@@ -100,6 +103,7 @@ kotlin {
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.auth)
             implementation(libs.firebase.database)
+            implementation(libs.firebase.storage)
             implementation(libs.androidx.credentials)
             implementation(libs.androidx.credentials.play.services.auth)
             implementation(libs.googleid)
@@ -141,6 +145,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String", "FIREBASE_DATABASE_URL", "\"$firebaseDatabaseUrl\"")
+        buildConfigField("String", "FIREBASE_STORAGE_BUCKET", "\"$firebaseStorageBucket\"")
     }
 
     buildFeatures {

@@ -16,6 +16,8 @@ import org.robolectric.annotation.Config
 import org.techascent.aifinder.data.cache.AiFinderDatabase
 import org.techascent.aifinder.data.cache.buildAiFinderDatabase
 import org.techascent.aifinder.data.auth.RoomWelcomeRepository
+import org.techascent.aifinder.data.inventory.ItemDto
+import org.techascent.aifinder.data.inventory.RoomItemLocalDataSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -133,6 +135,7 @@ class RoomLocationLocalDataSourceTest {
             val reopened = openDatabase()
             try {
                 assertTrue(RoomWelcomeRepository(reopened.welcomePreferenceDao()).hasSeenWelcome())
+                assertTrue(RoomItemLocalDataSource(reopened.itemDao()).isEmpty("a"))
                 assertEquals(
                     listOf("Garage", "Shelf"),
                     RoomLocationLocalDataSource(reopened.locationDao()).observe("a").first().map { it.second.name },
@@ -143,5 +146,21 @@ class RoomLocationLocalDataSourceTest {
         } finally {
             context.deleteDatabase(name)
         }
+    }
+
+    @Test
+    fun itemsArePerUserNewestFirstAndKeepTags() = runBlocking<Unit> {
+        val items = RoomItemLocalDataSource(database.itemDao())
+        assertTrue(items.isEmpty("a"))
+        val old = ItemDto("Hammer", "Tools", listOf("hammer", "steel, heavy"), "loc", "p1", 0.8f, 10)
+        val new = ItemDto("Cable", "Electronics", emptyList(), "loc", null, null, 20)
+        items.replaceAll("a", listOf("1" to old))
+        items.upsertAll("a", listOf("2" to new))
+        items.upsertAll("b", listOf("x" to new))
+
+        assertEquals(listOf("2" to new, "1" to old), items.observe("a").first())
+        items.replaceAll("a", emptyList())
+        assertTrue(items.isEmpty("a"))
+        assertFalse(items.isEmpty("b"))
     }
 }

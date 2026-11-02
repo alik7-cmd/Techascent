@@ -79,14 +79,21 @@ fun ReviewScreen(
         },
         bottomBar = {
             if (state is ReviewUiState.Success && detections.isNotEmpty()) {
-                Box(
+                Column(
                     Modifier.fillMaxWidth().navigationBarsPadding()
-                        .padding(horizontal = 24.dp, vertical = 24.dp)
+                        .padding(horizontal = 24.dp, vertical = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    state.data.saveError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                     PrimaryAction(
-                        stringResource(Res.string.review_save_items, state.data.detections.size),
+                        if (state.data.isSaving) {
+                            stringResource(Res.string.review_saving)
+                        } else {
+                            stringResource(Res.string.review_save_items, state.data.detections.size)
+                        },
                         onSave,
-                        enabled = selectedLocation.isNotBlank()
+                        enabled = selectedLocation.isNotBlank() && !state.data.isSaving,
+                        isLoading = state.data.isSaving
                     )
                 }
             }
@@ -107,7 +114,7 @@ fun ReviewScreen(
                 item(key = "summary") {
                     InfoCard(
                         title = stringResource(Res.string.review_items_found, state.data.detections.size),
-                        subtitle = stringResource(Res.string.review_mock_notice),
+                        subtitle = stringResource(Res.string.review_check_items),
                         containerColor = AiFinderPalette.Mint,
                         titleColor = AiFinderPalette.Teal,
                         titleFontSize = 18.sp,
