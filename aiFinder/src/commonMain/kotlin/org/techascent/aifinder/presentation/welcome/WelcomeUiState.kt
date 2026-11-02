@@ -7,12 +7,14 @@ import apphub.aifinder.generated.resources.welcome_description
 import apphub.aifinder.generated.resources.welcome_title
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
+import org.techascent.aifinder.domain.auth.WelcomeDestination
 
 
 sealed interface WelcomeUiState {
     data object Loading : WelcomeUiState
     data class Success(val data: WelcomeContent) : WelcomeUiState
     data class Error(val message: String) : WelcomeUiState
+    data class Navigate(val destination: WelcomeDestination) : WelcomeUiState
 }
 
 data class WelcomeContent(

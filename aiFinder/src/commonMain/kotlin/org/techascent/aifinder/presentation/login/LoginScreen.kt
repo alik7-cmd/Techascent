@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ChevronLeft
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,7 +27,6 @@ import org.techascent.aifinder.presentation.theme.AiFinderPalette
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    onBack: () -> Unit,
     onSignedIn: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
@@ -39,13 +36,12 @@ fun LoginScreen(
             onSignedIn()
         }
     }
-    LoginContent(state, onBack = onBack, onSignIn = viewModel::onSignIn)
+    LoginContent(state, onSignIn = viewModel::onSignIn)
 }
 
 @Composable
 private fun LoginContent(
     state: LoginUiState,
-    onBack: () -> Unit,
     onSignIn: (AuthProvider) -> Unit,
 ) {
     Scaffold(containerColor = AiFinderPalette.Background) { padding ->

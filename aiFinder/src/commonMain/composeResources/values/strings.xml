@@ -82,7 +82,7 @@
 
     <string name="login_title">Welcome home</string>
     <string name="login_subtitle">Your home inventory, securely synced.</string>
-    <string name="login_choose">Choose how you\'d like to continue</string>
+    <string name="login_choose">Choose how you'd like to continue</string>
     <string name="login_continue_apple">Continue with Apple</string>
     <string name="login_continue_google">Continue with Google</string>
     <string name="login_terms">By continuing, you agree to our Terms of Service and Privacy Policy.</string>

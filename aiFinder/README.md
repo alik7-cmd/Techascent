@@ -13,7 +13,17 @@ Photograph a drawer, shelf or storage box. Confirm the objects recognized by AI.
 5. Move, edit, remove and manually add items.
 6. Store an offline inventory and basic usage accounting.
 
-**Current implementation is a UI-only mock.** No camera, image processing, local database, authentication, payments, cloud sync, API integration or real item mutations exist yet. Scan and review use mock objects. Search is a keyword-based demo, not semantic search. Screens provide `Loading`, `Success` and `Error` UI states, but the mock repository returns synchronously and currently starts in Success.
+**Current implementation:** camera capture, editable scan review, Android Google/Firebase authentication, and user-scoped Firebase locations with a persistent Room cache. Scan analysis remains mocked, and Home/search inventory remains in memory. iOS authentication and Firebase location access still need native integration.
+
+## Location cache
+Room Multiplatform stores locations in `aifinder.db` on Android and iOS, using a shared entity/DAO and bundled SQLite driver. Rows are keyed by Firebase user ID and location ID. The repository reads Firebase only when that user's local cache is empty; subsequent reads observe Room. Creating a location writes Firebase first and then upserts Room. Remote failures are surfaced without inserting a local-only location.
+
+Room adopts the existing version-1 SQLite cache without deleting its records. KSP generates the platform database constructors; exported Room schemas live in `aiFinder/schemas`. Commit schema changes alongside future migrations.
+
+This is cache-first, not live cross-device synchronization: changes from other devices are not fetched while the cache contains locations. An empty cache triggers a Firebase read again when observation restarts.
+
+## Startup routing
+Welcome checks the restored Firebase session and a device-local Room welcome flag while showing only the background (no content or spinner). Signed-in users go directly to Home. Signed-out users see welcome content once per app data installation; subsequent launches go directly to Login. The flag is saved before the first welcome content is shown. Continuing replaces Welcome with Login, and Login has no route back to Welcome. Room migration 2-to-3 adds the flag table without changing cached locations.
 
 ## Monetization proposal (hypotheses to validate)
 | Plan | Price hypothesis | Proposed limits |
@@ -50,7 +60,7 @@ commonMain/kotlin/org/techascent/aifinder/
       <Screen>ViewModel.kt    # presentation state/actions only
 ```
 
-ViewModels do not own the inventory rules. A future use-case layer can be injected into ViewModels and the mock repository replaced with SQLDelight/Room, photo analysis and a sync implementation. Navigation is currently minimal and has no back stack or deep links; replace it when adopting the app's production navigation solution.
+ViewModels do not own the inventory rules. Authentication and location operations use injected use cases and repository interfaces. The location repository combines Firebase access with a Room local data source. Inventory/search still use the mock repository. Navigation is currently minimal and has no deep links.
 
 `AiFinderApp` provides a shared Compose `KoinApplication` using `di/aiFinderModule`. Welcome is the first injected screen: `WelcomeScreen` resolves its lifecycle-managed `WelcomeViewModel` with `koinViewModel()` and collects its read-only `state` StateFlow with `collectAsState()`. Retry is handled by the injected ViewModel. Other screens still construct their ViewModels in the mock navigation coordinator.
 

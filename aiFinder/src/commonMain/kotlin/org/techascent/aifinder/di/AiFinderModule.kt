@@ -14,12 +14,18 @@ import org.techascent.aifinder.presentation.search.SearchViewModel
 import org.techascent.aifinder.presentation.welcome.WelcomeViewModel
 import org.techascent.aifinder.presentation.location.LocationViewModel
 import org.techascent.aifinder.data.auth.AuthRepositoryImpl
+import org.techascent.aifinder.data.auth.RoomWelcomeRepository
+import org.techascent.aifinder.domain.auth.WelcomeRepository
+import org.techascent.aifinder.domain.auth.ResolveWelcomeDestinationUseCase
 import org.techascent.aifinder.domain.auth.AuthRepository
 import org.techascent.aifinder.domain.auth.usecase.GetCurrentUserUseCase
 import org.techascent.aifinder.domain.auth.usecase.SignInUseCase
 import org.techascent.aifinder.domain.auth.usecase.SignOutUseCase
 import org.techascent.aifinder.presentation.login.LoginViewModel
 import org.techascent.aifinder.data.location.LocationRepositoryImpl
+import org.techascent.aifinder.data.location.LocationLocalDataSource
+import org.techascent.aifinder.data.location.RoomLocationLocalDataSource
+import org.techascent.aifinder.data.cache.AiFinderDatabase
 import org.techascent.aifinder.domain.location.LocationRepository
 import org.techascent.aifinder.domain.location.usecase.CreateLocationUseCase
 import org.techascent.aifinder.domain.location.usecase.ObserveLocationsUseCase
@@ -32,10 +38,13 @@ val aiFinderModule = module {
     factory { SignInUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
     factory { SignOutUseCase(get()) }
-    single<LocationRepository> { LocationRepositoryImpl(remote = get(), auth = get()) }
+    single<LocationLocalDataSource> { RoomLocationLocalDataSource(get<AiFinderDatabase>().locationDao()) }
+    single<LocationRepository> { LocationRepositoryImpl(remote = get(), local = get(), auth = get()) }
     factory { ObserveLocationsUseCase(get()) }
     factory { CreateLocationUseCase(get()) }
-    viewModel { WelcomeViewModel() }
+    single<WelcomeRepository> { RoomWelcomeRepository(get<AiFinderDatabase>().welcomePreferenceDao()) }
+    factory { ResolveWelcomeDestinationUseCase(auth = get(), welcome = get()) }
+    viewModel { WelcomeViewModel(resolveDestination = get()) }
     viewModel { LoginViewModel(signIn = get(), getCurrentUser = get()) }
     viewModel { HomeViewModel(repository = get()) }
     viewModel { ScanViewModel(analyzer = get()) }

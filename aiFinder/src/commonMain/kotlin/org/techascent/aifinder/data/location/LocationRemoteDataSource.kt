@@ -1,10 +1,8 @@
 package org.techascent.aifinder.data.location
 
-import kotlinx.coroutines.flow.Flow
-
 interface LocationRemoteDataSource {
-    /** Emits `(id, dto)` pairs for every location the user owns. */
-    fun observe(userId: String): Flow<List<Pair<String, LocationDto>>>
+    /** One-shot read of every `(id, dto)` the user owns. */
+    suspend fun fetchAll(userId: String): List<Pair<String, LocationDto>>
 
     /** Writes the location and returns its generated id. */
     suspend fun create(userId: String, location: LocationDto): String

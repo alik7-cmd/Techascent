@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,24 +25,28 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.aifinder.presentation.components.*
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
+import org.techascent.aifinder.domain.auth.WelcomeDestination
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 fun WelcomeScreen(
     viewModel: WelcomeViewModel = koinViewModel<WelcomeViewModel>(),
+    onNavigate: (WelcomeDestination) -> Unit,
     onContinue: () -> Unit
 ) {
     val uiState by viewModel.state.collectAsState()
+    LaunchedEffect(uiState) {
+        (uiState as? WelcomeUiState.Navigate)?.let { onNavigate(it.destination) }
+    }
     Scaffold(containerColor = AiFinderPalette.Background) { padding ->
         BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
             when (val state = uiState) {
-                is WelcomeUiState.Loading -> Box(
-                    Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { LoadingContent() }
+                WelcomeUiState.Loading, is WelcomeUiState.Navigate -> Unit
+
                 is WelcomeUiState.Error -> Box(Modifier.padding(28.dp)) {
                     ErrorContent(state.message, viewModel::retry)
                 }
+
                 is WelcomeUiState.Success -> {
                     val content = state.data
                     val viewportHeight = maxHeight

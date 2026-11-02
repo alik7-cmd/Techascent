@@ -12,6 +12,7 @@ import org.techascent.aifinder.presentation.search.*
 import org.techascent.aifinder.presentation.details.*
 import org.techascent.aifinder.presentation.location.*
 import org.techascent.aifinder.presentation.login.*
+import org.techascent.aifinder.domain.auth.WelcomeDestination
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -49,7 +50,6 @@ fun AiFinderNavigation() {
     }
     val onBack: () -> Unit = {
         when (destination) {
-            "login" -> destination = "welcome"
             "scan" -> {
                 scan.cancelAnalysis()
                 destination = "home"
@@ -60,17 +60,23 @@ fun AiFinderNavigation() {
         }
     }
     SystemBackHandler(
-        enabled = destination != "welcome" && destination != "home",
+        enabled = destination in listOf("scan", "review", "search", "details"),
         onBack = onBack
     )
     when (destination) {
         "welcome" -> WelcomeScreen(
-            onContinue = { destination = if (login.isSignedIn) "home" else "login" }
+            onContinue = { destination = "login" },
+            onNavigate = { target ->
+                destination = when (target) {
+                    WelcomeDestination.Home -> "home"
+                    WelcomeDestination.Login -> "login"
+                    WelcomeDestination.Welcome -> "welcome"
+                }
+            }
         )
 
         "login" -> LoginScreen(
             viewModel = login,
-            onBack = onBack,
             onSignedIn = { destination = "home" }
         )
 
