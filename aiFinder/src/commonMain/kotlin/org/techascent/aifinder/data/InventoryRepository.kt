@@ -8,12 +8,11 @@ interface InventoryRepository {
     fun items(): List<LocatedItem>
     fun search(query: String): List<LocatedItem>
     fun detections(): List<ItemDetection>
-    fun locations(): List<StorageLocation>
-    fun locationPath(id: String): String
-    fun createLocation(request: CreateLocationRequest): StorageLocation
-    fun saveDetections(locationId: String, detections: List<ItemDetection>)
+    /** [location] comes from [org.techascent.aifinder.domain.location.LocationRepository]. */
+    fun saveDetections(location: StorageLocation, path: String, detections: List<ItemDetection>)
 }
 
+// Home spaces and items are still sample data; locations for saving come from Realtime Database.
 class MockInventoryRepository : InventoryRepository {
     private val locations = mutableListOf(
         StorageLocation("home", "Home", LocationType.HOME),
@@ -49,42 +48,11 @@ class MockInventoryRepository : InventoryRepository {
     }
     override fun detections() = inventory.mapIndexed { index, record -> ItemDetection("mock-photo", record.item, (0.94f - index * 0.03f)) }
 
-    override fun locations(): List<StorageLocation> = locations.toList()
-
-    override fun locationPath(id: String): String {
-        val segments = mutableListOf<String>()
-        var current = locations.firstOrNull { it.id == id } ?: error("Location not found.")
-        while (true) {
-            segments.add(0, current.name)
-            current = current.parentId?.let { parentId -> locations.first { it.id == parentId } } ?: break
-        }
-        return segments.joinToString(" › ")
-    }
-
-    override fun createLocation(request: CreateLocationRequest): StorageLocation {
-        val name = request.name.trim()
-        require(name.isNotEmpty()) { "Enter a location name." }
-        require(request.type in listOf(LocationType.AREA, LocationType.ROOM, LocationType.CONTAINER)) {
-            "Choose Area, Room or Container."
-        }
-        require(request.parentId == null || locations.any { it.id == request.parentId }) { "Parent location not found." }
-        require(locations.none { it.parentId == request.parentId && it.name.equals(name, ignoreCase = true) }) {
-            "A location with this name already exists here."
-        }
-        return StorageLocation(
-            id = "location-${locations.size}",
-            name = name,
-            type = request.type,
-            parentId = request.parentId
-        ).also { locations.add(it) }
-    }
-
-    override fun saveDetections(locationId: String, detections: List<ItemDetection>) {
-        val location = locations.firstOrNull { it.id == locationId } ?: error("Choose a valid location.")
+    override fun saveDetections(location: StorageLocation, path: String, detections: List<ItemDetection>) {
         require(detections.isNotEmpty()) { "There are no items to save." }
         detections.forEach { detection ->
             inventory.removeAll { it.item.id == detection.item.id }
-            inventory.add(LocatedItem(detection.item, location, locationPath(locationId)))
+            inventory.add(LocatedItem(detection.item, location, path))
         }
     }
 }

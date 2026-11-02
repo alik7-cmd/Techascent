@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import org.techascent.aifinder.domain.model.ItemDetection
+import org.techascent.aifinder.domain.model.StorageLocation
 import org.techascent.aifinder.data.InventoryRepository
 import org.techascent.aifinder.data.MockInventoryRepository
 
@@ -37,8 +38,8 @@ class ReviewViewModel(private val repository: InventoryRepository = MockInventor
         state = ReviewUiState.Success(ReviewContent(detections))
     }
 
-    fun save(locationId: String) {
-        repository.saveDetections(locationId, detections)
+    fun save(location: StorageLocation, path: String) {
+        repository.saveDetections(location, path, detections)
     }
 
     fun retry() { state = ReviewUiState.Success(ReviewContent(detections)) }

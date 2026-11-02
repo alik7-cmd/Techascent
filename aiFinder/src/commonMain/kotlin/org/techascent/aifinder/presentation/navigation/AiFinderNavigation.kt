@@ -11,6 +11,7 @@ import org.techascent.aifinder.presentation.review.*
 import org.techascent.aifinder.presentation.search.*
 import org.techascent.aifinder.presentation.details.*
 import org.techascent.aifinder.presentation.location.*
+import org.techascent.aifinder.presentation.login.*
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -22,7 +23,9 @@ fun AiFinderNavigation() {
     val search = koinViewModel<SearchViewModel>()
     val details = koinViewModel<DetailsViewModel>()
     val locations = koinViewModel<LocationViewModel>()
+    val locationState by locations.state.collectAsState()
     val home = koinViewModel<HomeViewModel>()
+    val login = koinViewModel<LoginViewModel>()
     var choosingLocation by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(destination) {
         if (destination == "home") home.retry()
@@ -46,6 +49,7 @@ fun AiFinderNavigation() {
     }
     val onBack: () -> Unit = {
         when (destination) {
+            "login" -> destination = "welcome"
             "scan" -> {
                 scan.cancelAnalysis()
                 destination = "home"
@@ -61,7 +65,13 @@ fun AiFinderNavigation() {
     )
     when (destination) {
         "welcome" -> WelcomeScreen(
-            onContinue = { destination = "home" }
+            onContinue = { destination = if (login.isSignedIn) "home" else "login" }
+        )
+
+        "login" -> LoginScreen(
+            viewModel = login,
+            onBack = onBack,
+            onSignedIn = { destination = "home" }
         )
 
         "home" -> HomeScreen(
@@ -75,14 +85,15 @@ fun AiFinderNavigation() {
             onAnalyze = scan::analyze,
             onBack = onBack,
             onRetry = scan::retry,
-            selectedLocation = locations.selectedPath,
+            selectedLocation = locationState.selectedPath,
             onChooseLocation = { choosingLocation = true }
         )
 
         "review" -> ReviewScreen(
             review.state,
             onSave = {
-                review.save(requireNotNull(locations.selectedId) { "Choose a location before saving." })
+                val location = requireNotNull(locationState.selectedLocation) { "Choose a location before saving." }
+                review.save(location, locationState.selectedPath)
                 search.retry()
                 destination = "home"
             },
@@ -90,7 +101,7 @@ fun AiFinderNavigation() {
             onDelete = review::delete,
             onBack = onBack,
             onRetry = review::retry,
-            selectedLocation = locations.selectedPath,
+            selectedLocation = locationState.selectedPath,
             onChooseLocation = { choosingLocation = true }
         )
 

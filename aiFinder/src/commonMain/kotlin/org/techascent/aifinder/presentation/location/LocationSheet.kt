@@ -26,19 +26,22 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.domain.model.CreateLocationRequest
 import org.techascent.aifinder.domain.model.LocationType
 import org.techascent.aifinder.presentation.components.InfoCard
+import org.techascent.aifinder.presentation.components.LoadingContent
 import org.techascent.aifinder.presentation.components.PrimaryAction
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationSheet(viewModel: LocationViewModel, itemCount: Int?, onDismiss: () -> Unit) {
+    val state by viewModel.state.collectAsState()
+    LaunchedEffect(Unit) { viewModel.start() }
     var creating by rememberSaveable { mutableStateOf(false) }
     var name by rememberSaveable { mutableStateOf("") }
     var type by rememberSaveable { mutableStateOf(LocationType.ROOM) }
-    var parentId by rememberSaveable { mutableStateOf(viewModel.selectedId) }
+    var parentId by rememberSaveable { mutableStateOf(state.selectedId) }
     var parentExpanded by remember { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
-    var pendingId by rememberSaveable { mutableStateOf(viewModel.selectedId) }
+    var pendingId by rememberSaveable { mutableStateOf(state.selectedId) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -118,7 +121,7 @@ fun LocationSheet(viewModel: LocationViewModel, itemCount: Int?, onDismiss: () -
                 FieldLabel(stringResource(Res.string.location_inside))
                 Box {
                     InfoCard(
-                        title = parentId?.let(viewModel::path) ?: stringResource(Res.string.location_no_parent),
+                        title = parentId?.let(state::path) ?: stringResource(Res.string.location_no_parent),
                         subtitle = stringResource(Res.string.location_parent_hint),
                         containerColor = AiFinderPalette.Background,
                         onClick = { parentExpanded = true },
@@ -135,16 +138,16 @@ fun LocationSheet(viewModel: LocationViewModel, itemCount: Int?, onDismiss: () -
                             text = { Text(stringResource(Res.string.location_no_parent), color = AiFinderPalette.Ink) },
                             onClick = { parentId = null; parentExpanded = false; viewModel.clearError() }
                         )
-                        viewModel.locations.forEach { location ->
+                        state.locations.forEach { location ->
                             DropdownMenuItem(
-                                text = { Text(viewModel.path(location.id), color = AiFinderPalette.Ink) },
+                                text = { Text(state.path(location.id), color = AiFinderPalette.Ink) },
                                 onClick = { parentId = location.id; parentExpanded = false; viewModel.clearError() }
                             )
                         }
                     }
                 }
                 val preview = listOfNotNull(
-                    parentId?.let(viewModel::path),
+                    parentId?.let(state::path),
                     name.trim().takeIf { it.isNotEmpty() } ?: stringResource(Res.string.location_new_name)
                 ).joinToString(" › ")
                 Text(
@@ -154,13 +157,12 @@ fun LocationSheet(viewModel: LocationViewModel, itemCount: Int?, onDismiss: () -
                     modifier = Modifier.fillMaxWidth()
                         .background(AiFinderPalette.Mint, RoundedCornerShape(16.dp)).padding(16.dp)
                 )
-                viewModel.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                state.createError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 PrimaryAction(
                     stringResource(Res.string.location_create_action),
-                    onClick = {
-                        if (viewModel.create(CreateLocationRequest(name, type, parentId))) onDismiss()
-                    },
-                    enabled = name.isNotBlank()
+                    onClick = { viewModel.create(CreateLocationRequest(name, type, parentId), onCreated = onDismiss) },
+                    isLoading = state.isCreating,
+                    enabled = name.isNotBlank() && !state.isCreating
                 )
                 TextButton(onClick = { creating = false; viewModel.clearError() }) {
                     Text(stringResource(Res.string.back), color = AiFinderPalette.Teal)
@@ -186,11 +188,22 @@ fun LocationSheet(viewModel: LocationViewModel, itemCount: Int?, onDismiss: () -
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldLabel(stringResource(Res.string.location_your_locations))
-                val matches = viewModel.locations.filter {
+                val matches = state.locations.filter {
                     it.type != LocationType.HOME &&
-                        viewModel.path(it.id).contains(query.trim(), ignoreCase = true)
+                        state.path(it.id).contains(query.trim(), ignoreCase = true)
                 }
                 Column(Modifier.fillMaxWidth().selectableGroup()) {
+                    if (state.isLoading) {
+                        Box(Modifier.fillMaxWidth().padding(vertical = 24.dp), contentAlignment = Alignment.Center) {
+                            LoadingContent()
+                        }
+                    }
+                    state.loadError?.let { message ->
+                        Text(message, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(vertical = 8.dp))
+                        TextButton(onClick = viewModel::retry) {
+                            Text(stringResource(Res.string.location_retry), color = AiFinderPalette.Teal, fontWeight = FontWeight.Bold)
+                        }
+                    }
                     matches.forEach { location ->
                         val selected = pendingId == location.id
                         Row(
@@ -214,13 +227,15 @@ fun LocationSheet(viewModel: LocationViewModel, itemCount: Int?, onDismiss: () -
                             )
                             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Text(location.name, color = AiFinderPalette.Ink, fontWeight = FontWeight.Bold)
-                                Text(viewModel.path(location.id).removePrefix("Home › "), color = AiFinderPalette.Muted, fontSize = 13.sp)
+                                Text(state.path(location.id).removePrefix("Home › "), color = AiFinderPalette.Muted, fontSize = 13.sp)
                             }
                         }
                     }
-                    if (matches.isEmpty()) {
+                    if (matches.isEmpty() && !state.isLoading && state.loadError == null) {
                         Text(
-                            stringResource(Res.string.location_no_matches),
+                            stringResource(
+                                if (state.locations.isEmpty()) Res.string.location_empty else Res.string.location_no_matches
+                            ),
                             color = AiFinderPalette.Muted,
                             modifier = Modifier.padding(vertical = 16.dp)
                         )

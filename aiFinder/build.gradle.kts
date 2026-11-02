@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.googleServices)
 }
 
 // Vertex AI settings come from the git-ignored local.properties so the key is never committed.
@@ -16,6 +17,9 @@ val localProperties = Properties().apply {
 }
 val vertexApiKey = localProperties.getProperty("VERTEX_API_KEY").orEmpty()
 val vertexModel = localProperties.getProperty("VERTEX_MODEL")?.takeIf { it.isNotBlank() } ?: "gemini-2.5-flash"
+// Override with FIREBASE_DATABASE_URL in local.properties to point at another instance.
+val firebaseDatabaseUrl = localProperties.getProperty("FIREBASE_DATABASE_URL")?.trim()?.takeIf { it.isNotEmpty() }
+    ?: ""
 val vertexConfigDir = layout.buildDirectory.dir("generated/vertexConfig/commonMain/kotlin")
 
 val generateVertexConfig by tasks.registering {
@@ -85,6 +89,13 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.bundles.camera)
             implementation(libs.ktor.client.okhttp)
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.auth)
+            implementation(libs.firebase.database)
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play.services.auth)
+            implementation(libs.googleid)
+            implementation(libs.kotlinx.coroutines.play.services)
         }
 
         iosMain.dependencies {
@@ -110,6 +121,11 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "FIREBASE_DATABASE_URL", "\"$firebaseDatabaseUrl\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     compileOptions {
