@@ -43,6 +43,7 @@ fun AccountScreen(
     viewModel: AccountViewModel,
     onBack: () -> Unit,
     onSignedOut: () -> Unit,
+    onSubscription: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
@@ -73,7 +74,7 @@ fun AccountScreen(
         item(key = "profile") { ProfileCard(success.profile) }
         item(key = "preferences") {
             SettingsSection(stringResource(Res.string.account_section_preferences)) {
-                SettingsCell(Icons.Outlined.AutoAwesome, stringResource(Res.string.account_subscription), onClick = {})
+                SettingsCell(Icons.Outlined.AutoAwesome, stringResource(Res.string.account_subscription), onClick = onSubscription)
                 CellDivider()
                 SettingsCell(Icons.Outlined.Home, stringResource(Res.string.account_household), onClick = {})
                 CellDivider()

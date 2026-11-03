@@ -15,6 +15,25 @@ import org.techascent.aifinder.presentation.login.*
 import org.techascent.aifinder.presentation.account.*
 import org.techascent.aifinder.presentation.spaces.*
 import org.techascent.aifinder.domain.auth.WelcomeDestination
+import org.techascent.aifinder.presentation.subscription.SubscriptionSheet
+import org.techascent.aifinder.presentation.subscription.SubscriptionViewModel
+import org.techascent.aifinder.presentation.subscription.SubscriptionUiState
+import androidx.compose.ui.window.Dialog
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import apphub.aifinder.generated.resources.Res
+import apphub.aifinder.generated.resources.subscription_checking
+import org.jetbrains.compose.resources.stringResource
+import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -35,7 +54,34 @@ fun AiFinderNavigation() {
     val home = koinViewModel<HomeViewModel>()
     val login = koinViewModel<LoginViewModel>()
     val account = koinViewModel<AccountViewModel>()
+    val subscription = koinViewModel<SubscriptionViewModel>()
+    val subscriptionState by subscription.state.collectAsState()
     var choosingLocation by rememberSaveable { mutableStateOf(false) }
+    var showingSubscription by rememberSaveable { mutableStateOf(false) }
+    var pendingScan by rememberSaveable { mutableStateOf(false) }
+    val requestScan: () -> Unit = {
+        pendingScan = true
+        subscription.refresh(onAllowed = {
+            showingSubscription = false
+            pendingScan = false
+            destination = "scan"
+        })
+    }
+    LaunchedEffect(Unit) {
+        if (pendingScan || showingSubscription) {
+            subscription.refresh(onAllowed = if (pendingScan) ({
+                showingSubscription = false
+                pendingScan = false
+                destination = "scan"
+            }) else null)
+        }
+    }
+    LaunchedEffect(subscriptionState, pendingScan) {
+        if (pendingScan && (subscriptionState is SubscriptionUiState.Error ||
+                (subscriptionState as? SubscriptionUiState.Ready)?.access?.canScan == false)) {
+            showingSubscription = true
+        }
+    }
     // Where back goes from screens reachable from more than one place.
     var spaceBack by rememberSaveable { mutableStateOf("home") }
     var detailsBack by rememberSaveable { mutableStateOf("search") }
@@ -89,7 +135,7 @@ fun AiFinderNavigation() {
         }
     }
     SystemBackHandler(
-        enabled = destination in listOf("scan", "review", "search", "details", "account", "spaces", "space"),
+        enabled = !showingSubscription && !pendingScan && destination in listOf("scan", "review", "search", "details", "account", "spaces", "space"),
         onBack = onBack
     )
     when (destination) {
@@ -115,7 +161,7 @@ fun AiFinderNavigation() {
                 search.clearQuery()
                 destination = "search"
             },
-            onScan = { destination = "scan" },
+            onScan = requestScan,
             onAccount = { destination = "account" },
             onSpace = { id -> openSpace(id, "home") },
             onSeeAll = { destination = "spaces" },
@@ -124,7 +170,7 @@ fun AiFinderNavigation() {
         "spaces" -> SpacesScreen(
             allSpacesState,
             onSpace = { id -> openSpace(id, "spaces") },
-            onScan = { destination = "scan" },
+            onScan = requestScan,
             onBack = onBack,
             onRetry = spaces::retry
         )
@@ -132,7 +178,7 @@ fun AiFinderNavigation() {
         "space" -> SpaceScreen(
             spaceState,
             onItem = { id -> openDetails(id, "space") },
-            onScan = { destination = "scan" },
+            onScan = requestScan,
             onBack = onBack,
             onRetry = spaces::retry
         )
@@ -140,6 +186,11 @@ fun AiFinderNavigation() {
         "account" -> AccountScreen(
             viewModel = account,
             onBack = onBack,
+            onSubscription = {
+                pendingScan = false
+                showingSubscription = true
+                subscription.refresh()
+            },
             onSignedOut = {
                 locations.reset()
                 home.reset()
@@ -147,6 +198,9 @@ fun AiFinderNavigation() {
                 details.reset()
                 spaces.reset()
                 choosingLocation = false
+                showingSubscription = false
+                pendingScan = false
+                subscription.reset()
                 destination = "login"
             }
         )
@@ -185,6 +239,40 @@ fun AiFinderNavigation() {
             detailsState,
             onBack = onBack,
             onRetry = details::retry
+        )
+    }
+    if (pendingScan && !showingSubscription && subscriptionState is SubscriptionUiState.Loading) {
+        Dialog(onDismissRequest = {
+            pendingScan = false
+            subscription.reset()
+        }) {
+            Surface(shape = RoundedCornerShape(20.dp), color = AiFinderPalette.Surface) {
+                Column(
+                    Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CircularProgressIndicator(Modifier.size(28.dp), color = AiFinderPalette.Teal)
+                    Text(stringResource(Res.string.subscription_checking), color = AiFinderPalette.Ink)
+                }
+            }
+        }
+    }
+    if (showingSubscription) {
+        SubscriptionSheet(
+            state = subscriptionState,
+            onRetry = {
+                subscription.refresh(onAllowed = if (pendingScan) ({
+                    showingSubscription = false
+                    pendingScan = false
+                    destination = "scan"
+                }) else null)
+            },
+            onDismiss = {
+                showingSubscription = false
+                pendingScan = false
+                subscription.reset()
+            }
         )
     }
 }

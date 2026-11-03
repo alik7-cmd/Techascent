@@ -59,6 +59,53 @@ Device names require no permissions: Android uses manufacturer/model and iOS use
 The account icon on Home opens `AccountScreen`. It shows the signed-in Firebase user's name, email, initial and sign-in provider (Google or Apple). The Subscription, Household & sharing and Privacy & data cells are placeholders for now. Log out asks for confirmation in a native dialog (Material `AlertDialog` on Android, `UIAlertController` on iOS). It then calls `SignOutUseCase`, clears the location state and returns to Login.
 
 ## Monetization proposal (hypotheses to validate)
+Account's Subscription row opens a compact, content-sized modal bottom sheet over Account, matching Choose Location's padding, spacing, rounded top corners, and drag handle. It shows credit status, selectable 3-scan and 5-scan preview packs, and a short purchase-availability notice, without a hero illustration or promotional copy. Pack cards use a soft mint selected background, left-aligned titles and prices, a right-side radio indicator, and a subtle best-value label. Selection survives screen recreation while open; closing, swiping down, or pressing back dismisses the sheet. All content scrolls together. Prices are illustrative USD values and purchasing is disabled with a coming-soon notice. Credit checking/accounting is described below; no billing SDK is integrated yet.
+
+## Prepaid scan access: model and flow
+
+Scan access now uses **prepaid credits**, not a recurring subscription: `remainingScans > 0` means subscribed, and zero means inactive. A master account bypasses the limit without deducting credits. The sheet displays the real balance when it can be loaded; buying credits is still unavailable.
+
+Realtime Database structure (example values, not seeded by the app):
+
+```json
+{
+  "aifinder": {
+    "users": {
+      "FIREBASE_USER_UID": {
+        "scanWallet": {
+          "remainingScans": 4,
+          "activeSubscription": true,
+          "usedScans": {
+            "PHOTO_ID_ALREADY_CHARGED": true
+          }
+        },
+        "purchases": {
+          "VERIFIED_STORE_TRANSACTION_ID": {
+            "purchaseId": "VERIFIED_STORE_TRANSACTION_ID",
+            "productId": "scan_pack_5",
+            "scansGranted": 5,
+            "purchasedAt": 1793700000000,
+            "store": "google_play",
+            "status": "verified"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+- **Sign-in:** authenticate, save sign-in metadata, then load credit access before emitting SignedIn. For non-master users, a transaction creates a missing wallet with `remainingScans: 0` and `activeSubscription: false`. Existing balances and usage history are preserved; the active flag is reconciled to `remainingScans > 0`. Missing balance fields are initialized to zero, while malformed/negative balances produce an error rather than being reset. A read/write failure shows a retryable login error. Restored sessions check again when scanning.
+- **Scan entry:** all Home/Spaces scan actions check Firebase access. Master users and users with credit proceed to the camera. Others see the purchase sheet. A connection/permission failure offers retry and never grants access. Inventory browsing remains offline-first; checking and spending cloud credits requires Firebase access.
+- **Successful scan:** the metered analyzer checks access again before calling Gemini. After analysis produces usable detections, a Realtime Database transaction decrements the wallet and records the photo ID in `usedScans` together. Duplicate consumption of the same ID does not deduct twice; concurrent transactions cannot make the balance negative. Review is shown only after consumption is acknowledged. Empty recognition, camera failures, and AI errors do not spend a credit. Saving, renaming, or deleting reviewed items does not spend another credit or refund it.
+- **Exhaustion:** spending the last credit atomically sets `activeSubscription: false` alongside the balance deduction. The balance remains authoritative for access; every wallet refresh repairs a stale active flag. Earlier purchases and scan IDs remain intact. Sign-out cancels pending gate checks so the next user cannot inherit access.
+- **Purchases (backend contract; not yet implemented):** verify the Play/App Store receipt server-side, use the verified transaction ID as an idempotency key, and atomically add its credits to the wallet and append its purchase record. Never replace the wallet or erase prior purchase records on re-purchase. Refunds/revocations must be handled server-side with an auditable status update/adjustment. The app does not create purchase history without a real verified purchase.
+- **Test bypass:** add Firebase Authentication UIDs to `MasterUsers.userIds` in `config/MasterUsers.kt`, for example `setOf("YOUR_TEST_UID")`, and rebuild. The list starts empty and is shared by Android and iOS. Listed users skip remote credit reads and deductions; no Firebase master-user node or permission is needed. This is a client-side testing convenience, not production authorization. Never add credentials.
+
+**Required rules before use:** permit users to read only their own wallet and purchase history. Only the Admin SDK/console may grant credits or create purchase records. Allow initial wallet creation only at zero credits with `activeSubscription: false`. Wallet client transactions must be constrained to decreasing the current balance by exactly one (or keeping the balance unchanged during initialization/reconciliation/idempotent retry), with `activeSubscription == (remainingScans > 0)`; deny increases, deletes, invalid balances, and changes to existing usage IDs. Credit-granting backends must update the active flag atomically too. Do not enable broad writes at `aifinder/users/{uid}`: parent grants would bypass narrower restrictions. Integrate these restrictions with the existing location/item/sign-in rules.
+
+**Production boundary:** this is app-side gating/accounting, not a tamper-proof billing backend. Gemini is still called directly by the app; a modified client could skip the gate, and simultaneous analyses may run before one loses the final-credit race. A timed-out/cancelled database transaction can still commit; the same photo ID is safe to reconcile/retry, but a newly captured photo has a new ID. Before charging real users, move analysis and consumption into an authenticated server operation with a persistent request ID, credit reservation, result recovery, and failure refunds. Keep the Firebase usage ledger for idempotency/reconciliation. Purchases remain disabled meanwhile. iOS has the shared flow/model but its Firebase credit adapter explicitly reports unavailable until native integration is added.
+
 | Plan | Price hypothesis | Proposed limits |
 |---|---|---|
 | Free | $0 | 3 storage locations, 50 items, 10 total AI scans, local search |

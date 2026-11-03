@@ -2,6 +2,7 @@ package org.techascent.aifinder.presentation.login
 
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.login_error_network
+import apphub.aifinder.generated.resources.login_error_scan_access
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -21,6 +22,8 @@ import org.techascent.aifinder.domain.auth.AuthRepository
 import org.techascent.aifinder.domain.auth.AuthUser
 import org.techascent.aifinder.domain.auth.usecase.GetCurrentUserUseCase
 import org.techascent.aifinder.domain.auth.usecase.SignInUseCase
+import org.techascent.aifinder.domain.subscription.ScanAccess
+import org.techascent.aifinder.domain.subscription.ScanAccessRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -44,7 +47,7 @@ class LoginViewModelTest {
         assertEquals(LoginUiState.Loading, viewModel.state.value)
         runCurrent()
 
-        assertEquals(AuthProvider.Apple, assertIs<LoginUiState.SignedIn>(viewModel.state.value).provider)
+        assertIs<LoginUiState.SignedIn>(viewModel.state.value)
         assertEquals(1, repository.signInCalls)
         viewModel.onSignedInHandled()
         assertEquals(LoginUiState.Idle, viewModel.state.value)
@@ -72,8 +75,24 @@ class LoginViewModelTest {
         assertEquals(LoginUiState.Idle, viewModel.state.value)
     }
 
-    private fun newViewModel(repository: AuthRepository) =
-        LoginViewModel(SignInUseCase(repository), GetCurrentUserUseCase(repository))
+    @Test
+    fun signedInIsNotEmittedWhenCreditLoadingFails() = runTest {
+        val viewModel = newViewModel(FakeAuthRepository(), object : ScanAccessRepository {
+            override suspend fun refresh(): ScanAccess = error("Permission denied")
+            override suspend fun consume(userId: String, scanId: String) = error("Not used")
+        })
+        viewModel.onSignIn(AuthProvider.Google)
+        runCurrent()
+        assertEquals(LoginUiState.Error(Res.string.login_error_scan_access), viewModel.state.value)
+    }
+
+    private fun newViewModel(
+        repository: AuthRepository,
+        access: ScanAccessRepository = object : ScanAccessRepository {
+            override suspend fun refresh() = ScanAccess("user", 0)
+            override suspend fun consume(userId: String, scanId: String) = error("Not used")
+        },
+    ) = LoginViewModel(SignInUseCase(repository), GetCurrentUserUseCase(repository), access)
 
     private class FakeAuthRepository(
         private val result: Result<AuthUser> = Result.success(AuthUser("user", null, null, null))

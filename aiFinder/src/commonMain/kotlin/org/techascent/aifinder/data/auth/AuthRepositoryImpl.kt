@@ -32,7 +32,6 @@ class AuthRepositoryImpl(
                         platform = getPlatform(),
                         provider = provider,
                         deviceName = deviceName(),
-                        signedInAt = currentTimeMillis()
                     )
                 )
                 true

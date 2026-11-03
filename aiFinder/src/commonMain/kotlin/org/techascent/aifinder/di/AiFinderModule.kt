@@ -40,14 +40,25 @@ import org.techascent.aifinder.data.cache.AiFinderDatabase
 import org.techascent.aifinder.domain.location.LocationRepository
 import org.techascent.aifinder.domain.location.usecase.CreateLocationUseCase
 import org.techascent.aifinder.domain.location.usecase.ObserveLocationsUseCase
+import org.techascent.aifinder.domain.subscription.ScanAccessRepository
+import org.techascent.aifinder.domain.subscription.MeteredPhotoAnalyzer
+import org.techascent.aifinder.data.subscription.ScanAccessRepositoryImpl
+import org.techascent.aifinder.presentation.subscription.SubscriptionViewModel
 
 val aiFinderModule = module {
+    single<ScanAccessRepository> {
+        ScanAccessRepositoryImpl(auth = get(), remote = get())
+    }
+    viewModel { SubscriptionViewModel(get()) }
     single<PhotoAnalyzer> {
-        VertexGeminiPhotoAnalyzer(
-            client = createAiHttpClient(),
-            apiKey = VertexAiConfig.API_KEY,
-            model = VertexAiConfig.MODEL,
-            dispatcher = Dispatchers.Default,
+        MeteredPhotoAnalyzer(
+            analyzer = VertexGeminiPhotoAnalyzer(
+                client = createAiHttpClient(),
+                apiKey = VertexAiConfig.API_KEY,
+                model = VertexAiConfig.MODEL,
+                dispatcher = Dispatchers.Default,
+            ),
+            access = get()
         )
     }
     single<AuthRepository> { AuthRepositoryImpl(google = get(), signInRemote = get()) }
@@ -66,7 +77,7 @@ val aiFinderModule = module {
     single<WelcomeRepository> { RoomWelcomeRepository(get<AiFinderDatabase>().welcomePreferenceDao()) }
     factory { ResolveWelcomeDestinationUseCase(auth = get(), welcome = get()) }
     viewModel { WelcomeViewModel(resolveDestination = get()) }
-    viewModel { LoginViewModel(signIn = get(), getCurrentUser = get()) }
+    viewModel { LoginViewModel(signIn = get(), getCurrentUser = get(), scanAccess = get()) }
     viewModel { AccountViewModel(getCurrentUser = get(), signOut = get()) }
     viewModel { HomeViewModel(observeInventory = get()) }
     viewModel { ScanViewModel(analyzer = get()) }

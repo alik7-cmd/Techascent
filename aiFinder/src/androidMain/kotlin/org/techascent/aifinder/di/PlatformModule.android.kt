@@ -17,8 +17,11 @@ import org.techascent.aifinder.data.photo.FirebasePhotoDataSource
 import org.techascent.aifinder.data.photo.PhotoLocalDataSource
 import org.techascent.aifinder.data.photo.PhotoRemoteDataSource
 import java.io.File
+import org.techascent.aifinder.data.subscription.ScanAccessRemoteDataSource
+import org.techascent.aifinder.data.subscription.FirebaseScanAccessDataSource
 
 actual val platformModule = module {
+    single<ScanAccessRemoteDataSource> { FirebaseScanAccessDataSource() }
     single<GoogleAuthDataSource> { FirebaseGoogleAuthDataSource() }
     single<SignInRemoteDataSource> { FirebaseSignInDataSource() }
     single<LocationRemoteDataSource> { FirebaseLocationDataSource() }

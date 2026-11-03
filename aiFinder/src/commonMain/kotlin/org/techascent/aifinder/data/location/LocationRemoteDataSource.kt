@@ -13,4 +13,5 @@ object RealtimeDatabasePaths {
     fun locations(userId: String) = "$ROOT/users/$userId/locations"
     fun items(userId: String) = "$ROOT/users/$userId/items"
     fun signedIn(userId: String) = "$ROOT/users/$userId/signedIn"
+    fun scanWallet(userId: String) = "$ROOT/users/$userId/scanWallet"
 }

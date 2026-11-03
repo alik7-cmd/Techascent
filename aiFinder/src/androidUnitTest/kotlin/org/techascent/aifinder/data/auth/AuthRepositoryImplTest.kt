@@ -38,7 +38,11 @@ class AuthRepositoryImplTest {
     fun googleSignInReturnsUser() = runBlocking {
         val repo = repository(FakeGoogle { user })
         assertEquals(user, repo.signIn(AuthProvider.Google).getOrThrow())
-        assertEquals(listOf("uid" to SignedInData(Platform.ANDROID, AuthProvider.Google, "Google Pixel")), saved)
+        val (userId, metadata) = saved.single()
+        assertEquals("uid", userId)
+        assertEquals(Platform.ANDROID, metadata.platform)
+        assertEquals(AuthProvider.Google, metadata.provider)
+        assertEquals("Google Pixel", metadata.deviceName)
         assertEquals(user, repo.currentUser)
         repo.signOut()
         assertNull(repo.currentUser)

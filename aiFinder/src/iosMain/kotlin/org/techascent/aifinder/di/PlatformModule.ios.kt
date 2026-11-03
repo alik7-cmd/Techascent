@@ -15,8 +15,11 @@ import org.techascent.aifinder.data.photo.FilePhotoLocalDataSource
 import org.techascent.aifinder.data.photo.PhotoLocalDataSource
 import org.techascent.aifinder.data.photo.PhotoRemoteDataSource
 import org.techascent.aifinder.data.photo.UnavailablePhotoDataSource
+import org.techascent.aifinder.data.subscription.ScanAccessRemoteDataSource
+import org.techascent.aifinder.data.subscription.UnavailableScanAccessDataSource
 
 actual val platformModule = module {
+    single<ScanAccessRemoteDataSource> { UnavailableScanAccessDataSource() }
     single<GoogleAuthDataSource> { UnavailableGoogleAuthDataSource() }
     single<SignInRemoteDataSource> { UnavailableSignInDataSource() }
     single<LocationRemoteDataSource> { UnavailableLocationDataSource() }
