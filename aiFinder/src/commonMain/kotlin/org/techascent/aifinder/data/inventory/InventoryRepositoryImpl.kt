@@ -13,6 +13,7 @@ import org.techascent.aifinder.domain.inventory.InventoryRepository
 import org.techascent.aifinder.domain.inventory.StoredItem
 import org.techascent.aifinder.domain.model.ItemDetection
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 
 /**
@@ -53,7 +54,7 @@ class InventoryRepositoryImpl(
 
     private suspend fun syncFromRemote(userId: String) {
         val nodes = try {
-            withTimeoutOrNull(remoteTimeoutMillis) { remote.fetchAll(userId) }
+            withTimeoutOrNull(remoteTimeoutMillis.milliseconds) { remote.fetchAll(userId) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

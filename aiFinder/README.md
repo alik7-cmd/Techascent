@@ -28,6 +28,8 @@ This is offline-first, not live cross-device synchronization:
 Home shows a shimmer skeleton of the spaces list until the cache emits.
 
 ## Inventory cache
+Scanning requires a selected storage location. Analyze stays disabled with a warning until a location is selected; the selection carries over to review, where it can be changed before saving.
+
 Scans are analyzed by `VertexGeminiPhotoAnalyzer` using `VERTEX_API_KEY` and `VERTEX_MODEL` from the git-ignored root `local.properties`. Reviewed items are saved to `aifinder/users/{uid}/items/{itemId}` in one atomic Realtime Database update (name, category, tags, locationId, photoId, confidence, createdAt), then upserted into the Room `CachedItem` table. Like locations, items are fetched from Firebase only when the user's item cache is empty. A failed save keeps the review results and shows the error.
 
 `ObserveInventoryUseCase` combines cached locations and items into an `InventorySnapshot`, which provides:
@@ -50,6 +52,10 @@ You need Storage rules that allow `aifinder/users/{uid}/**` when `request.auth.u
 Welcome checks the restored Firebase session and a device-local Room welcome flag while showing only the background (no content or spinner). Signed-in users go directly to Home. Signed-out users see welcome content once per app data installation; subsequent launches go directly to Login. The flag is saved before the first welcome content is shown. Continuing replaces Welcome with Login, and Login has no route back to Welcome. Room migration 2-to-3 adds the flag table without changing cached locations.
 
 ## Account settings
+After authentication, Android updates `aifinder/users/{uid}/signedIn` with `platform` (`ANDROID` or `IOS`), `provider` (`Google` or `Apple`), and `deviceName`. This stores the latest sign-in, not a history, and leaves locations/items untouched. Login navigates only after the write succeeds; failures or a 15-second timeout show a retryable error. Realtime Database rules must permit writes to this node only when `auth.uid == uid`. Restored sessions do not trigger another write.
+
+Device names require no permissions: Android uses manufacturer/model and iOS uses `UIDevice.name` (often a generic name such as “iPhone”). iOS metadata collection is implemented, but Firebase writes remain unavailable until native iOS authentication/database integration is added.
+
 The account icon on Home opens `AccountScreen`. It shows the signed-in Firebase user's name, email, initial and sign-in provider (Google or Apple). The Subscription, Household & sharing and Privacy & data cells are placeholders for now. Log out asks for confirmation in a native dialog (Material `AlertDialog` on Android, `UIAlertController` on iOS). It then calls `SignOutUseCase`, clears the location state and returns to Login.
 
 ## Monetization proposal (hypotheses to validate)

@@ -25,6 +25,7 @@ fun InfoCard(
     containerColor: Color = AiFinderPalette.Surface,
     titleColor: Color = AiFinderPalette.Ink,
     titleFontSize: TextUnit = 16.sp,
+    subtitleColor: Color = AiFinderPalette.Muted,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null
 ) {
@@ -39,7 +40,7 @@ fun InfoCard(
         leadingContent?.invoke()
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             Text(title, fontWeight = FontWeight.Bold, color = titleColor, fontSize = titleFontSize)
-            Text(subtitle, color = AiFinderPalette.Muted)
+            Text(subtitle, color = subtitleColor)
         }
         trailingContent?.invoke()
     }

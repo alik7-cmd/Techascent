@@ -33,7 +33,8 @@ class SaveDetectionsUseCase(
         if (locationId.isNullOrBlank()) return Result.failure(InventoryError.NoLocation)
         val valid = detections.filter { it.item.name.isNotBlank() }
         if (valid.isEmpty()) return Result.failure(InventoryError.NothingToSave)
-        if (photo != null) photos.save(photo.id, photo.jpegBytes).onFailure { return Result.failure(it) }
+        if (photo != null) photos.save(photo.id, photo.jpegBytes)
+            .onFailure { return Result.failure(it) }
         return repository.saveDetections(locationId, valid)
     }
 }

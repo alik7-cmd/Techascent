@@ -6,6 +6,8 @@ import org.techascent.aifinder.data.cache.buildAiFinderDatabase
 import org.techascent.aifinder.data.location.LocationRemoteDataSource
 import org.techascent.aifinder.data.location.UnavailableLocationDataSource
 import org.techascent.aifinder.data.auth.GoogleAuthDataSource
+import org.techascent.aifinder.data.auth.SignInRemoteDataSource
+import org.techascent.aifinder.data.auth.UnavailableSignInDataSource
 import org.techascent.aifinder.data.auth.UnavailableGoogleAuthDataSource
 import org.techascent.aifinder.data.inventory.ItemRemoteDataSource
 import org.techascent.aifinder.data.inventory.UnavailableItemDataSource
@@ -16,6 +18,7 @@ import org.techascent.aifinder.data.photo.UnavailablePhotoDataSource
 
 actual val platformModule = module {
     single<GoogleAuthDataSource> { UnavailableGoogleAuthDataSource() }
+    single<SignInRemoteDataSource> { UnavailableSignInDataSource() }
     single<LocationRemoteDataSource> { UnavailableLocationDataSource() }
     single<ItemRemoteDataSource> { UnavailableItemDataSource() }
     single<PhotoRemoteDataSource> { UnavailablePhotoDataSource() }

@@ -24,6 +24,7 @@ import org.techascent.aifinder.domain.auth.AuthProvider
 import org.techascent.aifinder.presentation.components.SectionTitle
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 import org.techascent.aifinder.util.Platform
+import org.techascent.aifinder.util.getPlatform
 
 @Composable
 fun LoginScreen(
@@ -31,8 +32,8 @@ fun LoginScreen(
     onSignedIn: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
-    LaunchedEffect(state.isSignedIn) {
-        if (state.isSignedIn) {
+    LaunchedEffect(state) {
+        if (state is LoginUiState.SignedIn) {
             viewModel.onSignedInHandled()
             onSignedIn()
         }
@@ -45,6 +46,13 @@ private fun LoginContent(
     state: LoginUiState,
     onSignIn: (AuthProvider) -> Unit,
 ) {
+    val platform = remember { getPlatform() }
+    var selectedProvider by remember { mutableStateOf<AuthProvider?>(null) }
+    val isLoading = state is LoginUiState.Loading
+    val onProviderSelected: (AuthProvider) -> Unit = { provider ->
+        selectedProvider = provider
+        onSignIn(provider)
+    }
     Scaffold(containerColor = AiFinderPalette.Background) { padding ->
         Column(
             Modifier.fillMaxSize()
@@ -84,16 +92,16 @@ private fun LoginContent(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(36.dp))
-            if(state.platform == Platform.IOS){
+            if(platform == Platform.IOS){
                 ProviderButton(
                     label = stringResource(Res.string.login_continue_apple),
                     icon = painterResource(Res.drawable.ic_apple),
                     containerColor = Color.Black,
                     contentColor = Color.White,
                     border = null,
-                    isLoading = state.loadingProvider == AuthProvider.Apple,
-                    enabled = !state.isLoading,
-                    onClick = { onSignIn(AuthProvider.Apple) }
+                    isLoading = isLoading && selectedProvider == AuthProvider.Apple,
+                    enabled = !isLoading,
+                    onClick = { onProviderSelected(AuthProvider.Apple) }
                 )
                 Spacer(Modifier.height(16.dp))
             }
@@ -103,14 +111,14 @@ private fun LoginContent(
                 containerColor = AiFinderPalette.Surface,
                 contentColor = AiFinderPalette.Ink,
                 border = BorderStroke(1.dp, AiFinderPalette.Border),
-                isLoading = state.loadingProvider == AuthProvider.Google,
-                enabled = !state.isLoading,
-                onClick = { onSignIn(AuthProvider.Google) }
+                isLoading = isLoading && selectedProvider == AuthProvider.Google,
+                enabled = !isLoading,
+                onClick = { onProviderSelected(AuthProvider.Google) }
             )
-            state.errorRes?.let {
+            if (state is LoginUiState.Error) {
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    stringResource(it),
+                    stringResource(state.errorRes),
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center,

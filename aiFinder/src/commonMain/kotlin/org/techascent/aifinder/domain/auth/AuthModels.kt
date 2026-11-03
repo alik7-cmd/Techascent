@@ -16,6 +16,7 @@ sealed interface AuthError {
     data object NoAccount : AuthError
     data object Network : AuthError
     data object Unavailable : AuthError
+    data object SignInDataSaveFailed : AuthError
     data class Unknown(val message: String?) : AuthError
 }
 

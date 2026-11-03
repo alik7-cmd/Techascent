@@ -7,6 +7,7 @@ import apphub.aifinder.generated.resources.login_error_network
 import apphub.aifinder.generated.resources.login_error_no_account
 import apphub.aifinder.generated.resources.login_error_unavailable
 import apphub.aifinder.generated.resources.login_error_unknown
+import apphub.aifinder.generated.resources.login_error_save_details
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,34 +23,40 @@ class LoginViewModel(
     private val signIn: SignInUseCase,
     private val getCurrentUser: GetCurrentUserUseCase,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(LoginUiState())
+    private val _state = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val state = _state.asStateFlow()
 
     val isSignedIn: Boolean get() = getCurrentUser() != null
 
     fun onSignIn(provider: AuthProvider) {
-        if (_state.value.isLoading) return
-        _state.update { it.copy(loadingProvider = provider, errorRes = null) }
+        if (_state.value is LoginUiState.Loading) return
+        _state.value = LoginUiState.Loading
         viewModelScope.launch {
             signIn(provider)
-                .onSuccess { _state.update { it.copy(loadingProvider = null, isSignedIn = true) } }
+                .onSuccess { _state.value = LoginUiState.SignedIn }
                 .onFailure { e ->
                     val error = (e as? AuthException)?.error ?: AuthError.Unknown(e.message)
-                    _state.update { it.copy(loadingProvider = null, errorRes = error.toMessageRes()) }
+                    _state.value =
+                        error.toMessageRes()?.let(LoginUiState::Error) ?: LoginUiState.Idle
                 }
         }
     }
 
-    fun onSignedInHandled() = _state.update { it.copy(isSignedIn = false) }
+    fun onSignedInHandled() = _state.update {
+        if (it is LoginUiState.SignedIn) LoginUiState.Idle else it
+    }
 
-    fun dismissError() = _state.update { it.copy(errorRes = null) }
+    fun dismissError() = _state.update {
+        if (it is LoginUiState.Error) LoginUiState.Idle else it
+    }
 }
 
 /** Returns null for errors that shouldn't be surfaced, such as the user dismissing the picker. */
 internal fun AuthError.toMessageRes(): StringResource? = when (this) {
-    AuthError.Cancelled -> null
-    AuthError.NoAccount -> Res.string.login_error_no_account
-    AuthError.Network -> Res.string.login_error_network
-    AuthError.Unavailable -> Res.string.login_error_unavailable
+    is AuthError.NoAccount -> Res.string.login_error_no_account
+    is AuthError.Network -> Res.string.login_error_network
+    is AuthError.Unavailable -> Res.string.login_error_unavailable
     is AuthError.Unknown -> Res.string.login_error_unknown
+    is AuthError.Cancelled -> null
+    AuthError.SignInDataSaveFailed -> Res.string.login_error_save_details
 }

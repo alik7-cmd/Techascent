@@ -8,6 +8,8 @@ import org.techascent.aifinder.data.location.LocationRemoteDataSource
 import org.techascent.aifinder.data.location.FirebaseLocationDataSource
 import org.techascent.aifinder.data.auth.FirebaseGoogleAuthDataSource
 import org.techascent.aifinder.data.auth.GoogleAuthDataSource
+import org.techascent.aifinder.data.auth.SignInRemoteDataSource
+import org.techascent.aifinder.data.auth.FirebaseSignInDataSource
 import org.techascent.aifinder.data.inventory.FirebaseItemDataSource
 import org.techascent.aifinder.data.inventory.ItemRemoteDataSource
 import org.techascent.aifinder.data.photo.FilePhotoLocalDataSource
@@ -18,6 +20,7 @@ import java.io.File
 
 actual val platformModule = module {
     single<GoogleAuthDataSource> { FirebaseGoogleAuthDataSource() }
+    single<SignInRemoteDataSource> { FirebaseSignInDataSource() }
     single<LocationRemoteDataSource> { FirebaseLocationDataSource() }
     single<ItemRemoteDataSource> { FirebaseItemDataSource() }
     single<PhotoRemoteDataSource> { FirebasePhotoDataSource() }

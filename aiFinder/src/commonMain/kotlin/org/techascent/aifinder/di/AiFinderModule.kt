@@ -50,7 +50,7 @@ val aiFinderModule = module {
             dispatcher = Dispatchers.Default,
         )
     }
-    single<AuthRepository> { AuthRepositoryImpl(google = get()) }
+    single<AuthRepository> { AuthRepositoryImpl(google = get(), signInRemote = get()) }
     factory { SignInUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
     factory { SignOutUseCase(get()) }
