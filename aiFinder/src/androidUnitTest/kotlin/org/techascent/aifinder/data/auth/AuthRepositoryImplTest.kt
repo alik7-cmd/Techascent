@@ -65,14 +65,11 @@ class AuthRepositoryImplTest {
     }
 
     @Test
-    fun metadataFailureIsSurfaced() = runBlocking {
+    fun metadataFailureDoesNotBlockSignIn() = runBlocking {
         val repo = repository(FakeGoogle { user }, object : SignInRemoteDataSource {
             override suspend fun save(userId: String, data: SignedInData) = error("Permission denied")
         })
-        val error = repo.signIn(AuthProvider.Google).exceptionOrNull() as AuthException
-        assertEquals(AuthError.SignInDataSaveFailed, error.error)
-        assertEquals("Permission denied", error.cause?.message)
-        assertTrue(error.error.toMessageRes() != null)
+        assertEquals(user, repo.signIn(AuthProvider.Google).getOrThrow())
     }
 
     @Test
@@ -82,8 +79,7 @@ class AuthRepositoryImplTest {
                 CompletableDeferred<Unit>().await()
             }
         })
-        val error = repo.signIn(AuthProvider.Google).exceptionOrNull() as AuthException
-        assertEquals(AuthError.SignInDataSaveFailed, error.error)
+        assertEquals(user, repo.signIn(AuthProvider.Google).getOrThrow())
         assertEquals(15_000L, testScheduler.currentTime)
     }
 

@@ -24,14 +24,21 @@ val firebaseDatabaseUrl = localProperties.getProperty("FIREBASE_DATABASE_URL")?.
     ?: ""
 // Firebase Storage bucket for scan photos, e.g. gs://<project>.firebasestorage.app.
 val firebaseStorageBucket = localProperties.getProperty("FIREBASE_STORAGE_BUCKET")?.trim().orEmpty()
+// RevenueCat public SDK keys (Test Store / sandbox keys work too). Blank keys disable purchases.
+val revenueCatAndroidApiKey = localProperties.getProperty("REVENUECAT_ANDROID_API_KEY")?.trim().orEmpty()
+val revenueCatIosApiKey = localProperties.getProperty("REVENUECAT_IOS_API_KEY")?.trim().orEmpty()
 val vertexConfigDir = layout.buildDirectory.dir("generated/vertexConfig/commonMain/kotlin")
 
 val generateVertexConfig by tasks.registering {
     val apiKey = vertexApiKey
     val model = vertexModel
+    val revenueCatAndroidKey = revenueCatAndroidApiKey
+    val revenueCatIosKey = revenueCatIosApiKey
     val outputDir = vertexConfigDir
     inputs.property("apiKey", apiKey)
     inputs.property("model", model)
+    inputs.property("revenueCatAndroidKey", revenueCatAndroidKey)
+    inputs.property("revenueCatIosKey", revenueCatIosKey)
     outputs.dir(outputDir)
     doLast {
         fun String.quoted() = "\"" + replace("\\", "\\\\").replace("\"", "\\\"").replace("$", "\\$") + "\""
@@ -44,6 +51,16 @@ val generateVertexConfig by tasks.registering {
             |internal object VertexAiConfig {
             |    const val API_KEY: String = ${apiKey.quoted()}
             |    const val MODEL: String = ${model.quoted()}
+            |}
+            |""".trimMargin()
+        )
+        outputDir.get().file("org/techascent/aifinder/config/RevenueCatConfig.kt").asFile.writeText(
+            """
+            |package org.techascent.aifinder.config
+            |
+            |internal object RevenueCatConfig {
+            |    const val ANDROID_API_KEY: String = ${revenueCatAndroidKey.quoted()}
+            |    const val IOS_API_KEY: String = ${revenueCatIosKey.quoted()}
             |}
             |""".trimMargin()
         )
@@ -63,6 +80,9 @@ kotlin {
     iosSimulatorArm64()
 
     sourceSets {
+        all {
+            if (name.startsWith("ios")) languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -83,6 +103,8 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.revenuecat.purchases.core)
+            implementation(libs.revenuecat.purchases.ui)
         }
         commonMain {
             kotlin.srcDir(generateVertexConfig)
@@ -151,6 +173,9 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    // Lets JVM unit tests run code that logs through android.util.Log.
+    testOptions.unitTests.isReturnDefaultValues = true
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

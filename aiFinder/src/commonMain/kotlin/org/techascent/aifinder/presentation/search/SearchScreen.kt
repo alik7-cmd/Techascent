@@ -49,7 +49,7 @@ fun SearchScreen(
     ) {
         item(key = "title") { SectionTitle(stringResource(Res.string.search_title)) }
         when (state) {
-            is SearchUiState.Loading -> item { LoadingContent() }
+            is SearchUiState.Loading -> searchLoadingContent()
             is SearchUiState.Error -> item { ErrorContent(state.message, onRetry) }
             is SearchUiState.Success -> searchContent(state.data, onQueryChange, onItemSelected)
         }

@@ -12,6 +12,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.advanceUntilIdle
+import org.techascent.aifinder.domain.subscription.PurchaseGateway
 import org.techascent.aifinder.domain.subscription.ScanAccess
 import org.techascent.aifinder.domain.subscription.ScanAccessRepository
 
@@ -26,13 +28,13 @@ class SubscriptionViewModelTest {
     @Test
     fun onlyUsersWithCreditOrMasterAccessContinue() = runTest {
         for (access in listOf(ScanAccess("user", 0), ScanAccess("user", 2), ScanAccess("master", 0, true))) {
-            val viewModel = SubscriptionViewModel(FakeRepository(access))
+            val viewModel = SubscriptionViewModel(FakeRepository(access), FakePurchases())
             var allowed = 0
             viewModel.refresh { allowed++ }
             viewModel.refresh { allowed++ }
             runCurrent()
             assertEquals(if (access.canScan) 1 else 0, allowed)
-            assertEquals(SubscriptionUiState.Ready(access), viewModel.state.value)
+            assertEquals(SubscriptionUiState.Ready(access, purchasesEnabled = !access.canScan), viewModel.state.value)
         }
     }
 
@@ -40,7 +42,7 @@ class SubscriptionViewModelTest {
     fun failureIsRetryableAndResetCancelsPendingNavigation() = runTest {
         val repository = FakeRepository(ScanAccess("user", 1))
         repository.fail = true
-        val viewModel = SubscriptionViewModel(repository)
+        val viewModel = SubscriptionViewModel(repository, FakePurchases())
         viewModel.refresh()
         runCurrent()
         assertIs<SubscriptionUiState.Error>(viewModel.state.value)
@@ -55,7 +57,69 @@ class SubscriptionViewModelTest {
         assertEquals(1, allowed)
     }
 
-    private class FakeRepository(private val value: ScanAccess) : ScanAccessRepository {
+    @Test
+    fun outOfCreditUsersGetThePaywallOnlyWhenIdentified() = runTest {
+        val purchases = FakePurchases()
+        val viewModel = SubscriptionViewModel(FakeRepository(ScanAccess("uid", 0)), purchases)
+        viewModel.refresh()
+        runCurrent()
+        assertEquals(SubscriptionUiState.Ready(ScanAccess("uid", 0), purchasesEnabled = true), viewModel.state.value)
+        assertEquals(listOf("uid"), purchases.identified)
+
+        purchases.failIdentify = true
+        viewModel.refresh()
+        runCurrent()
+        assertEquals(SubscriptionUiState.Ready(ScanAccess("uid", 0)), viewModel.state.value)
+
+        val unconfigured = SubscriptionViewModel(FakeRepository(ScanAccess("uid", 0)), FakePurchases(available = false))
+        unconfigured.refresh()
+        runCurrent()
+        assertEquals(SubscriptionUiState.Ready(ScanAccess("uid", 0)), unconfigured.state.value)
+    }
+
+    @Test
+    fun purchaseWaitsForTheWebhookCreditThenContinues() = runTest {
+        val repository = FakeRepository(ScanAccess("uid", 0))
+        val viewModel = SubscriptionViewModel(repository, FakePurchases())
+        viewModel.refresh()
+        runCurrent()
+        var allowed = 0
+        viewModel.onPurchaseCompleted { allowed++ }
+        runCurrent()
+        assertEquals(SubscriptionUiState.AddingScans, viewModel.state.value)
+        repository.value = ScanAccess("uid", 5)
+        advanceUntilIdle()
+        assertEquals(SubscriptionUiState.Ready(ScanAccess("uid", 5), purchasesEnabled = true), viewModel.state.value)
+        assertEquals(1, allowed)
+    }
+
+    @Test
+    fun purchaseNotCreditedInTimeIsReportedAsPending() = runTest {
+        val viewModel = SubscriptionViewModel(FakeRepository(ScanAccess("uid", 0)), FakePurchases())
+        viewModel.refresh()
+        runCurrent()
+        var allowed = 0
+        viewModel.onPurchaseCompleted { allowed++ }
+        advanceUntilIdle()
+        assertEquals(
+            SubscriptionUiState.Ready(ScanAccess("uid", 0), purchasesEnabled = true, creditsPending = true),
+            viewModel.state.value
+        )
+        assertEquals(0, allowed)
+    }
+
+    private class FakePurchases(private val available: Boolean = true) : PurchaseGateway {
+        val identified = mutableListOf<String>()
+        var failIdentify = false
+        override fun prepare() = available
+        override suspend fun identify(userId: String) {
+            check(!failIdentify) { "Store offline" }
+            identified += userId
+        }
+        override suspend fun reset() = Unit
+    }
+
+    private class FakeRepository(var value: ScanAccess) : ScanAccessRepository {
         var fail = false
         override suspend fun refresh(): ScanAccess {
             check(!fail) { "Offline" }

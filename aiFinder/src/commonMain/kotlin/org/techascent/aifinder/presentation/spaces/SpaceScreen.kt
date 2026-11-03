@@ -28,6 +28,7 @@ fun SpaceScreen(
     state: SpaceUiState,
     onItem: (String) -> Unit,
     onScan: () -> Unit,
+    isCheckingScan: Boolean = false,
     onBack: () -> Unit,
     onRetry: () -> Unit,
 ) {
@@ -62,7 +63,7 @@ fun SpaceScreen(
                                 title = stringResource(Res.string.space_empty_title),
                                 subtitle = stringResource(Res.string.space_empty_message)
                             )
-                            PrimaryAction(stringResource(Res.string.home_scan_action), onScan)
+                            PrimaryAction(stringResource(Res.string.home_scan_action), onScan, isLoading = isCheckingScan)
                         }
                     }
                 }

@@ -18,22 +18,6 @@ import org.techascent.aifinder.domain.auth.WelcomeDestination
 import org.techascent.aifinder.presentation.subscription.SubscriptionSheet
 import org.techascent.aifinder.presentation.subscription.SubscriptionViewModel
 import org.techascent.aifinder.presentation.subscription.SubscriptionUiState
-import androidx.compose.ui.window.Dialog
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
-import apphub.aifinder.generated.resources.Res
-import apphub.aifinder.generated.resources.subscription_checking
-import org.jetbrains.compose.resources.stringResource
-import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -59,21 +43,19 @@ fun AiFinderNavigation() {
     var choosingLocation by rememberSaveable { mutableStateOf(false) }
     var showingSubscription by rememberSaveable { mutableStateOf(false) }
     var pendingScan by rememberSaveable { mutableStateOf(false) }
+    val openScanner: () -> Unit = {
+        showingSubscription = false
+        pendingScan = false
+        destination = "scan"
+    }
+    val checkingScan = pendingScan && !showingSubscription && subscriptionState is SubscriptionUiState.Loading
     val requestScan: () -> Unit = {
         pendingScan = true
-        subscription.refresh(onAllowed = {
-            showingSubscription = false
-            pendingScan = false
-            destination = "scan"
-        })
+        subscription.refresh(onAllowed = openScanner)
     }
     LaunchedEffect(Unit) {
         if (pendingScan || showingSubscription) {
-            subscription.refresh(onAllowed = if (pendingScan) ({
-                showingSubscription = false
-                pendingScan = false
-                destination = "scan"
-            }) else null)
+            subscription.refresh(onAllowed = if (pendingScan) openScanner else null)
         }
     }
     LaunchedEffect(subscriptionState, pendingScan) {
@@ -85,7 +67,14 @@ fun AiFinderNavigation() {
     // Where back goes from screens reachable from more than one place.
     var spaceBack by rememberSaveable { mutableStateOf("home") }
     var detailsBack by rememberSaveable { mutableStateOf("search") }
+    var scanCheckOrigin by remember { mutableStateOf(destination) }
     LaunchedEffect(destination) {
+        // Leaving the screen while the credit check runs cancels the pending scan.
+        if (destination != scanCheckOrigin && pendingScan && !showingSubscription) {
+            pendingScan = false
+            subscription.reset()
+        }
+        scanCheckOrigin = destination
         when (destination) {
             "home" -> home.start()
             "search" -> search.start()
@@ -162,6 +151,7 @@ fun AiFinderNavigation() {
                 destination = "search"
             },
             onScan = requestScan,
+            isCheckingScan = checkingScan,
             onAccount = { destination = "account" },
             onSpace = { id -> openSpace(id, "home") },
             onSeeAll = { destination = "spaces" },
@@ -171,6 +161,7 @@ fun AiFinderNavigation() {
             allSpacesState,
             onSpace = { id -> openSpace(id, "spaces") },
             onScan = requestScan,
+            isCheckingScan = checkingScan,
             onBack = onBack,
             onRetry = spaces::retry
         )
@@ -179,6 +170,7 @@ fun AiFinderNavigation() {
             spaceState,
             onItem = { id -> openDetails(id, "space") },
             onScan = requestScan,
+            isCheckingScan = checkingScan,
             onBack = onBack,
             onRetry = spaces::retry
         )
@@ -241,32 +233,12 @@ fun AiFinderNavigation() {
             onRetry = details::retry
         )
     }
-    if (pendingScan && !showingSubscription && subscriptionState is SubscriptionUiState.Loading) {
-        Dialog(onDismissRequest = {
-            pendingScan = false
-            subscription.reset()
-        }) {
-            Surface(shape = RoundedCornerShape(20.dp), color = AiFinderPalette.Surface) {
-                Column(
-                    Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    CircularProgressIndicator(Modifier.size(28.dp), color = AiFinderPalette.Teal)
-                    Text(stringResource(Res.string.subscription_checking), color = AiFinderPalette.Ink)
-                }
-            }
-        }
-    }
     if (showingSubscription) {
         SubscriptionSheet(
             state = subscriptionState,
-            onRetry = {
-                subscription.refresh(onAllowed = if (pendingScan) ({
-                    showingSubscription = false
-                    pendingScan = false
-                    destination = "scan"
-                }) else null)
+            onRetry = { subscription.refresh(onAllowed = if (pendingScan) openScanner else null) },
+            onPurchaseCompleted = {
+                subscription.onPurchaseCompleted(onAllowed = if (pendingScan) openScanner else null)
             },
             onDismiss = {
                 showingSubscription = false

@@ -20,6 +20,7 @@ fun SpacesScreen(
     state: SpacesUiState,
     onSpace: (String) -> Unit,
     onScan: () -> Unit,
+    isCheckingScan: Boolean = false,
     onBack: () -> Unit,
     onRetry: () -> Unit,
 ) {
@@ -37,7 +38,7 @@ fun SpacesScreen(
                         InfoCard(
                             title = stringResource(Res.string.home_spaces_empty_title),
                             subtitle = stringResource(Res.string.home_spaces_empty_message),
-                            onClick = onScan
+                            onClick = onScan.takeUnless { isCheckingScan }
                         )
                     }
                 }

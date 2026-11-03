@@ -29,6 +29,7 @@ mlkitBarcodeScanning-android = "17.3.0"
 androidx-camera = "1.5.1"
 appcompat = "1.7.1"
 firebaseBom = "34.4.0"
+revenuecatKmp = "2.2.4+17.12.0"
 googleServices = "4.4.4"
 credentials = "1.5.0"
 googleId = "1.1.1"
@@ -38,6 +39,8 @@ ksp = "2.1.21-2.0.2"
 robolectric = "4.14.1"
 
 [libraries]
+revenuecat-purchases-core = { module = "com.revenuecat.purchases:purchases-kmp-core", version.ref = "revenuecatKmp" }
+revenuecat-purchases-ui = { module = "com.revenuecat.purchases:purchases-kmp-ui", version.ref = "revenuecatKmp" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }

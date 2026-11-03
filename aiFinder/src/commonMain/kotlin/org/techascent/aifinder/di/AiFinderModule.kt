@@ -44,12 +44,21 @@ import org.techascent.aifinder.domain.subscription.ScanAccessRepository
 import org.techascent.aifinder.domain.subscription.MeteredPhotoAnalyzer
 import org.techascent.aifinder.data.subscription.ScanAccessRepositoryImpl
 import org.techascent.aifinder.presentation.subscription.SubscriptionViewModel
+import org.techascent.aifinder.domain.subscription.PurchaseGateway
+import org.techascent.aifinder.data.subscription.RevenueCatPurchaseGateway
+import org.techascent.aifinder.data.subscription.revenueCatApiKey
 
 val aiFinderModule = module {
     single<ScanAccessRepository> {
         ScanAccessRepositoryImpl(auth = get(), remote = get())
     }
-    viewModel { SubscriptionViewModel(get()) }
+    single<PurchaseGateway> {
+        RevenueCatPurchaseGateway(
+            apiKey = revenueCatApiKey(),
+            currentUserId = { get<AuthRepository>().currentUser?.id },
+        )
+    }
+    viewModel { SubscriptionViewModel(repository = get(), purchases = get()) }
     single<PhotoAnalyzer> {
         MeteredPhotoAnalyzer(
             analyzer = VertexGeminiPhotoAnalyzer(
@@ -77,8 +86,8 @@ val aiFinderModule = module {
     single<WelcomeRepository> { RoomWelcomeRepository(get<AiFinderDatabase>().welcomePreferenceDao()) }
     factory { ResolveWelcomeDestinationUseCase(auth = get(), welcome = get()) }
     viewModel { WelcomeViewModel(resolveDestination = get()) }
-    viewModel { LoginViewModel(signIn = get(), getCurrentUser = get(), scanAccess = get()) }
-    viewModel { AccountViewModel(getCurrentUser = get(), signOut = get()) }
+    viewModel { LoginViewModel(signIn = get(), getCurrentUser = get(), scanAccess = get(), purchases = get()) }
+    viewModel { AccountViewModel(getCurrentUser = get(), signOut = get(), purchases = get()) }
     viewModel { HomeViewModel(observeInventory = get()) }
     viewModel { ScanViewModel(analyzer = get()) }
     viewModel { ReviewViewModel(saveDetections = get()) }

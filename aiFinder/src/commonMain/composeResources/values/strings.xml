@@ -6,12 +6,13 @@
     <string name="get_started">Get started</string>
     <string name="welcome_tagline">Your home, searchable.</string>
     <string name="subscription_title">AI scan credits</string>
-    <string name="subscription_preview_notice">Preview prices · Purchases not available yet.</string>
+    <string name="subscription_preview_notice">Purchases aren\'t configured yet. Add a RevenueCat API key to enable them.</string>
+    <string name="subscription_adding_scans">Purchase complete. Adding your scans…</string>
+    <string name="subscription_credits_pending">Purchase received. Your scans will appear shortly.</string>
     <string name="subscription_checking">Checking your scan credits…</string>
     <string name="subscription_access_error">Could not check your scan credits. Check your connection and try again.</string>
     <string name="subscription_scans_remaining">%1$d scans remaining</string>
     <string name="subscription_master_access">Test account · Unlimited scans</string>
-    <string name="login_error_scan_access">You signed in, but your scan credits could not be loaded. Please try again.</string>
     <string name="subscription_close">Close scan credits</string>
     <string name="subscription_headline">Find it faster.</string>
     <string name="subscription_description">Use AI to identify items in your storage spaces.</string>
@@ -25,7 +26,7 @@
     <string name="subscription_large_price">$1.99</string>
     <string name="subscription_large_detail">About $0.40 per scan · Save 20% compared with the 3-pack</string>
     <string name="subscription_best_value">Best value</string>
-    <string name="subscription_purchase_unavailable">Purchases coming soon</string>
+    <string name="subscription_purchase_unavailable">Purchases unavailable</string>
     <string name="subscription_billing_notice">Purchases are not available yet. Selecting a pack will not charge you or add credits.</string>
     <string name="subscription_no_subscription">One-time packs. No subscription.</string>
 
@@ -123,7 +124,6 @@
     <string name="login_error_network">Couldn\'t reach the server. Check your connection and try again.</string>
     <string name="login_error_unavailable">This sign-in option isn\'t available on this device yet.</string>
     <string name="login_error_unknown">Something went wrong while signing in. Please try again.</string>
-    <string name="login_error_save_details">You signed in, but your sign-in details could not be saved. Please try again.</string>
     <string name="location_empty">No locations yet. Create your first one to start organising.</string>
     <string name="location_retry">Try again</string>
     <string name="account_title">Account</string>

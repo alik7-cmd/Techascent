@@ -2,7 +2,6 @@ package org.techascent.aifinder.presentation.login
 
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.login_error_network
-import apphub.aifinder.generated.resources.login_error_scan_access
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -22,6 +21,7 @@ import org.techascent.aifinder.domain.auth.AuthRepository
 import org.techascent.aifinder.domain.auth.AuthUser
 import org.techascent.aifinder.domain.auth.usecase.GetCurrentUserUseCase
 import org.techascent.aifinder.domain.auth.usecase.SignInUseCase
+import org.techascent.aifinder.domain.subscription.PurchaseGateway
 import org.techascent.aifinder.domain.subscription.ScanAccess
 import org.techascent.aifinder.domain.subscription.ScanAccessRepository
 
@@ -76,14 +76,37 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun signedInIsNotEmittedWhenCreditLoadingFails() = runTest {
+    fun creditAndPurchaseFailuresDoNotBlockSignIn() = runTest {
+        val purchases = FakePurchases(fail = true)
         val viewModel = newViewModel(FakeAuthRepository(), object : ScanAccessRepository {
             override suspend fun refresh(): ScanAccess = error("Permission denied")
             override suspend fun consume(userId: String, scanId: String) = error("Not used")
-        })
+        }, purchases)
         viewModel.onSignIn(AuthProvider.Google)
         runCurrent()
-        assertEquals(LoginUiState.Error(Res.string.login_error_scan_access), viewModel.state.value)
+        assertIs<LoginUiState.SignedIn>(viewModel.state.value)
+        assertEquals(1, purchases.identifyCalls)
+    }
+
+    @Test
+    fun signInIdentifiesTheFirebaseUserWithThePurchaseStore() = runTest {
+        val purchases = FakePurchases()
+        val viewModel = newViewModel(FakeAuthRepository(), purchases = purchases)
+        viewModel.onSignIn(AuthProvider.Google)
+        runCurrent()
+        assertEquals(listOf("user"), purchases.identified)
+    }
+
+    private class FakePurchases(private val fail: Boolean = false) : PurchaseGateway {
+        val identified = mutableListOf<String>()
+        var identifyCalls = 0
+        override fun prepare() = true
+        override suspend fun identify(userId: String) {
+            identifyCalls++
+            check(!fail) { "Store offline" }
+            identified += userId
+        }
+        override suspend fun reset() = Unit
     }
 
     private fun newViewModel(
@@ -92,7 +115,8 @@ class LoginViewModelTest {
             override suspend fun refresh() = ScanAccess("user", 0)
             override suspend fun consume(userId: String, scanId: String) = error("Not used")
         },
-    ) = LoginViewModel(SignInUseCase(repository), GetCurrentUserUseCase(repository), access)
+        purchases: PurchaseGateway = FakePurchases(),
+    ) = LoginViewModel(SignInUseCase(repository), GetCurrentUserUseCase(repository), access, purchases)
 
     private class FakeAuthRepository(
         private val result: Result<AuthUser> = Result.success(AuthUser("user", null, null, null))

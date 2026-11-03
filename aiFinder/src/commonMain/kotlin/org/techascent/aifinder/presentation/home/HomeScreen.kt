@@ -23,6 +23,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel<HomeViewModel>(),
     onSearch: () -> Unit,
     onScan: () -> Unit,
+    isCheckingScan: Boolean = false,
     onAccount: () -> Unit,
     onSpace: (String) -> Unit,
     onSeeAll: () -> Unit,
@@ -37,7 +38,7 @@ fun HomeScreen(
         ) {
             item(key = "header") { HomeHeader(onAccount) }
             item(key = "search") { HomeSearch(onSearch) }
-            item(key = "scan") { ScanPrompt(onScan) }
+            item(key = "scan") { ScanPrompt(onScan, isCheckingScan) }
             when (val state = uiState) {
                 is HomeUiState.Loading -> {
                     item(key = "spaces-skeleton") { SpacesHeaderSkeleton() }
@@ -51,7 +52,7 @@ fun HomeScreen(
                             InfoCard(
                                 title = stringResource(Res.string.home_spaces_empty_title),
                                 subtitle = stringResource(Res.string.home_spaces_empty_message),
-                                onClick = onScan
+                                onClick = {}//onScan.takeUnless { isCheckingScan }
                             )
                         }
                     }
