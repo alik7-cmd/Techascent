@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">Muslim – Namaz &amp; Halal Scanner</string>
 
-    <string name="welcome_title">Never lose track of your things again.</string>
-    <string name="welcome_description">Take a photo. Let AI remember where everything is.</string>
+    <string name="welcome_title">Stop searching, Start finding!</string>
+    <string name="welcome_description">Remember where everything is, from the smallest drawer to the biggest storage box.</string>
+    <string name="welcome_app_name">Where Did I Put It?</string>
+    <string name="welcome_illustration_description">An open drawer with a passport, keys and cables next to a storage box, under a magnifying glass.</string>
     <string name="get_started">Get started</string>
     <string name="welcome_tagline">Your home, searchable.</string>
     <string name="subscription_title">AI scan credits</string>
-    <string name="subscription_preview_notice">Purchases aren\'t configured yet. Add a RevenueCat API key to enable them.</string>
+    <string name="subscription_preview_notice">Purchases aren't configured yet. Add a RevenueCat API key to enable them.</string>
     <string name="subscription_adding_scans">Purchase complete. Adding your scans…</string>
     <string name="subscription_credits_pending">Purchase received. Your scans will appear shortly.</string>
     <string name="subscription_checking">Checking your scan credits…</string>
@@ -114,15 +116,15 @@
     <string name="location_save_action">Save location</string>
 
     <string name="login_title">Welcome home</string>
-    <string name="login_subtitle">Your home inventory, securely synced.</string>
-    <string name="login_choose">Choose how you'd like to continue</string>
+    <string name="login_subtitle">Sign in to keep your spaces and items safely synced across devices.</string>
     <string name="login_continue_apple">Continue with Apple</string>
     <string name="login_continue_google">Continue with Google</string>
     <string name="login_terms">By continuing, you agree to our Terms of Service and Privacy Policy.</string>
-    <string name="login_tagline">No password to remember. Just your account.</string>
+    <string name="login_error_title">Couldn't sign you in</string>
+    <string name="login_error_dismiss">Dismiss error</string>
     <string name="login_error_no_account">No Google account found on this device. Add one in Settings and try again.</string>
-    <string name="login_error_network">Couldn\'t reach the server. Check your connection and try again.</string>
-    <string name="login_error_unavailable">This sign-in option isn\'t available on this device yet.</string>
+    <string name="login_error_network">Couldn't reach the server. Check your connection and try again.</string>
+    <string name="login_error_unavailable">This sign-in option isn't available on this device yet.</string>
     <string name="login_error_unknown">Something went wrong while signing in. Please try again.</string>
     <string name="location_empty">No locations yet. Create your first one to start organising.</string>
     <string name="location_retry">Try again</string>

@@ -2,7 +2,7 @@ package org.techascent.aifinder.presentation.welcome
 
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.get_started
-import apphub.aifinder.generated.resources.ic_full_box
+import apphub.aifinder.generated.resources.welcome_illustration
 import apphub.aifinder.generated.resources.welcome_description
 import apphub.aifinder.generated.resources.welcome_title
 import org.jetbrains.compose.resources.DrawableResource
@@ -18,7 +18,7 @@ sealed interface WelcomeUiState {
 }
 
 data class WelcomeContent(
-    val boxRes: DrawableResource = Res.drawable.ic_full_box,
+    val boxRes: DrawableResource = Res.drawable.welcome_illustration,
     val welcomeTitleRes: StringResource = Res.string.welcome_title,
     val descriptionRes: StringResource = Res.string.welcome_description,
     val buttonTextRes: StringResource = Res.string.get_started

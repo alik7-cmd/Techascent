@@ -4,7 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -14,10 +14,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.aifinder.generated.resources.Res
+import apphub.aifinder.generated.resources.welcome_app_name
+import apphub.aifinder.generated.resources.welcome_illustration_description
 import apphub.aifinder.generated.resources.welcome_tagline
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -54,54 +59,59 @@ fun WelcomeScreen(
                         modifier = Modifier.fillMaxWidth()
                             .verticalScroll(rememberScrollState())
                             .heightIn(min = viewportHeight)
-                            .padding(horizontal = 28.dp, vertical = 28.dp),
+                            .padding(horizontal = 28.dp, vertical = 24.dp),
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Spacer(Modifier.height(viewportHeight * 0.1f))
-                            Box(
+                            Text(
+                                stringResource(Res.string.welcome_app_name),
+                                modifier = Modifier.fillMaxWidth(),
+                                color = AiFinderPalette.Teal,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(Modifier.height(32.dp))
+                            Image(
+                                painter = painterResource(content.boxRes),
+                                contentDescription = stringResource(Res.string.welcome_illustration_description),
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
-                                    .widthIn(max = 300.dp).fillMaxWidth().aspectRatio(1f)
-                                    .background(AiFinderPalette.Mint, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Image(
-                                    modifier = Modifier.fillMaxSize().padding(42.dp),
-                                    painter = painterResource(content.boxRes),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            Spacer(Modifier.height(56.dp))
+                                    .widthIn(max = 480.dp).fillMaxWidth()
+                                    .aspectRatio(770f / 520f)
+                                    .clip(RoundedCornerShape(28.dp))
+                                    .background(AiFinderPalette.IllustrationMint)
+                                    .padding(12.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                            Spacer(Modifier.height(40.dp))
                             SectionTitle(
                                 stringResource(content.welcomeTitleRes),
                                 fontSize = 30.sp,
-                                lineHeight = 39.sp
+                                lineHeight = 38.sp
                             )
-                            Spacer(Modifier.height(20.dp))
+                            Spacer(Modifier.height(14.dp))
                             Text(
                                 stringResource(content.descriptionRes),
                                 color = AiFinderPalette.Muted,
-                                fontSize = 16.sp,
-                                lineHeight = 21.sp
+                                fontSize = 17.sp,
+                                lineHeight = 24.sp
                             )
                         }
                         Column(
-                            modifier = Modifier.padding(top = 56.dp),
+                            modifier = Modifier.padding(top = 40.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(20.dp)
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             PrimaryAction(
                                 stringResource(content.buttonTextRes),
                                 onContinue,
-                                modifier = Modifier.heightIn(min = 50.dp)
+                                modifier = Modifier.heightIn(min = 54.dp)
                             )
                             Text(
                                 stringResource(Res.string.welcome_tagline),
                                 color = AiFinderPalette.Muted,
                                 fontSize = 13.sp
                             )
-                            Spacer(Modifier.height(4.dp))
                         }
                     }
                 }

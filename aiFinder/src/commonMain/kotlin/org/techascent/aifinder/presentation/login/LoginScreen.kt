@@ -11,7 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,13 +40,14 @@ fun LoginScreen(
             onSignedIn()
         }
     }
-    LoginContent(state, onSignIn = viewModel::onSignIn)
+    LoginContent(state, onSignIn = viewModel::onSignIn, onDismissError = viewModel::dismissError)
 }
 
 @Composable
 private fun LoginContent(
     state: LoginUiState,
     onSignIn: (AuthProvider) -> Unit,
+    onDismissError: () -> Unit,
 ) {
     val platform = remember { getPlatform() }
     var selectedProvider by remember { mutableStateOf<AuthProvider?>(null) }
@@ -54,95 +57,87 @@ private fun LoginContent(
         onSignIn(provider)
     }
     Scaffold(containerColor = AiFinderPalette.Background) { padding ->
-        Column(
-            Modifier.fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 12.dp)
-        ) {
-            Spacer(Modifier.height(24.dp))
-            Box(
-                Modifier.align(Alignment.CenterHorizontally)
-                    .size(140.dp)
-                    .background(AiFinderPalette.Mint, RoundedCornerShape(36.dp)),
-                contentAlignment = Alignment.Center
+        BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
+            Column(
+                Modifier.fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = maxHeight)
+                    .padding(horizontal = 28.dp, vertical = 24.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    painterResource(Res.drawable.ic_full_box),
-                    contentDescription = null,
-                    modifier = Modifier.size(92.dp)
-                )
+                Column {
+                    Text(
+                        stringResource(Res.string.welcome_app_name),
+                        modifier = Modifier.fillMaxWidth(),
+                        color = AiFinderPalette.Teal,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(32.dp))
+                    Image(
+                        painter = painterResource(Res.drawable.welcome_illustration),
+                        contentDescription = stringResource(Res.string.welcome_illustration_description),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                            .widthIn(max = 480.dp).fillMaxWidth()
+                            .aspectRatio(770f / 520f)
+                            .clip(RoundedCornerShape(28.dp))
+                            .background(AiFinderPalette.IllustrationMint)
+                            .padding(12.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                    Spacer(Modifier.height(40.dp))
+                    SectionTitle(stringResource(Res.string.login_title), fontSize = 30.sp, lineHeight = 38.sp)
+                    Spacer(Modifier.height(14.dp))
+                    Text(
+                        stringResource(Res.string.login_subtitle),
+                        color = AiFinderPalette.Muted,
+                        fontSize = 17.sp,
+                        lineHeight = 24.sp
+                    )
+                }
+                Column(
+                    Modifier.padding(top = 40.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    LoginErrorBanner(
+                        errorRes = (state as? LoginUiState.Error)?.errorRes,
+                        onDismiss = onDismissError,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    if (platform == Platform.IOS) {
+                        ProviderButton(
+                            label = stringResource(Res.string.login_continue_apple),
+                            icon = painterResource(Res.drawable.ic_apple),
+                            containerColor = Color.Black,
+                            contentColor = Color.White,
+                            border = null,
+                            isLoading = isLoading && selectedProvider == AuthProvider.Apple,
+                            enabled = !isLoading,
+                            onClick = { onProviderSelected(AuthProvider.Apple) }
+                        )
+                    }
+                    ProviderButton(
+                        label = stringResource(Res.string.login_continue_google),
+                        icon = painterResource(Res.drawable.ic_google),
+                        containerColor = AiFinderPalette.Surface,
+                        contentColor = AiFinderPalette.Ink,
+                        border = BorderStroke(1.dp, AiFinderPalette.Border),
+                        isLoading = isLoading && selectedProvider == AuthProvider.Google,
+                        enabled = !isLoading,
+                        onClick = { onProviderSelected(AuthProvider.Google) }
+                    )
+                    Text(
+                        stringResource(Res.string.login_terms),
+                        color = AiFinderPalette.Muted,
+                        fontSize = 12.sp,
+                        lineHeight = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, start = 12.dp, end = 12.dp)
+                    )
+                }
             }
-            Spacer(Modifier.height(40.dp))
-            SectionTitle(stringResource(Res.string.login_title), fontSize = 30.sp, lineHeight = 38.sp)
-            Spacer(Modifier.height(12.dp))
-            Text(
-                stringResource(Res.string.login_subtitle),
-                color = AiFinderPalette.Muted,
-                fontSize = 15.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(64.dp))
-            Text(
-                stringResource(Res.string.login_choose),
-                color = AiFinderPalette.Muted,
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(36.dp))
-            if(platform == Platform.IOS){
-                ProviderButton(
-                    label = stringResource(Res.string.login_continue_apple),
-                    icon = painterResource(Res.drawable.ic_apple),
-                    containerColor = Color.Black,
-                    contentColor = Color.White,
-                    border = null,
-                    isLoading = isLoading && selectedProvider == AuthProvider.Apple,
-                    enabled = !isLoading,
-                    onClick = { onProviderSelected(AuthProvider.Apple) }
-                )
-                Spacer(Modifier.height(16.dp))
-            }
-            ProviderButton(
-                label = stringResource(Res.string.login_continue_google),
-                icon = painterResource(Res.drawable.ic_google),
-                containerColor = AiFinderPalette.Surface,
-                contentColor = AiFinderPalette.Ink,
-                border = BorderStroke(1.dp, AiFinderPalette.Border),
-                isLoading = isLoading && selectedProvider == AuthProvider.Google,
-                enabled = !isLoading,
-                onClick = { onProviderSelected(AuthProvider.Google) }
-            )
-            if (state is LoginUiState.Error) {
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    stringResource(state.errorRes),
-                    color = MaterialTheme.colorScheme.error,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            Spacer(Modifier.height(48.dp))
-            Text(
-                stringResource(Res.string.login_terms),
-                color = AiFinderPalette.Muted,
-                fontSize = 13.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
-            )
-            Spacer(Modifier.height(36.dp))
-            Text(
-                stringResource(Res.string.login_tagline),
-                color = AiFinderPalette.Muted,
-                fontSize = 13.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(24.dp))
         }
     }
 }
@@ -162,7 +157,7 @@ private fun ProviderButton(
         onClick = onClick,
         enabled = enabled,
         modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(28.dp),
         border = border,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
