@@ -75,9 +75,14 @@ kotlin {
         }
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
+        target.binaries.framework {
+            baseName = "AiFinder"
+            isStatic = true
+            binaryOption("bundleId", "org.techascent.aifinder.shared")
+            linkerOpts("-lsqlite3")
+        }
+    }
 
     sourceSets {
         all {
@@ -95,8 +100,9 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.moko.permissions)
-            implementation(libs.moko.permissions.compose)
+            implementation(libs.moko.aifinder.core)
+            implementation(libs.moko.aifinder.compose)
+            implementation(libs.moko.aifinder.camera)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.ktor.client.content.negotiation)
             implementation(libs.ktor.ktor.serialization.kotlinx.json)

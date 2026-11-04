@@ -63,13 +63,19 @@ Account's Subscription row opens a compact, content-sized modal bottom sheet ove
 
 ## RevenueCat purchases
 - **UI (V2, active):** navigation uses `SubscriptionSheetV2`. When purchases are available, it shows RevenueCat's dashboard-designed `Paywall` full screen, with RevenueCat's own close button. For loading, errors, a missing key and the "adding scans" state, it falls back to the original `SubscriptionSheet`, which is kept unchanged.
-- **SDK:** `purchases-kmp-core` and `purchases-kmp-ui` `2.2.4+17.12.0`, the newest line built with this project's Kotlin 2.1.21. 3.x/4.x need a Kotlin upgrade.
+- **SDK:** `purchases-kmp-core` and `purchases-kmp-ui` `4.0.0`, using Kotlin 2.3.20 and Compose Multiplatform 1.9.3.
 - **Keys:** add `REVENUECAT_ANDROID_API_KEY` and `REVENUECAT_IOS_API_KEY` to the git-ignored root `local.properties`. A RevenueCat **Test Store** (sandbox) public key works for development without Play/App Store setup. A blank key disables purchases on that platform; the app keeps working and shows the preview sheet. The keys are generated into `config/RevenueCatConfig`. Use public SDK keys only; never use secret keys.
 - **Dashboard setup:** create consumable products `scan_pack_3` and `scan_pack_5`, add them as packages to the **current offering**, and attach a paywall to it. No entitlement is needed, because credits live in Firebase.
 - **Identity:** `RevenueCatPurchaseGateway` configures the SDK lazily, with the Firebase UID as `appUserId`. Login calls `logIn(uid)` (best-effort), and logout calls `logOut()`. The paywall is shown only after the user is identified, so a purchase is never attached to an anonymous RevenueCat ID.
 - **After purchase:** the sheet shows "Adding your scans…" and polls the wallet (8 × 2 s) until the balance increases. If a scan was pending, it then continues to the camera. If the credit is late, the sheet says it will appear shortly and offers a retry.
 - **Granting credits (client):** when the paywall reports `onPurchaseCompleted`, the app writes the `StoreTransaction` to `aifinder/users/{uid}/purchases/{transactionId}` (`purchaseId`, `productId`, `scansGranted`, `purchasedAt`, `store`, `status` `pending` → `credited`) and, in one Firebase transaction, adds 3 (`scan_pack_3`) or 5 (`scan_pack_5`) to `scanWallet/remainingScans`, sets `activeSubscription: true`, and marks `scanWallet/creditedPurchases/{transactionId}` so a purchase is never credited twice. Invalid key characters in transaction IDs are replaced with `_`. If the write fails, the app polls the wallet in case a backend credits it. Because the client can write its own wallet, a RevenueCat webhook plus tighter database rules is still recommended before production.
-- **iOS:** the Kotlin code compiles against the RevenueCat cinterop bindings. The app that links this framework must also add the native `PurchasesHybridCommon` and `PurchasesHybridCommonUI` (17.12.0) via SPM or CocoaPods, with an iOS 15+ deployment target. Note that the iOS Firebase credit adapter is still unavailable.
+- **iOS:** RevenueCat 4 includes its native implementation; do not add `PurchasesHybridCommon` or `PurchasesHybridCommonUI` through SPM/CocoaPods. The iOS deployment target is 15+. Note that the iOS Firebase credit adapter is still unavailable.
+
+### Running the separate iOS app
+
+Open `aiFinderIos/aiFinderIos.xcodeproj` from the repository root and select the `aiFinderIos` scheme. The build phase runs `:aiFinder:embedAndSignAppleFrameworkForXcode` and the SwiftUI host launches `AiFinderApp` through `MainViewController`. Java 17 is required; the script discovers it with `/usr/libexec/java_home` when `JAVA_HOME` is unset. For a physical device, select your signing team in Xcode.
+
+The existing `iosApp` project still runs `composeApp` and is unchanged. The new project generates its basic Info.plist through Xcode. Add your own permission descriptions (including camera usage) in the target's Info settings before using the camera. You can instead provide a custom Info.plist and set the target's **Info.plist File** build setting. Add `GoogleService-Info.plist` to the new target when configuring Firebase; it is git-ignored. Firebase authentication, inventory and wallet adapters on iOS are still placeholders, so adding the plist alone does not enable those features.
 
 ## Prepaid scan access: model and flow
 
