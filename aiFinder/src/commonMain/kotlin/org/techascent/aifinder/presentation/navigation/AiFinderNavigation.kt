@@ -185,6 +185,8 @@ fun AiFinderNavigation() {
                 subscription.refresh()
             },
             onSignedOut = {
+                scan.reset()
+                review.show(emptyList())
                 locations.reset()
                 home.reset()
                 search.reset()

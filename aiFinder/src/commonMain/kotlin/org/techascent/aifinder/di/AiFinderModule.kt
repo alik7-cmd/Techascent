@@ -73,7 +73,16 @@ val aiFinderModule = module {
     single<AuthRepository> { AuthRepositoryImpl(google = get(), signInRemote = get()) }
     factory { SignInUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
-    factory { SignOutUseCase(get()) }
+    factory {
+        val database = get<AiFinderDatabase>()
+        val photos = get<ItemPhotoRepositoryImpl>()
+        SignOutUseCase(get()) { userId ->
+            photos.clearCache(userId)
+            database.itemDao().deleteForUser(userId)
+            database.locationDao().deleteForUser(userId)
+            database.scanWalletDao().deleteForUser(userId)
+        }
+    }
     single<LocationLocalDataSource> { RoomLocationLocalDataSource(get<AiFinderDatabase>().locationDao()) }
     single<LocationRepository> { LocationRepositoryImpl(remote = get(), local = get(), auth = get()) }
     factory { ObserveLocationsUseCase(get()) }
@@ -81,7 +90,8 @@ val aiFinderModule = module {
     single<ItemLocalDataSource> { RoomItemLocalDataSource(get<AiFinderDatabase>().itemDao()) }
     single<InventoryRepository> { InventoryRepositoryImpl(remote = get(), local = get(), auth = get()) }
     factory { ObserveInventoryUseCase(items = get(), locations = get()) }
-    single<ItemPhotoRepository> { ItemPhotoRepositoryImpl(remote = get(), local = get(), auth = get()) }
+    single { ItemPhotoRepositoryImpl(remote = get(), local = get(), auth = get()) }
+    single<ItemPhotoRepository> { get<ItemPhotoRepositoryImpl>() }
     factory { SaveDetectionsUseCase(repository = get(), photos = get()) }
     single<WelcomeRepository> { RoomWelcomeRepository(get<AiFinderDatabase>().welcomePreferenceDao()) }
     factory { ResolveWelcomeDestinationUseCase(auth = get(), welcome = get()) }

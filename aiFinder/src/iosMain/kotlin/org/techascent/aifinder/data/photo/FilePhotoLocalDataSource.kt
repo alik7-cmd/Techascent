@@ -20,6 +20,13 @@ import platform.posix.memcpy
 class FilePhotoLocalDataSource : PhotoLocalDataSource {
     private val fileManager get() = NSFileManager.defaultManager
 
+    override suspend fun deleteForUser(userId: String): Unit = withContext(Dispatchers.IO) {
+        val path = directory(userId)
+        check(!fileManager.fileExistsAtPath(path) || fileManager.removeItemAtPath(path, error = null)) {
+            "Couldn't clear cached photos."
+        }
+    }
+
     override suspend fun read(userId: String, photoId: String): ByteArray? = withContext(Dispatchers.IO) {
         val data = NSData.dataWithContentsOfFile(path(userId, photoId)) ?: return@withContext null
         val size = data.length.toInt()

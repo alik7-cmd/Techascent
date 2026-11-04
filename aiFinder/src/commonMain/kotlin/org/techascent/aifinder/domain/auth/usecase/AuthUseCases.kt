@@ -12,6 +12,13 @@ class GetCurrentUserUseCase(private val repository: AuthRepository) {
     operator fun invoke(): AuthUser? = repository.currentUser
 }
 
-class SignOutUseCase(private val repository: AuthRepository) {
-    suspend operator fun invoke() = repository.signOut()
+class SignOutUseCase(
+    private val repository: AuthRepository,
+    private val clearUserCache: suspend (String) -> Unit,
+) {
+    suspend operator fun invoke() {
+        val userId = repository.currentUser?.id
+        if (userId != null) clearUserCache(userId)
+        repository.signOut()
+    }
 }

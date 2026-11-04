@@ -113,6 +113,7 @@ class ScanAccessRepositoryTest {
         private val wallets = mutableMapOf<String, CachedScanWallet>()
         override suspend fun get(userId: String) = wallets[userId]
         override suspend fun upsert(wallet: CachedScanWallet) { wallets[wallet.userId] = wallet }
+        override suspend fun deleteForUser(userId: String) { wallets.remove(userId) }
     }
 
     private class FakeAuth : AuthRepository {

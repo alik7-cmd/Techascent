@@ -49,6 +49,33 @@ class ItemPhotoRepositoryImplTest {
         ItemPhotoRepositoryImpl(remote, FilePhotoLocalDataSource(folder.root), auth)
 
     @Test
+    fun clearingCacheRemovesMemoryAndDiskButPreservesCloudPhotos() = runBlocking<Unit> {
+        val remote = FakeRemote()
+        val repo = repository(remote)
+        repo.save("p", bytes).getOrThrow()
+        repo.clearCache("u1")
+        assertNull(FilePhotoLocalDataSource(folder.root).read("u1", "p"))
+        assertContentEquals(bytes, remote.store[StoragePaths.photo("u1", "p")])
+        assertContentEquals(bytes, repo.load("p"))
+        assertEquals(1, remote.downloads)
+    }
+
+    @Test
+    fun clearingCachePreventsPendingDownloadFromRepopulatingIt() = runBlocking<Unit> {
+        val remote = FakeRemote().apply {
+            store[StoragePaths.photo("u1", "p")] = bytes
+            gate = CompletableDeferred()
+        }
+        val repo = repository(remote)
+        val pending = async { repo.load("p") }
+        kotlinx.coroutines.yield()
+        repo.clearCache("u1")
+        remote.gate!!.complete(Unit)
+        assertNull(pending.await())
+        assertNull(FilePhotoLocalDataSource(folder.root).read("u1", "p"))
+    }
+
+    @Test
     fun saveUploadsThenServesFromDeviceWithoutDownloading() = runBlocking<Unit> {
         val remote = FakeRemote()
         repository(remote).save("photo-1", bytes).getOrThrow()

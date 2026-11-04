@@ -11,6 +11,7 @@ interface PhotoRemoteDataSource {
 interface PhotoLocalDataSource {
     suspend fun read(userId: String, photoId: String): ByteArray?
     suspend fun write(userId: String, photoId: String, jpegBytes: ByteArray)
+    suspend fun deleteForUser(userId: String)
 }
 
 object StoragePaths {

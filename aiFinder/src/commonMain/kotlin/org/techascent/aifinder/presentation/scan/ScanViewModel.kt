@@ -97,6 +97,13 @@ class ScanViewModel(
         loadBalance()
     }
 
+    fun reset() {
+        cancelAnalysis()
+        balanceJob?.cancel()
+        balanceJob = null
+        _state.value = ScanUiState.Success(ScanContent())
+    }
+
     private fun logRaw(photoId: String, results: List<RecognizedObject>) {
         logDebug(TAG, "Raw detection for $photoId: ${results.size} result(s)")
         results.forEachIndexed { i, r ->

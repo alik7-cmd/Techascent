@@ -19,4 +19,7 @@ interface ScanWalletDao {
 
     @Upsert
     suspend fun upsert(wallet: CachedScanWallet)
+
+    @Query("DELETE FROM CachedScanWallet WHERE userId = :userId")
+    suspend fun deleteForUser(userId: String)
 }

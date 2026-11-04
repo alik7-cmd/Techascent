@@ -22,12 +22,22 @@ class ItemPhotoRepositoryImpl(
     private val lock = Mutex()
     private val memory = LinkedHashMap<String, ByteArray>()
     private val inFlight = mutableMapOf<String, CompletableDeferred<ByteArray?>>()
+    private var cacheGeneration = 0L
+
+    suspend fun clearCache(userId: String) = lock.withLock {
+        cacheGeneration++
+        memory.clear()
+        inFlight.values.forEach { it.complete(null) }
+        inFlight.clear()
+        local.deleteForUser(userId)
+    }
 
     override suspend fun save(photoId: String, jpegBytes: ByteArray): Result<Unit> {
         val userId = auth.currentUser?.id ?: return Result.failure(PhotoError.NotSignedIn)
+        val generation = lock.withLock { cacheGeneration }
         return try {
             remote.upload(userId, photoId, jpegBytes)
-            cacheLocally(userId, photoId, jpegBytes)
+            cacheLocally(userId, photoId, jpegBytes, generation)
             Result.success(Unit)
         } catch (e: CancellationException) {
             throw e
@@ -39,6 +49,7 @@ class ItemPhotoRepositoryImpl(
     override suspend fun load(photoId: String): ByteArray? {
         val userId = auth.currentUser?.id ?: return null
         val key = "$userId/$photoId"
+        val generation = lock.withLock { cacheGeneration }
         // Items from one scan share a photo, so concurrent requests for it share one load.
         val (deferred, owner) = lock.withLock {
             memory[key]?.let { return it }
@@ -47,7 +58,7 @@ class ItemPhotoRepositoryImpl(
         if (!owner) return deferred.await()
         val bytes = try {
             local.read(userId, photoId) ?: remote.download(userId, photoId)?.also {
-                runCatching { local.write(userId, photoId, it) }
+                cacheLocally(userId, photoId, it, generation)
             }
         } catch (e: CancellationException) {
             lock.withLock { inFlight.remove(key) }
@@ -58,6 +69,10 @@ class ItemPhotoRepositoryImpl(
             null
         }
         lock.withLock {
+            if (generation != cacheGeneration) {
+                deferred.complete(null)
+                return null
+            }
             inFlight.remove(key)
             if (bytes != null) remember(key, bytes)
         }
@@ -65,11 +80,12 @@ class ItemPhotoRepositoryImpl(
         return bytes
     }
 
-    private suspend fun cacheLocally(userId: String, photoId: String, bytes: ByteArray) {
+    private suspend fun cacheLocally(userId: String, photoId: String, bytes: ByteArray, generation: Long) = lock.withLock {
+        if (generation != cacheGeneration || auth.currentUser?.id != userId) return@withLock
         // The upload already succeeded; a failed local write only means a later re-download.
         runCatching { local.write(userId, photoId, bytes) }
             .onFailure { logDebug(TAG, "Couldn't cache photo $photoId: ${it.message}") }
-        lock.withLock { remember("$userId/$photoId", bytes) }
+        remember("$userId/$photoId", bytes)
     }
 
     private fun remember(key: String, bytes: ByteArray) {
