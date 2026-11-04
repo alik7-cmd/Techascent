@@ -5,6 +5,7 @@ import org.techascent.aifinder.config.MasterUsers
 import org.techascent.aifinder.domain.auth.AuthRepository
 import org.techascent.aifinder.domain.subscription.ScanAccess
 import org.techascent.aifinder.domain.subscription.ScanAccessRepository
+import org.techascent.aifinder.domain.subscription.ScanPurchase
 
 class ScanAccessRepositoryImpl(
     private val auth: AuthRepository,
@@ -24,6 +25,11 @@ class ScanAccessRepositoryImpl(
         if (userId in masterUserIds) return@withTimeoutOrNull ScanAccess(userId, 0, isMaster = true)
         remote.consume(userId, scanId)
     } ?: error("Updating scan credits timed out. Please try again.")
+
+    override suspend fun recordPurchase(purchase: ScanPurchase): ScanAccess = withTimeoutOrNull(15_000L) {
+        val userId = requireUser()
+        remote.recordPurchase(userId, purchase)
+    } ?: error("Saving your purchase timed out.")
 
     private fun requireUser(): String = checkNotNull(auth.currentUser) { "Please sign in to scan." }.id
 }

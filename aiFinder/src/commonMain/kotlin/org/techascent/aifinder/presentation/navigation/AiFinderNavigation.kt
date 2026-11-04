@@ -237,8 +237,8 @@ fun AiFinderNavigation() {
         SubscriptionSheet(
             state = subscriptionState,
             onRetry = { subscription.refresh(onAllowed = if (pendingScan) openScanner else null) },
-            onPurchaseCompleted = {
-                subscription.onPurchaseCompleted(onAllowed = if (pendingScan) openScanner else null)
+            onPurchaseCompleted = { purchase ->
+                subscription.onPurchaseCompleted(purchase, onAllowed = if (pendingScan) openScanner else null)
             },
             onDismiss = {
                 showingSubscription = false

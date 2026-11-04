@@ -74,27 +74,8 @@ private fun LoginContent(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
-                    Spacer(Modifier.height(32.dp))
-                    Image(
-                        painter = painterResource(Res.drawable.welcome_illustration),
-                        contentDescription = stringResource(Res.string.welcome_illustration_description),
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                            .widthIn(max = 480.dp).fillMaxWidth()
-                            .aspectRatio(770f / 520f)
-                            .clip(RoundedCornerShape(28.dp))
-                            .background(AiFinderPalette.IllustrationMint)
-                            .padding(12.dp),
-                        contentScale = ContentScale.Fit
-                    )
-                    Spacer(Modifier.height(40.dp))
-                    SectionTitle(stringResource(Res.string.login_title), fontSize = 30.sp, lineHeight = 38.sp)
-                    Spacer(Modifier.height(14.dp))
-                    Text(
-                        stringResource(Res.string.login_subtitle),
-                        color = AiFinderPalette.Muted,
-                        fontSize = 17.sp,
-                        lineHeight = 24.sp
-                    )
+                    Spacer(Modifier.height(28.dp))
+                    LoginOnboardingPager(Modifier.fillMaxWidth())
                 }
                 Column(
                     Modifier.padding(top = 40.dp),
@@ -106,7 +87,7 @@ private fun LoginContent(
                         onDismiss = onDismissError,
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
-                    if (platform == Platform.IOS) {
+                    if (platform.isIos()) {
                         ProviderButton(
                             label = stringResource(Res.string.login_continue_apple),
                             icon = painterResource(Res.drawable.ic_apple),
@@ -178,3 +159,5 @@ private fun ProviderButton(
         Text(label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
     }
 }
+
+private fun Platform.isIos() = this == Platform.IOS

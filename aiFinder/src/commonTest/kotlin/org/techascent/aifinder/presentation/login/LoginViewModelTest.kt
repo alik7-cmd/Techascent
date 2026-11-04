@@ -24,6 +24,7 @@ import org.techascent.aifinder.domain.auth.usecase.SignInUseCase
 import org.techascent.aifinder.domain.subscription.PurchaseGateway
 import org.techascent.aifinder.domain.subscription.ScanAccess
 import org.techascent.aifinder.domain.subscription.ScanAccessRepository
+import org.techascent.aifinder.domain.subscription.ScanPurchase
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -81,6 +82,7 @@ class LoginViewModelTest {
         val viewModel = newViewModel(FakeAuthRepository(), object : ScanAccessRepository {
             override suspend fun refresh(): ScanAccess = error("Permission denied")
             override suspend fun consume(userId: String, scanId: String) = error("Not used")
+            override suspend fun recordPurchase(purchase: ScanPurchase) = error("Not used")
         }, purchases)
         viewModel.onSignIn(AuthProvider.Google)
         runCurrent()
@@ -114,6 +116,7 @@ class LoginViewModelTest {
         access: ScanAccessRepository = object : ScanAccessRepository {
             override suspend fun refresh() = ScanAccess("user", 0)
             override suspend fun consume(userId: String, scanId: String) = error("Not used")
+            override suspend fun recordPurchase(purchase: ScanPurchase) = error("Not used")
         },
         purchases: PurchaseGateway = FakePurchases(),
     ) = LoginViewModel(SignInUseCase(repository), GetCurrentUserUseCase(repository), access, purchases)

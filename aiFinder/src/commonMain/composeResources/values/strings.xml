@@ -115,8 +115,19 @@
     <string name="location_create_new">+ Create new location</string>
     <string name="location_save_action">Save location</string>
 
-    <string name="login_title">Welcome home</string>
-    <string name="login_subtitle">Sign in to keep your spaces and items safely synced across devices.</string>
+    <string name="login_slide_scan_title">Snap it once</string>
+    <string name="login_slide_scan_description">Take a photo of a drawer, shelf or box. AI spots and names every item in it for you.</string>
+    <string name="login_slide_find_title">Find it in seconds</string>
+    <string name="login_slide_find_description">Search for anything and see exactly which room, shelf or box it's in.</string>
+    <string name="login_slide_scan_illustration_description">A photo of a drawer with keys, a cable and headphones tagged by AI</string>
+    <string name="login_slide_find_illustration_description">A search for a passport showing it is in the bedroom wardrobe, top drawer</string>
+    <string name="login_slide_position">Slide %1$d of %2$d</string>
+    <string name="login_illustration_tag_keys">Keys</string>
+    <string name="login_illustration_tag_cable">HDMI cable</string>
+    <string name="login_illustration_tag_headphones">Headphones</string>
+    <string name="login_illustration_search_query">Passport</string>
+    <string name="login_illustration_search_result">Passport</string>
+    <string name="login_illustration_search_path">Bedroom › Wardrobe › Top drawer</string>
     <string name="login_continue_apple">Continue with Apple</string>
     <string name="login_continue_google">Continue with Google</string>
     <string name="login_terms">By continuing, you agree to our Terms of Service and Privacy Policy.</string>

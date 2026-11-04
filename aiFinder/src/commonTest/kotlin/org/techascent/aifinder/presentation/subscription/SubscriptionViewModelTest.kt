@@ -16,6 +16,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import org.techascent.aifinder.domain.subscription.PurchaseGateway
 import org.techascent.aifinder.domain.subscription.ScanAccess
 import org.techascent.aifinder.domain.subscription.ScanAccessRepository
+import org.techascent.aifinder.domain.subscription.ScanPurchase
+import org.techascent.aifinder.domain.subscription.StorePurchase
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SubscriptionViewModelTest {
@@ -108,6 +110,45 @@ class SubscriptionViewModelTest {
         assertEquals(0, allowed)
     }
 
+    @Test
+    fun purchaseIsRecordedAndCreditedThenContinues() = runTest {
+        val repository = FakeRepository(ScanAccess("uid", 0))
+        val viewModel = SubscriptionViewModel(repository, FakePurchases())
+        viewModel.refresh()
+        runCurrent()
+        var allowed = 0
+        viewModel.onPurchaseCompleted(StorePurchase("GPA.1", listOf("scan_pack_5"), 42L, "play_store")) { allowed++ }
+        advanceUntilIdle()
+        assertEquals(
+            listOf(ScanPurchase("GPA.1", "scan_pack_5", 5, 42L, "play_store")),
+            repository.recorded
+        )
+        assertEquals(SubscriptionUiState.Ready(ScanAccess("uid", 5), purchasesEnabled = true), viewModel.state.value)
+        assertEquals(1, allowed)
+    }
+
+    @Test
+    fun failedRecordFallsBackToPollingForTheCredit() = runTest {
+        val repository = FakeRepository(ScanAccess("uid", 0)).apply { failRecord = true }
+        val viewModel = SubscriptionViewModel(repository, FakePurchases())
+        viewModel.refresh()
+        runCurrent()
+        viewModel.onPurchaseCompleted(StorePurchase("t1", listOf("scan_pack_3"), 1L, "play_store"))
+        runCurrent()
+        assertEquals(SubscriptionUiState.AddingScans, viewModel.state.value)
+        repository.value = ScanAccess("uid", 3)
+        advanceUntilIdle()
+        assertEquals(SubscriptionUiState.Ready(ScanAccess("uid", 3), purchasesEnabled = true), viewModel.state.value)
+    }
+
+    @Test
+    fun storePurchasesMapToScanPacks() {
+        assertEquals(3, ScanPurchase.from(StorePurchase("a", listOf("scan_pack_3"), 1L, "s"))?.scansGranted)
+        assertEquals(5, ScanPurchase.from(StorePurchase("a", listOf("scan_pack_5:base"), 1L, "s"))?.scansGranted)
+        assertEquals("scan_pack_3_7", ScanPurchase.from(StorePurchase(null, listOf("scan_pack_3"), 7L, "s"))?.purchaseId)
+        assertEquals(null, ScanPurchase.from(StorePurchase("a", listOf("premium_monthly"), 1L, "s")))
+    }
+
     private class FakePurchases(private val available: Boolean = true) : PurchaseGateway {
         val identified = mutableListOf<String>()
         var failIdentify = false
@@ -126,5 +167,13 @@ class SubscriptionViewModelTest {
             return value
         }
         override suspend fun consume(userId: String, scanId: String) = error("Not used")
+        val recorded = mutableListOf<ScanPurchase>()
+        var failRecord = false
+        override suspend fun recordPurchase(purchase: ScanPurchase): ScanAccess {
+            check(!failRecord) { "Offline" }
+            recorded += purchase
+            value = value.copy(remainingScans = value.remainingScans + purchase.scansGranted)
+            return value
+        }
     }
 }

@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import org.techascent.aifinder.domain.subscription.PurchaseGateway
 import org.techascent.aifinder.domain.subscription.ScanAccess
 import org.techascent.aifinder.domain.subscription.ScanAccessRepository
+import org.techascent.aifinder.domain.subscription.ScanPurchase
+import org.techascent.aifinder.domain.subscription.StorePurchase
 import org.techascent.aifinder.util.logDebug
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -63,12 +65,30 @@ class SubscriptionViewModel(
         }
     }
 
-    /** Polls the wallet until the server-side webhook has added the purchased scans. */
-    fun onPurchaseCompleted(onAllowed: (() -> Unit)? = null) {
+    /**
+     * Saves the transaction to the purchase history and credits the wallet. If that write fails,
+     * keeps polling in case the purchase is credited elsewhere (e.g. by a backend webhook).
+     */
+    fun onPurchaseCompleted(purchase: StorePurchase? = null, onAllowed: (() -> Unit)? = null) {
         val previous = (_state.value as? SubscriptionUiState.Ready)?.access?.remainingScans ?: 0L
         job?.cancel()
         _state.value = SubscriptionUiState.AddingScans
         job = viewModelScope.launch {
+            val record = purchase?.let(ScanPurchase::from)
+            if (record == null) {
+                logDebug(TAG, "Purchase has no known scan pack: ${purchase?.productIds}")
+            } else {
+                try {
+                    val access = repository.recordPurchase(record)
+                    _state.value = SubscriptionUiState.Ready(access, purchasesEnabled = true)
+                    if (access.canScan) onAllowed?.invoke()
+                    return@launch
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logDebug(TAG, "Recording purchase ${record.purchaseId} failed: ${e.message}")
+                }
+            }
             var latest: ScanAccess? = null
             repeat(creditPollAttempts) { attempt ->
                 if (attempt > 0) delay(creditPollInterval)

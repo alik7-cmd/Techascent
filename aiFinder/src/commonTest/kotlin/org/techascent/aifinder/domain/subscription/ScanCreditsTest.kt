@@ -83,5 +83,6 @@ class ScanCreditsTest {
             consumed += userId to scanId
             return value.copy(remainingScans = 0)
         }
+        override suspend fun recordPurchase(purchase: ScanPurchase) = error("Not used")
     }
 }

@@ -14,4 +14,7 @@ class ScanAccessRequiredException : IllegalStateException("No scans remaining. C
 interface ScanAccessRepository {
     suspend fun refresh(): ScanAccess
     suspend fun consume(userId: String, scanId: String): ScanAccess
+
+    /** Saves the purchase to the user's history and adds its scans to the wallet once. */
+    suspend fun recordPurchase(purchase: ScanPurchase): ScanAccess
 }

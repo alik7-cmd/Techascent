@@ -18,6 +18,7 @@ class ScanAccessRepositoryTest {
         val repository = ScanAccessRepositoryImpl(auth, object : ScanAccessRemoteDataSource {
             override suspend fun load(userId: String): ScanAccess = error("Must not read Firebase")
             override suspend fun consume(userId: String, scanId: String): ScanAccess = error("Must not deduct credits")
+            override suspend fun recordPurchase(userId: String, purchase: ScanPurchase) = error("Not used")
         }, masterUserIds = setOf("user"))
         assertEquals(ScanAccess("user", 0, true), repository.refresh())
         assertEquals(ScanAccess("user", 0, true), repository.consume("user", "scan"))
@@ -32,6 +33,7 @@ class ScanAccessRepositoryTest {
             override suspend fun load(userId: String): ScanAccess = CompletableDeferred<ScanAccess>().await()
             override suspend fun consume(userId: String, scanId: String): ScanAccess =
                 CompletableDeferred<ScanAccess>().await()
+            override suspend fun recordPurchase(userId: String, purchase: ScanPurchase) = error("Not used")
         })
         assertFailsWith<IllegalStateException> { repository.refresh() }
         assertEquals(15_000L, testScheduler.currentTime)
@@ -53,6 +55,7 @@ class ScanAccessRepositoryTest {
                 charges++
                 return ScanAccess(userId, 0)
             }
+            override suspend fun recordPurchase(userId: String, purchase: ScanPurchase) = error("Not used")
         })
         repository.refresh()
         auth.currentUser = AuthUser("other", null, null, null)
