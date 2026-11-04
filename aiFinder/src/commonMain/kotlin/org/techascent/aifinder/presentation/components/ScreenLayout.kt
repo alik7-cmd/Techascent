@@ -17,6 +17,7 @@ fun ScreenLayout(
     content: LazyListScope.() -> Unit
 ) {
     Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = AiFinderPalette.Background,
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,

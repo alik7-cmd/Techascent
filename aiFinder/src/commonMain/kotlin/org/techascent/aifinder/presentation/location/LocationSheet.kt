@@ -28,6 +28,7 @@ import org.techascent.aifinder.domain.model.LocationType
 import org.techascent.aifinder.presentation.components.InfoCard
 import org.techascent.aifinder.presentation.components.LoadingContent
 import org.techascent.aifinder.presentation.components.PrimaryAction
+import org.techascent.aifinder.presentation.components.EmptyListCard
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -232,12 +233,13 @@ fun LocationSheet(viewModel: LocationViewModel, itemCount: Int?, onDismiss: () -
                         }
                     }
                     if (matches.isEmpty() && !state.isLoading && state.loadError == null) {
-                        Text(
-                            stringResource(
-                                if (state.locations.isEmpty()) Res.string.location_empty else Res.string.location_no_matches
-                            ),
-                            color = AiFinderPalette.Muted,
-                            modifier = Modifier.padding(vertical = 16.dp)
+                        EmptyListCard(
+                            titleRes = if (query.isBlank()) Res.string.home_spaces_empty_title
+                                else Res.string.search_empty_matches_title,
+                            descriptionRes = if (query.isBlank()) Res.string.location_empty
+                                else Res.string.location_no_matches,
+                            actionLabel = if (query.isNotBlank()) stringResource(Res.string.search_clear_query) else null,
+                            onAction = if (query.isNotBlank()) ({ query = "" }) else null,
                         )
                     }
                 }

@@ -56,7 +56,10 @@ private fun LoginContent(
         selectedProvider = provider
         onSignIn(provider)
     }
-    Scaffold(containerColor = AiFinderPalette.Background) { padding ->
+    Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = AiFinderPalette.Background
+    ) { padding ->
         BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
             Column(
                 Modifier.fillMaxWidth()
@@ -115,7 +118,8 @@ private fun LoginContent(
                         fontSize = 12.sp,
                         lineHeight = 18.sp,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, start = 12.dp, end = 12.dp)
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(top = 4.dp, start = 12.dp, end = 12.dp)
                     )
                 }
             }
@@ -150,7 +154,11 @@ private fun ProviderButton(
     ) {
         Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) {
             if (isLoading) {
-                CircularProgressIndicator(Modifier.size(18.dp), color = contentColor, strokeWidth = 2.dp)
+                CircularProgressIndicator(
+                    Modifier.size(18.dp),
+                    color = contentColor,
+                    strokeWidth = 2.dp
+                )
             } else {
                 Image(icon, contentDescription = null, modifier = Modifier.size(20.dp))
             }

@@ -111,7 +111,7 @@ fun ReviewScreen(
                         onClick = onChooseLocation
                     )
                 }
-                item(key = "summary") {
+                if (detections.isNotEmpty()) item(key = "summary") {
                     InfoCard(
                         title = stringResource(Res.string.review_items_found, state.data.detections.size),
                         subtitle = stringResource(Res.string.review_check_items),
@@ -134,9 +134,9 @@ fun ReviewScreen(
                 if (detections.isEmpty()) {
                     item(key = "empty") {
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            InfoCard(
-                                title = stringResource(Res.string.review_empty_title),
-                                subtitle = stringResource(Res.string.review_empty_message)
+                            EmptyListCard(
+                                titleRes = Res.string.review_empty_title,
+                                descriptionRes = Res.string.review_empty_message,
                             )
                             PrimaryAction(stringResource(Res.string.review_scan_again), onBack)
                         }

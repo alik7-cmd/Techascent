@@ -35,11 +35,14 @@ fun SpacesScreen(
             is SpacesUiState.Success -> {
                 if (state.spaces.isEmpty()) {
                     item(key = "empty") {
-                        InfoCard(
-                            title = stringResource(Res.string.home_spaces_empty_title),
-                            subtitle = stringResource(Res.string.home_spaces_empty_message),
-                            onClick = onScan.takeUnless { isCheckingScan }
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            EmptyListCard()
+                            PrimaryAction(
+                                stringResource(Res.string.home_scan_action),
+                                onScan,
+                                isLoading = isCheckingScan,
+                            )
+                        }
                     }
                 }
                 items(state.spaces, key = { it.location.id }) { entry ->

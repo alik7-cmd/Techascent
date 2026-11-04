@@ -9,12 +9,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import apphub.aifinder.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.techascent.aifinder.presentation.components.ErrorContent
-import org.techascent.aifinder.presentation.components.InfoCard
+import org.techascent.aifinder.presentation.components.EmptyListCard
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @OptIn(KoinExperimentalAPI::class)
@@ -30,7 +28,10 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(containerColor = AiFinderPalette.Background) { padding ->
+    Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = AiFinderPalette.Background
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(horizontal = 24.dp, vertical = 28.dp),
@@ -42,18 +43,28 @@ fun HomeScreen(
             when (val state = uiState) {
                 is HomeUiState.Loading -> {
                     item(key = "spaces-skeleton") { SpacesHeaderSkeleton() }
-                    items(HOME_SKELETON_CARDS, key = { "space-skeleton-$it" }) { SpaceCardSkeleton() }
+                    items(
+                        HOME_SKELETON_CARDS,
+                        key = { "space-skeleton-$it" }) { SpaceCardSkeleton() }
                 }
-                is HomeUiState.Error -> item(key = "error") { ErrorContent(state.message, viewModel::retry) }
+
+                is HomeUiState.Error -> item(key = "error") {
+                    ErrorContent(
+                        state.message,
+                        viewModel::retry
+                    )
+                }
+
                 is HomeUiState.Success -> {
-                    item(key = "spaces") { SpacesHeader(onSeeAll, showSeeAll = state.data.spaces.isNotEmpty()) }
+                    item(key = "spaces") {
+                        SpacesHeader(
+                            onSeeAll,
+                            showSeeAll = state.data.spaces.isNotEmpty()
+                        )
+                    }
                     if (state.data.spaces.isEmpty()) {
                         item(key = "empty") {
-                            InfoCard(
-                                title = stringResource(Res.string.home_spaces_empty_title),
-                                subtitle = stringResource(Res.string.home_spaces_empty_message),
-                                onClick = {}//onScan.takeUnless { isCheckingScan }
-                            )
+                            EmptyListCard()
                         }
                     }
                     items(state.data.spaces, key = { it.location.id }) { entry ->

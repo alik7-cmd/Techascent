@@ -1,7 +1,6 @@
 package org.techascent.aifinder.presentation.search
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -34,7 +33,6 @@ fun SearchScreen(
     onBack: () -> Unit,
     onRetry: () -> Unit
 ) {
-    val darkTheme = isSystemInDarkTheme()
     ScreenLayout(
         topBar = {
             Surface(color = AiFinderPalette.Background) {
@@ -85,8 +83,14 @@ private fun LazyListScope.searchContent(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
         )
+        Text(
+            stringResource(Res.string.search_tip),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
+            color = AiFinderPalette.Muted,
+            fontSize = 14.sp
+        )
     }
-    item(key = "count") {
+    if (data.results.isNotEmpty()) item(key = "count") {
         Text(
             stringResource(
                 if (data.results.size == 1) Res.string.search_one_found else Res.string.search_items_found,
@@ -98,13 +102,15 @@ private fun LazyListScope.searchContent(
     }
     if (data.results.isEmpty()) {
         item(key = "empty") {
-            Text(
-                if (data.hasItems) {
-                    stringResource(Res.string.search_no_results, data.query.trim())
+            EmptyListCard(
+                titleRes = if (data.hasItems) Res.string.search_empty_matches_title else Res.string.search_empty_inventory_title,
+                description = if (data.hasItems) {
+                    stringResource(Res.string.search_empty_matches_description, data.query)
                 } else {
-                    stringResource(Res.string.search_no_items)
+                    stringResource(Res.string.search_empty_inventory_description)
                 },
-                color = AiFinderPalette.Ink
+                actionLabel = if (data.hasItems && data.query.isNotBlank()) stringResource(Res.string.search_clear_query) else null,
+                onAction = if (data.hasItems && data.query.isNotBlank()) ({ onQueryChange("") }) else null,
             )
         }
     }
@@ -154,13 +160,5 @@ private fun LazyListScope.searchContent(
                 onClick = { onItemSelected(record.item.id) }
             )
         }
-    }
-    item(key = "tip") {
-        Text(
-            stringResource(Res.string.search_tip),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 28.dp),
-            color = AiFinderPalette.Muted,
-            fontSize = 14.sp
-        )
     }
 }

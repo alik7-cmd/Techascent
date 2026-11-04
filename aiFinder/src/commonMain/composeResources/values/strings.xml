@@ -33,7 +33,7 @@
     <string name="subscription_no_subscription">One-time packs. No subscription.</string>
 
     <string name="home_title">Where Did I Put It?</string>
-    <string name="home_greeting">Good morning! Find anything in seconds.</string>
+    <string name="home_greeting">Good day! Find anything in seconds.</string>
     <string name="home_search_hint">Where is my HDMI cable?</string>
     <string name="home_scan_title">Make your home\nsearchable</string>
     <string name="home_scan_description">Snap a drawer or box and let AI\ncatalog the things inside.</string>
@@ -80,12 +80,18 @@
     <string name="scan_location_required">Select a storage location before analyzing your photo.</string>
     <string name="review_saving">Saving…</string>
     <string name="home_spaces_empty_title">No spaces yet</string>
-    <string name="home_spaces_empty_message">Scan a space and choose where it lives to start cataloging.</string>
+    <string name="home_spaces_empty_message">Give everything a place. Scan your first drawer, shelf or box to start finding things faster.</string>
+    <string name="home_spaces_empty_illustration">A man looking into an empty storage box, wondering where everything went</string>
     <string name="spaces_title">All spaces</string>
     <string name="space_empty_title">Nothing saved here yet</string>
     <string name="space_empty_message">Scan this space to catalog what's inside.</string>
     <string name="space_not_found">This space no longer exists.</string>
     <string name="search_no_items">You haven't saved any items yet. Scan a space to get started.</string>
+    <string name="search_empty_inventory_title">Your inventory starts here</string>
+    <string name="search_empty_inventory_description">Scan a drawer, shelf or box from Home, then save your findings. Your items will be ready to find here.</string>
+    <string name="search_empty_matches_title">No matches just yet</string>
+    <string name="search_empty_matches_description">We couldn't find anything for “%1$s”. Try a shorter name, a category or a different keyword.</string>
+    <string name="search_clear_query">Clear search</string>
     <string name="search_no_results">No items match "%1$s".</string>
     <string name="review_edit_item">Rename %1$s</string>
     <string name="review_delete_item">Delete %1$s</string>

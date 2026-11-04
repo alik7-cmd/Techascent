@@ -59,9 +59,9 @@ fun SpaceScreen(
                 if (state.data.items.isEmpty()) {
                     item(key = "empty") {
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            InfoCard(
-                                title = stringResource(Res.string.space_empty_title),
-                                subtitle = stringResource(Res.string.space_empty_message)
+                            EmptyListCard(
+                                titleRes = Res.string.space_empty_title,
+                                descriptionRes = Res.string.space_empty_message,
                             )
                             PrimaryAction(stringResource(Res.string.home_scan_action), onScan, isLoading = isCheckingScan)
                         }
