@@ -51,6 +51,9 @@ You need Storage rules that allow `aifinder/users/{uid}/**` when `request.auth.u
 ## Startup routing
 Welcome checks the restored Firebase session and a device-local Room welcome flag while showing only the background (no content or spinner). Signed-in users go directly to Home. Signed-out users see welcome content once per app data installation; subsequent launches go directly to Login. The flag is saved before the first welcome content is shown. Continuing replaces Welcome with Login, and Login has no route back to Welcome. Room migration 2-to-3 adds the flag table without changing cached locations.
 
+## Navigation
+`AiFinderNavigation` uses Navigation Compose's multiplatform `NavHost`, with all routes defined in the sealed `AiFinderScreen` class. Space and item details receive encoded IDs as navigation arguments. Back returns to the actual originating screen, including when opening Scan from a space. Welcome completion, sign-in and sign-out replace the back stack, preventing Back from reopening authentication screens or a signed-out session. Saving a review returns to Home and removes the scan/review flow from the stack. Shared ViewModels retain the scan-to-review handoff and existing logout cleanup.
+
 ## Account settings
 After authentication, Android updates `aifinder/users/{uid}/signedIn` with `platform` (`ANDROID` or `IOS`), `provider` (`Google` or `Apple`), and `deviceName`. This stores the latest sign-in, not a history, and leaves locations/items untouched. Login navigates only after the write succeeds; failures or a 15-second timeout show a retryable error. Realtime Database rules must permit writes to this node only when `auth.uid == uid`. Restored sessions do not trigger another write.
 
@@ -75,7 +78,7 @@ Account's Subscription row opens a compact, content-sized modal bottom sheet ove
 
 Open `aiFinderIos/aiFinderIos.xcodeproj` from the repository root and select the `aiFinderIos` scheme. The build phase runs `:aiFinder:embedAndSignAppleFrameworkForXcode` and the SwiftUI host launches `AiFinderApp` through `MainViewController`. Java 17 is required; the script discovers it with `/usr/libexec/java_home` when `JAVA_HOME` is unset. For a physical device, select your signing team in Xcode.
 
-The existing `iosApp` project still runs `composeApp` and is unchanged. The new project generates its basic Info.plist through Xcode. Add your own permission descriptions (including camera usage) in the target's Info settings before using the camera. You can instead provide a custom Info.plist and set the target's **Info.plist File** build setting. Add `GoogleService-Info.plist` to the new target when configuring Firebase; it is git-ignored. Firebase authentication, inventory and wallet adapters on iOS are still placeholders, so adding the plist alone does not enable those features.
+The existing `iosApp` project still runs `composeApp` and is unchanged. Xcode merges generated app metadata with `aiFinderIos/aiFinderIos/Info.plist`, which sets the Boolean `CADisableMinimumFrameDurationOnPhone = YES` required by Compose at startup. Preserve this Boolean if you replace the plist. Add your own permission descriptions (including camera usage) to this plist before using the camera. Add `GoogleService-Info.plist` to the new target when configuring Firebase; it is git-ignored. Firebase authentication, inventory and wallet adapters on iOS are still placeholders, so adding the Firebase plist alone does not enable those features.
 
 ## Prepaid scan access: model and flow
 

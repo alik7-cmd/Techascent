@@ -2,27 +2,33 @@ package org.techascent.aifinder.presentation.navigation
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.savedstate.read
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.annotation.KoinExperimentalAPI
-import org.techascent.aifinder.presentation.welcome.*
-import org.techascent.aifinder.presentation.home.*
-import org.techascent.aifinder.presentation.scan.*
-import org.techascent.aifinder.presentation.review.*
-import org.techascent.aifinder.presentation.search.*
+import org.techascent.aifinder.domain.auth.WelcomeDestination
+import org.techascent.aifinder.presentation.account.*
 import org.techascent.aifinder.presentation.details.*
+import org.techascent.aifinder.presentation.home.*
 import org.techascent.aifinder.presentation.location.*
 import org.techascent.aifinder.presentation.login.*
-import org.techascent.aifinder.presentation.account.*
+import org.techascent.aifinder.presentation.review.*
+import org.techascent.aifinder.presentation.scan.*
+import org.techascent.aifinder.presentation.search.*
 import org.techascent.aifinder.presentation.spaces.*
-import org.techascent.aifinder.domain.auth.WelcomeDestination
-import org.techascent.aifinder.presentation.subscription.SubscriptionSheet
-import org.techascent.aifinder.presentation.subscription.SubscriptionViewModel
-import org.techascent.aifinder.presentation.subscription.SubscriptionUiState
+import org.techascent.aifinder.presentation.subscription.*
+import org.techascent.aifinder.presentation.welcome.*
 
-@OptIn(KoinExperimentalAPI::class)
 @Composable
 fun AiFinderNavigation() {
-    var destination by rememberSaveable { mutableStateOf("welcome") }
+    val navController = rememberNavController()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val destination = backStackEntry?.destination?.route
+    // Shared across destinations so the scan-to-review handoff and account cleanup use the same instances.
     val scan = koinViewModel<ScanViewModel>()
     val scanState by scan.state.collectAsState()
     val review = koinViewModel<ReviewViewModel>()
@@ -43,10 +49,18 @@ fun AiFinderNavigation() {
     var choosingLocation by rememberSaveable { mutableStateOf(false) }
     var showingSubscription by rememberSaveable { mutableStateOf(false) }
     var pendingScan by rememberSaveable { mutableStateOf(false) }
+
+    fun replaceRoot(screen: AiFinderScreen) {
+        navController.navigate(screen.route) {
+            popUpTo(navController.graph.id) { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+
     val openScanner: () -> Unit = {
         showingSubscription = false
         pendingScan = false
-        destination = "scan"
+        navController.navigate(AiFinderScreen.Scan.route) { launchSingleTop = true }
     }
     val checkingScan = pendingScan && !showingSubscription && subscriptionState is SubscriptionUiState.Loading
     val requestScan: () -> Unit = {
@@ -64,183 +78,181 @@ fun AiFinderNavigation() {
             showingSubscription = true
         }
     }
-    // Where back goes from screens reachable from more than one place.
-    var spaceBack by rememberSaveable { mutableStateOf("home") }
-    var detailsBack by rememberSaveable { mutableStateOf("search") }
-    var scanCheckOrigin by remember { mutableStateOf(destination) }
-    LaunchedEffect(destination) {
-        // Leaving the screen while the credit check runs cancels the pending scan.
-        if (destination != scanCheckOrigin && pendingScan && !showingSubscription) {
+    var scanCheckOrigin by remember { mutableStateOf(backStackEntry?.id) }
+    LaunchedEffect(backStackEntry?.id) {
+        if (backStackEntry?.id != scanCheckOrigin && pendingScan && !showingSubscription) {
             pendingScan = false
             subscription.reset()
         }
-        scanCheckOrigin = destination
+        scanCheckOrigin = backStackEntry?.id
         when (destination) {
-            "home" -> home.start()
-            "scan" -> scan.loadBalance()
-            "search" -> search.start()
-            "details" -> details.start()
-            "spaces", "space" -> spaces.start()
+            AiFinderScreen.Home.route -> home.start()
+            AiFinderScreen.Scan.route -> scan.loadBalance()
+            AiFinderScreen.Search.route -> search.start()
+            AiFinderScreen.Details.route -> details.start()
+            AiFinderScreen.Spaces.route, AiFinderScreen.Space.route -> spaces.start()
         }
     }
-    val openSpace: (String, String) -> Unit = { id, from ->
-        spaces.select(id)
-        spaceBack = from
-        destination = "space"
-    }
-    val openDetails: (String, String) -> Unit = { id, from ->
-        details.select(id)
-        detailsBack = from
-        destination = "details"
+    val onBack: () -> Unit = {
+        if (destination == AiFinderScreen.Scan.route) scan.cancelAnalysis()
+        if (pendingScan) {
+            pendingScan = false
+            subscription.reset()
+        }
+        navController.popBackStack()
     }
     if (choosingLocation) {
         LocationSheet(
             locations,
-            itemCount = if (destination == "review") {
+            itemCount = if (destination == AiFinderScreen.Review.route) {
                 (review.state as? ReviewUiState.Success)?.data?.detections?.size
             } else null,
-            onDismiss = { choosingLocation = false }
+            onDismiss = { choosingLocation = false },
         )
     }
     val detections by scan.detections.collectAsState()
     LaunchedEffect(detections) {
         detections?.let {
             review.show(it.detections, it.photo)
-            destination = "review"
+            navController.navigate(AiFinderScreen.Review.route) { launchSingleTop = true }
             scan.consumeDetections()
         }
     }
-    val onBack: () -> Unit = {
-        when (destination) {
-            "scan" -> {
-                scan.cancelAnalysis()
-                destination = "home"
-            }
-            "review" -> destination = "scan"
-            "search" -> destination = "home"
-            "details" -> destination = detailsBack
-            "account" -> destination = "home"
-            "spaces" -> destination = "home"
-            "space" -> destination = spaceBack
+
+    NavHost(navController = navController, startDestination = AiFinderScreen.Welcome.route) {
+        composable(AiFinderScreen.Welcome.route) {
+            WelcomeScreen(
+                onContinue = { replaceRoot(AiFinderScreen.Login) },
+                onNavigate = { target ->
+                    when (target) {
+                        WelcomeDestination.Home -> replaceRoot(AiFinderScreen.Home)
+                        WelcomeDestination.Login -> replaceRoot(AiFinderScreen.Login)
+                        WelcomeDestination.Welcome -> Unit
+                    }
+                },
+            )
+        }
+        composable(AiFinderScreen.Login.route) {
+            LoginScreen(viewModel = login, onSignedIn = { replaceRoot(AiFinderScreen.Home) })
+        }
+        composable(AiFinderScreen.Home.route) {
+            HomeScreen(
+                viewModel = home,
+                onSearch = {
+                    search.clearQuery()
+                    navController.navigate(AiFinderScreen.Search.route)
+                },
+                onScan = requestScan,
+                isCheckingScan = checkingScan,
+                onAccount = { navController.navigate(AiFinderScreen.Account.route) },
+                onSpace = { navController.navigate(AiFinderScreen.Space.createRoute(it)) },
+                onSeeAll = { navController.navigate(AiFinderScreen.Spaces.route) },
+            )
+        }
+        composable(AiFinderScreen.Spaces.route) {
+            SpacesScreen(
+                allSpacesState,
+                onSpace = { navController.navigate(AiFinderScreen.Space.createRoute(it)) },
+                onScan = requestScan,
+                isCheckingScan = checkingScan,
+                onBack = onBack,
+                onRetry = spaces::retry,
+            )
+        }
+        composable(
+            AiFinderScreen.Space.route,
+            arguments = listOf(navArgument(AiFinderScreen.Space.SPACE_ID) { type = NavType.StringType }),
+        ) { entry ->
+            val id = checkNotNull(entry.arguments?.read { getString(AiFinderScreen.Space.SPACE_ID) })
+            LaunchedEffect(id) { spaces.select(id) }
+            SpaceScreen(
+                spaceState,
+                onItem = { navController.navigate(AiFinderScreen.Details.createRoute(it)) },
+                onScan = requestScan,
+                isCheckingScan = checkingScan,
+                onBack = onBack,
+                onRetry = spaces::retry,
+            )
+        }
+        composable(AiFinderScreen.Account.route) {
+            AccountScreen(
+                viewModel = account,
+                onBack = onBack,
+                onSubscription = {
+                    pendingScan = false
+                    showingSubscription = true
+                    subscription.refresh()
+                },
+                onSignedOut = {
+                    scan.reset()
+                    review.show(emptyList())
+                    locations.reset()
+                    home.reset()
+                    search.reset()
+                    details.reset()
+                    spaces.reset()
+                    choosingLocation = false
+                    showingSubscription = false
+                    pendingScan = false
+                    subscription.reset()
+                    replaceRoot(AiFinderScreen.Login)
+                },
+            )
+        }
+        composable(AiFinderScreen.Scan.route) {
+            ScanScreen(
+                scanState,
+                onAnalyze = scan::analyze,
+                onBack = onBack,
+                onRetry = scan::retry,
+                selectedLocation = locationState.selectedPath,
+                onChooseLocation = { choosingLocation = true },
+                onRetryBalance = scan::loadBalance,
+                onGetScans = {
+                    showingSubscription = true
+                    subscription.refresh()
+                },
+            )
+        }
+        composable(AiFinderScreen.Review.route) {
+            ReviewScreen(
+                review.state,
+                onSave = {
+                    review.save(locationState.selectedLocation?.id) {
+                        navController.popBackStack(AiFinderScreen.Home.route, inclusive = false)
+                    }
+                },
+                onRename = review::rename,
+                onDelete = review::delete,
+                onBack = onBack,
+                onRetry = review::retry,
+                selectedLocation = locationState.selectedPath,
+                onChooseLocation = { choosingLocation = true },
+            )
+        }
+        composable(AiFinderScreen.Search.route) {
+            SearchScreen(
+                searchState,
+                onQueryChange = search::updateQuery,
+                onItemSelected = { navController.navigate(AiFinderScreen.Details.createRoute(it)) },
+                onBack = onBack,
+                onRetry = search::retry,
+            )
+        }
+        composable(
+            AiFinderScreen.Details.route,
+            arguments = listOf(navArgument(AiFinderScreen.Details.ITEM_ID) { type = NavType.StringType }),
+        ) { entry ->
+            val id = checkNotNull(entry.arguments?.read { getString(AiFinderScreen.Details.ITEM_ID) })
+            LaunchedEffect(id) { details.select(id) }
+            DetailsScreen(detailsState, onBack = onBack, onRetry = details::retry)
         }
     }
+    // Registered after NavHost so hardware Back also cancels an active scan before popping.
     SystemBackHandler(
-        enabled = !showingSubscription && !pendingScan && destination in listOf("scan", "review", "search", "details", "account", "spaces", "space"),
-        onBack = onBack
+        enabled = !showingSubscription && !choosingLocation && navController.previousBackStackEntry != null,
+        onBack = onBack,
     )
-    when (destination) {
-        "welcome" -> WelcomeScreen(
-            onContinue = { destination = "login" },
-            onNavigate = { target ->
-                destination = when (target) {
-                    WelcomeDestination.Home -> "home"
-                    WelcomeDestination.Login -> "login"
-                    WelcomeDestination.Welcome -> "welcome"
-                }
-            }
-        )
-
-        "login" -> LoginScreen(
-            viewModel = login,
-            onSignedIn = { destination = "home" }
-        )
-
-        "home" -> HomeScreen(
-            viewModel = home,
-            onSearch = {
-                search.clearQuery()
-                destination = "search"
-            },
-            onScan = requestScan,
-            isCheckingScan = checkingScan,
-            onAccount = { destination = "account" },
-            onSpace = { id -> openSpace(id, "home") },
-            onSeeAll = { destination = "spaces" },
-        )
-
-        "spaces" -> SpacesScreen(
-            allSpacesState,
-            onSpace = { id -> openSpace(id, "spaces") },
-            onScan = requestScan,
-            isCheckingScan = checkingScan,
-            onBack = onBack,
-            onRetry = spaces::retry
-        )
-
-        "space" -> SpaceScreen(
-            spaceState,
-            onItem = { id -> openDetails(id, "space") },
-            onScan = requestScan,
-            isCheckingScan = checkingScan,
-            onBack = onBack,
-            onRetry = spaces::retry
-        )
-
-        "account" -> AccountScreen(
-            viewModel = account,
-            onBack = onBack,
-            onSubscription = {
-                pendingScan = false
-                showingSubscription = true
-                subscription.refresh()
-            },
-            onSignedOut = {
-                scan.reset()
-                review.show(emptyList())
-                locations.reset()
-                home.reset()
-                search.reset()
-                details.reset()
-                spaces.reset()
-                choosingLocation = false
-                showingSubscription = false
-                pendingScan = false
-                subscription.reset()
-                destination = "login"
-            }
-        )
-
-        "scan" -> ScanScreen(
-            scanState,
-            onAnalyze = scan::analyze,
-            onBack = onBack,
-            onRetry = scan::retry,
-            selectedLocation = locationState.selectedPath,
-            onChooseLocation = { choosingLocation = true },
-            onRetryBalance = scan::loadBalance,
-            onGetScans = {
-                showingSubscription = true
-                subscription.refresh()
-            }
-        )
-
-        "review" -> ReviewScreen(
-            review.state,
-            onSave = {
-                review.save(locationState.selectedLocation?.id) { destination = "home" }
-            },
-            onRename = review::rename,
-            onDelete = review::delete,
-            onBack = onBack,
-            onRetry = review::retry,
-            selectedLocation = locationState.selectedPath,
-            onChooseLocation = { choosingLocation = true }
-        )
-
-        "search" -> SearchScreen(
-            searchState,
-            onQueryChange = search::updateQuery,
-            onItemSelected = { id -> openDetails(id, "search") },
-            onBack = onBack,
-            onRetry = search::retry
-        )
-
-        "details" -> DetailsScreen(
-            detailsState,
-            onBack = onBack,
-            onRetry = details::retry
-        )
-    }
     if (showingSubscription) {
         SubscriptionSheet(
             state = subscriptionState,
@@ -248,7 +260,7 @@ fun AiFinderNavigation() {
             onPurchaseCompleted = { purchase ->
                 subscription.onPurchaseCompleted(purchase, onAllowed = when {
                     pendingScan -> openScanner
-                    destination == "scan" -> ({
+                    destination == AiFinderScreen.Scan.route -> ({
                         showingSubscription = false
                         scan.loadBalance()
                     })
@@ -259,7 +271,7 @@ fun AiFinderNavigation() {
                 showingSubscription = false
                 pendingScan = false
                 subscription.reset()
-            }
+            },
         )
     }
 }

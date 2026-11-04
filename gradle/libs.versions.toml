@@ -17,6 +17,7 @@ koinComposeViewModel = "4.1.1"
 koinCompose = "4.1.1"
 datastore = "1.1.1"
 navigationCompose = "2.8.0-alpha02"
+navigationAiFinder = "2.9.1"
 size = "0.5.0"
 moko = "0.18.0"
 moko-aiFinder = "0.20.1"
@@ -66,6 +67,7 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+navigation-aifinder = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationAiFinder" }
 screen-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "size" }
 moko-permissions = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
