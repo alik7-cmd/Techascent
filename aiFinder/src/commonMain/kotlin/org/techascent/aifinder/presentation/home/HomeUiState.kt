@@ -1,8 +1,8 @@
 package org.techascent.aifinder.presentation.home
 
-import org.techascent.aifinder.domain.model.StorageLocation
+import org.techascent.aifinder.presentation.spaces.SpaceListEntry
 
-data class HomeContent(val spaces: List<StorageLocation>)
+data class HomeContent(val spaces: List<SpaceListEntry>)
 
 sealed interface HomeUiState {
     data object Loading : HomeUiState

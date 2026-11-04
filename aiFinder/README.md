@@ -158,7 +158,7 @@ ViewModels do not own the inventory rules. Authentication and location operation
 
 Uses `ComposaButton` from Composa; applies feature-local colors to avoid altering other Composa consumers. UI is shared between Android and iOS; no platform-specific UI dependencies have been introduced.
 
-Home uses a search shortcut, scan prompt and top-level space cards. Space cards open that space's items. See all opens every space. Bottom navigation is currently removed. Scan, Review, Search, Details, Spaces, Space and Account share the same Back button; Welcome and Home have none. Review retains its fixed Save action.
+Home uses a search shortcut, scan prompt and cards for every space, ordered by full path. Nested space cards show their parent path, and newly created spaces appear through the Room cache observation without a manual refresh. Space cards open that space's items. See all opens every space. Bottom navigation is currently removed. Scan, Review, Search, Details, Spaces, Space and Account share the same Back button; Welcome and Home have none. Review retains its fixed Save action.
 
 ## UX and privacy
 - Start with one drawer, not an entire home.

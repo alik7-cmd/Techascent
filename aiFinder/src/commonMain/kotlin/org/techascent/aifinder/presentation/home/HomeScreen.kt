@@ -56,8 +56,12 @@ fun HomeScreen(
                             )
                         }
                     }
-                    items(state.data.spaces, key = { it.id }) { location ->
-                        SpaceCard(location, onClick = { onSpace(location.id) })
+                    items(state.data.spaces, key = { it.location.id }) { entry ->
+                        SpaceCard(
+                            entry.location,
+                            onClick = { onSpace(entry.location.id) },
+                            parentPath = entry.parentPath,
+                        )
                     }
                 }
             }
