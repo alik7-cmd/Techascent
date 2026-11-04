@@ -16,23 +16,42 @@ import org.techascent.aifinder.domain.vision.PhotoAnalyzer
 import org.techascent.aifinder.domain.vision.RecognizedObject
 import org.techascent.aifinder.domain.vision.toItemDetections
 import org.techascent.aifinder.util.logDebug
+import org.techascent.aifinder.domain.subscription.ScanAccessRepository
 import kotlin.math.roundToInt
 
 /** A photo and the items found in it, handed to Review. */
 class ScanResult(val photo: CapturedPhoto, val detections: List<ItemDetection>)
 
 class ScanViewModel(
-    private val analyzer: PhotoAnalyzer
+    private val analyzer: PhotoAnalyzer,
+    private val access: ScanAccessRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow<ScanUiState>(ScanUiState.Success(ScanContent()))
     val state: StateFlow<ScanUiState> = _state.asStateFlow()
     private val _detections = MutableStateFlow<ScanResult?>(null)
     val detections: StateFlow<ScanResult?> = _detections.asStateFlow()
     private var analysisJob: Job? = null
+    private var balanceJob: Job? = null
+
+    fun loadBalance() {
+        balanceJob?.cancel()
+        updateContent { it.copy(access = null, isLoadingBalance = true, balanceError = false) }
+        balanceJob = viewModelScope.launch {
+            try {
+                val balance = access.cachedOrRefresh()
+                updateContent { it.copy(access = balance, isLoadingBalance = false) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logDebug(TAG, "Loading scan balance failed: ${e.message}")
+                updateContent { it.copy(isLoadingBalance = false, balanceError = true) }
+            }
+        }
+    }
 
     fun analyze(camera: CameraCaptureController) {
         val current = (_state.value as? ScanUiState.Success)?.data ?: return
-        if (current.isAnalyzing) return
+        if (current.isAnalyzing || current.access?.canScan != true) return
         updateContent { it.copy(isAnalyzing = true, errorMessage = null) }
         analysisJob = viewModelScope.launch {
             try {
@@ -56,6 +75,8 @@ class ScanViewModel(
                 updateContent {
                     it.copy(isAnalyzing = false, errorMessage = e.message ?: "Couldn't analyze the photo. Please try again.")
                 }
+            } finally {
+                loadBalance()
             }
         }
     }
@@ -73,6 +94,7 @@ class ScanViewModel(
 
     fun retry() {
         _state.value = ScanUiState.Success(ScanContent())
+        loadBalance()
     }
 
     private fun logRaw(photoId: String, results: List<RecognizedObject>) {

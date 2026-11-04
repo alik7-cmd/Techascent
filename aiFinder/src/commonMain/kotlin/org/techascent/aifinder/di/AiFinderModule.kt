@@ -50,7 +50,7 @@ import org.techascent.aifinder.data.subscription.revenueCatApiKey
 
 val aiFinderModule = module {
     single<ScanAccessRepository> {
-        ScanAccessRepositoryImpl(auth = get(), remote = get())
+        ScanAccessRepositoryImpl(auth = get(), remote = get(), cache = get<AiFinderDatabase>().scanWalletDao())
     }
     single<PurchaseGateway> {
         RevenueCatPurchaseGateway(
@@ -89,7 +89,7 @@ val aiFinderModule = module {
     viewModel { LoginViewModel(signIn = get(), getCurrentUser = get(), scanAccess = get(), purchases = get()) }
     viewModel { AccountViewModel(getCurrentUser = get(), signOut = get(), purchases = get()) }
     viewModel { HomeViewModel(observeInventory = get()) }
-    viewModel { ScanViewModel(analyzer = get()) }
+    viewModel { ScanViewModel(analyzer = get(), access = get()) }
     viewModel { ReviewViewModel(saveDetections = get()) }
     viewModel { LocationViewModel(observeLocations = get(), createLocation = get()) }
     viewModel { SearchViewModel(observeInventory = get()) }

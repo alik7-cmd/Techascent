@@ -1,8 +1,13 @@
 package org.techascent.aifinder.presentation.scan
 
+import org.techascent.aifinder.domain.subscription.ScanAccess
+
 data class ScanContent(
     val isAnalyzing: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val access: ScanAccess? = null,
+    val isLoadingBalance: Boolean = true,
+    val balanceError: Boolean = false,
 )
 
 sealed interface ScanUiState {

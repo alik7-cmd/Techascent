@@ -67,6 +67,16 @@
     <string name="review_detection_confidence">%1$s · AI %2$d%%</string>
     <string name="review_detection_suggestion">%1$s · AI suggestion</string>
     <string name="scan_ai_notice">Your photo is sent to Gemini to detect items. Nothing is saved until you review the results.</string>
+    <string name="scan_description">Take a clear photo of what you store.</string>
+    <string name="scan_balance_title">Your scan credits</string>
+    <string name="scan_balance_unlimited">Unlimited scans</string>
+    <string name="scan_balance_error">Unable to load your scan balance.</string>
+    <string name="scan_balance_retry">Retry</string>
+    <string name="scan_balance_empty">You have used all your scan credits. Get a scan pack to continue.</string>
+    <string name="scan_get_scans">Get more scans</string>
+    <string name="scan_analyzing">Analyzing…</string>
+    <string name="scan_analyze">Analyze photo</string>
+    <string name="scan_credit_notice">Each successful photo scan uses 1 credit, even if you do not save the results. Review and save your findings after scanning to keep them in your inventory.</string>
     <string name="scan_location_required">Select a storage location before analyzing your photo.</string>
     <string name="review_saving">Saving…</string>
     <string name="home_spaces_empty_title">No spaces yet</string>

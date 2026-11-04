@@ -13,12 +13,13 @@ import kotlinx.coroutines.IO
 
 internal const val DATABASE_NAME = "aifinder.db"
 
-@Database(entities = [CachedLocation::class, WelcomePreference::class, CachedItem::class], version = 4)
+@Database(entities = [CachedLocation::class, WelcomePreference::class, CachedItem::class, CachedScanWallet::class], version = 5)
 @ConstructedBy(AiFinderDatabaseConstructor::class)
 abstract class AiFinderDatabase : RoomDatabase() {
     abstract fun locationDao(): LocationDao
     abstract fun welcomePreferenceDao(): WelcomePreferenceDao
     abstract fun itemDao(): ItemDao
+    abstract fun scanWalletDao(): ScanWalletDao
 }
 
 @Suppress("KotlinNoActualForExpect")
@@ -51,10 +52,19 @@ private val migration3To4 = object : Migration(3, 4) {
     }
 }
 
+private val migration4To5 = object : Migration(4, 5) {
+    override fun migrate(connection: SQLiteConnection) {
+        connection.prepare(
+            "CREATE TABLE IF NOT EXISTS `CachedScanWallet` (`userId` TEXT NOT NULL, " +
+                "`remainingScans` INTEGER NOT NULL, PRIMARY KEY(`userId`))"
+        ).use { it.step() }
+    }
+}
+
 fun RoomDatabase.Builder<AiFinderDatabase>.buildAiFinderDatabase(
     driver: SQLiteDriver = BundledSQLiteDriver(),
 ): AiFinderDatabase =
     setDriver(driver)
         .setQueryCoroutineContext(Dispatchers.IO)
-        .addMigrations(migration1To2, migration2To3, migration3To4)
+        .addMigrations(migration1To2, migration2To3, migration3To4, migration4To5)
         .build()

@@ -14,6 +14,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import org.techascent.aifinder.data.cache.AiFinderDatabase
+import org.techascent.aifinder.data.cache.CachedScanWallet
 import org.techascent.aifinder.data.cache.buildAiFinderDatabase
 import org.techascent.aifinder.data.auth.RoomWelcomeRepository
 import org.techascent.aifinder.data.inventory.ItemDto
@@ -124,6 +125,9 @@ class RoomLocationLocalDataSourceTest {
             val migrated = openDatabase()
             try {
                 val local = RoomLocationLocalDataSource(migrated.locationDao())
+                migrated.scanWalletDao().upsert(CachedScanWallet("a", 5))
+                migrated.scanWalletDao().upsert(CachedScanWallet("a", 0))
+                migrated.scanWalletDao().upsert(CachedScanWallet("b", 3))
                 assertEquals("Garage", local.observe("a").first().single().second.name)
                 local.upsert("a", "2", LocationDto("Shelf", "CONTAINER", "1", 20))
                 val welcome = RoomWelcomeRepository(migrated.welcomePreferenceDao())
@@ -135,6 +139,9 @@ class RoomLocationLocalDataSourceTest {
             val reopened = openDatabase()
             try {
                 assertTrue(RoomWelcomeRepository(reopened.welcomePreferenceDao()).hasSeenWelcome())
+                assertEquals(CachedScanWallet("a", 0), reopened.scanWalletDao().get("a"))
+                assertEquals(CachedScanWallet("b", 3), reopened.scanWalletDao().get("b"))
+                assertEquals(null, reopened.scanWalletDao().get("missing"))
                 assertTrue(RoomItemLocalDataSource(reopened.itemDao()).isEmpty("a"))
                 assertEquals(
                     listOf("Garage", "Shelf"),

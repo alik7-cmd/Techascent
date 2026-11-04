@@ -77,6 +77,7 @@ fun AiFinderNavigation() {
         scanCheckOrigin = destination
         when (destination) {
             "home" -> home.start()
+            "scan" -> scan.loadBalance()
             "search" -> search.start()
             "details" -> details.start()
             "spaces", "space" -> spaces.start()
@@ -203,7 +204,12 @@ fun AiFinderNavigation() {
             onBack = onBack,
             onRetry = scan::retry,
             selectedLocation = locationState.selectedPath,
-            onChooseLocation = { choosingLocation = true }
+            onChooseLocation = { choosingLocation = true },
+            onRetryBalance = scan::loadBalance,
+            onGetScans = {
+                showingSubscription = true
+                subscription.refresh()
+            }
         )
 
         "review" -> ReviewScreen(
@@ -238,7 +244,14 @@ fun AiFinderNavigation() {
             state = subscriptionState,
             onRetry = { subscription.refresh(onAllowed = if (pendingScan) openScanner else null) },
             onPurchaseCompleted = { purchase ->
-                subscription.onPurchaseCompleted(purchase, onAllowed = if (pendingScan) openScanner else null)
+                subscription.onPurchaseCompleted(purchase, onAllowed = when {
+                    pendingScan -> openScanner
+                    destination == "scan" -> ({
+                        showingSubscription = false
+                        scan.loadBalance()
+                    })
+                    else -> null
+                })
             },
             onDismiss = {
                 showingSubscription = false
