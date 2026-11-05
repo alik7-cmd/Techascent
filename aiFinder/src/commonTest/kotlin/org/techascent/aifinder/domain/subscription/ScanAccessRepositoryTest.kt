@@ -15,15 +15,15 @@ import org.techascent.aifinder.data.cache.ScanWalletDao
 
 class ScanAccessRepositoryTest {
     @Test
-    fun hardCodedMasterBypassesRemoteReadsAndDeductionsButNotUserChecks() = runTest {
+    fun everyUserRequiresRemoteReadsAndDeductions() = runTest {
         val auth = FakeAuth()
         val repository = ScanAccessRepositoryImpl(auth, object : ScanAccessRemoteDataSource {
-            override suspend fun load(userId: String): ScanAccess = error("Must not read Firebase")
-            override suspend fun consume(userId: String, scanId: String): ScanAccess = error("Must not deduct credits")
+            override suspend fun load(userId: String): ScanAccess = error("Firebase unavailable")
+            override suspend fun consume(userId: String, scanId: String): ScanAccess = error("Firebase unavailable")
             override suspend fun recordPurchase(userId: String, purchase: ScanPurchase) = error("Not used")
-        }, cache = FakeCache(), masterUserIds = setOf("user"))
-        assertEquals(ScanAccess("user", 0, true), repository.refresh())
-        assertEquals(ScanAccess("user", 0, true), repository.consume("user", "scan"))
+        }, cache = FakeCache())
+        assertFailsWith<IllegalStateException> { repository.refresh() }
+        assertFailsWith<IllegalStateException> { repository.consume("user", "scan") }
         auth.currentUser = AuthUser("other", null, null, null)
         assertFailsWith<IllegalStateException> { repository.consume("user", "scan") }
         assertFailsWith<IllegalStateException> { repository.refresh() }

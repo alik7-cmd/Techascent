@@ -28,8 +28,8 @@ class SubscriptionViewModelTest {
     fun tearDown() = Dispatchers.resetMain()
 
     @Test
-    fun onlyUsersWithCreditOrMasterAccessContinue() = runTest {
-        for (access in listOf(ScanAccess("user", 0), ScanAccess("user", 2), ScanAccess("master", 0, true))) {
+    fun onlyUsersWithCreditContinue() = runTest {
+        for (access in listOf(ScanAccess("user", 0), ScanAccess("user", 2))) {
             val viewModel = SubscriptionViewModel(FakeRepository(access), FakePurchases())
             var allowed = 0
             viewModel.refresh { allowed++ }

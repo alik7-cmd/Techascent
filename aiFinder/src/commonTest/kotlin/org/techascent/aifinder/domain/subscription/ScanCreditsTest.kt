@@ -21,7 +21,6 @@ class ScanCreditsTest {
         assertFailsWith<ScanAccessRequiredException> { wallet.consume("another") }
         assertFalse(ScanAccess("user", wallet.remainingScans).isSubscribed)
         assertFalse(ScanAccess("user", 0).canScan)
-        assertTrue(ScanAccess("master", 0, true).canScan)
     }
 
     @Test

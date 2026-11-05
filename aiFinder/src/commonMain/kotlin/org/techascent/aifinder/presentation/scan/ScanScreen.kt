@@ -68,7 +68,7 @@ private fun LazyListScope.scanContent(
                 stringResource(Res.string.scan_description),
                 color = AiFinderPalette.Muted
             )
-            ScanBalanceCard(data, onRetryBalance, onGetScans)
+            //ScanBalanceCard(data, onRetryBalance, onGetScans)
             ScanCameraCard(camera, isAnalyzing = data.isAnalyzing)
             data.errorMessage?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             InfoCard(

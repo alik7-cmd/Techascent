@@ -17,8 +17,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.ErrorCard
 import org.techascent.aifinder.presentation.components.EmptyListCard
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
-import org.techascent.aifinder.presentation.scan.ScanBalanceCard
+import org.techascent.aifinder.presentation.scan.ScanBalanceCardV3
 import org.techascent.aifinder.presentation.scan.ScanContent
+import org.techascent.aifinder.presentation.scan.CreditCardComparison
+import org.techascent.aifinder.config.CreditCardPreviewConfig
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -46,7 +48,10 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item(key = "header") { HomeHeader(onAccount) }
-            item(key = "credits") { ScanBalanceCard(scanBalance, onRetryBalance, onGetScans) }
+            item(key = "credits") { ScanBalanceCardV3(scanBalance, onRetryBalance, onGetScans) }
+            if (CreditCardPreviewConfig.SHOW_COMPARISON) {
+                item(key = "credit-design-comparison") { CreditCardComparison() }
+            }
             item(key = "search") { HomeSearch(onSearch) }
             item(key = "scan") { ScanPrompt(onScan, isCheckingScan) }
             when (val state = uiState) {

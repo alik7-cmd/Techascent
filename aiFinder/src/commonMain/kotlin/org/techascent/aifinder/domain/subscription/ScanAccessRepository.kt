@@ -3,9 +3,8 @@ package org.techascent.aifinder.domain.subscription
 data class ScanAccess(
     val userId: String,
     val remainingScans: Long,
-    val isMaster: Boolean = false,
 ) {
-    val canScan: Boolean get() = isMaster || remainingScans > 0
+    val canScan: Boolean get() = remainingScans > 0
     val isSubscribed: Boolean get() = remainingScans > 0
 }
 
