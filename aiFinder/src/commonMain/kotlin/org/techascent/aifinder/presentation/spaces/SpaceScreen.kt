@@ -35,11 +35,23 @@ fun SpaceScreen(
     ScreenLayout(topBar = { BackBar(onBack) }) {
         when (state) {
             is SpaceUiState.Loading -> item { LoadingContent() }
-            is SpaceUiState.Error -> item { ErrorContent(state.message, onRetry) }
+            is SpaceUiState.Error -> item {
+                ErrorCard(
+                    title = stringResource(Res.string.home_spaces_error_title),
+                    message = state.message,
+                    onRetry = onRetry,
+                )
+            }
+
             is SpaceUiState.Success -> {
                 val location = state.data.location
                 if (location == null) {
-                    item { Text(stringResource(Res.string.space_not_found), color = AiFinderPalette.Muted) }
+                    item {
+                        Text(
+                            stringResource(Res.string.space_not_found),
+                            color = AiFinderPalette.Muted
+                        )
+                    }
                     return@ScreenLayout
                 }
                 item(key = "title") {
@@ -49,7 +61,11 @@ fun SpaceScreen(
                             Text(state.data.path, color = AiFinderPalette.Muted, fontSize = 14.sp)
                         }
                         Text(
-                            stringResource(Res.string.home_space_summary, location.spaceCount, location.itemCount),
+                            stringResource(
+                                Res.string.home_space_summary,
+                                location.spaceCount,
+                                location.itemCount
+                            ),
                             color = AiFinderPalette.Teal,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
@@ -63,12 +79,19 @@ fun SpaceScreen(
                                 titleRes = Res.string.space_empty_title,
                                 descriptionRes = Res.string.space_empty_message,
                             )
-                            PrimaryAction(stringResource(Res.string.home_scan_action), onScan, isLoading = isCheckingScan)
+                            PrimaryAction(
+                                stringResource(Res.string.home_scan_action),
+                                onScan,
+                                isLoading = isCheckingScan
+                            )
                         }
                     }
                 }
                 items(state.data.items, key = { it.item.id }) { located ->
-                    SpaceItemRow(located, spacePath = state.data.path, onClick = { onItem(located.item.id) })
+                    SpaceItemRow(
+                        located,
+                        spacePath = state.data.path,
+                        onClick = { onItem(located.item.id) })
                 }
             }
         }
@@ -78,7 +101,8 @@ fun SpaceScreen(
 @Composable
 private fun SpaceItemRow(located: LocatedItem, spacePath: String, onClick: () -> Unit) {
     // Items in nested locations show where they are relative to this space.
-    val subPath = located.path.removePrefix(spacePath).removePrefix(" › ").takeIf { it.isNotEmpty() }
+    val subPath =
+        located.path.removePrefix(spacePath).removePrefix(" › ").takeIf { it.isNotEmpty() }
     Row(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))

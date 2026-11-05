@@ -11,7 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-import org.techascent.aifinder.presentation.components.ErrorContent
+import apphub.aifinder.generated.resources.Res
+import apphub.aifinder.generated.resources.home_spaces_error_title
+import org.jetbrains.compose.resources.stringResource
+import org.techascent.aifinder.presentation.components.ErrorCard
 import org.techascent.aifinder.presentation.components.EmptyListCard
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
@@ -49,9 +52,10 @@ fun HomeScreen(
                 }
 
                 is HomeUiState.Error -> item(key = "error") {
-                    ErrorContent(
-                        state.message,
-                        viewModel::retry
+                    ErrorCard(
+                        title = stringResource(Res.string.home_spaces_error_title),
+                        message = state.message,
+                        onRetry = viewModel::retry,
                     )
                 }
 

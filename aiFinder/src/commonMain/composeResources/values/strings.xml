@@ -39,6 +39,8 @@
     <string name="home_scan_description">Snap a drawer or box and let AI\ncatalog the things inside.</string>
     <string name="home_scan_action">Scan a space</string>
     <string name="home_spaces_title">Your spaces</string>
+    <string name="home_spaces_error_title">Couldn't load your spaces</string>
+    <string name="error_card_retry">Try again</string>
     <string name="home_see_all">See all</string>
     <string name="home_space_summary">%1$d spaces • %2$d items</string>
     <string name="home_box_summary">%1$d boxes • %2$d items</string>

@@ -42,11 +42,23 @@ fun DetailsScreen(state: DetailsUiState, onBack: () -> Unit, onRetry: () -> Unit
         item(key = "title") { SectionTitle(stringResource(Res.string.details_title)) }
         when (state) {
             is DetailsUiState.Loading -> item { LoadingContent() }
-            is DetailsUiState.Error -> item { ErrorContent(state.message, onRetry) }
+            is DetailsUiState.Error -> item {
+                ErrorCard(
+                    title = stringResource(Res.string.home_spaces_error_title),
+                    message = state.message,
+                    onRetry = onRetry,
+                )
+            }
+
             is DetailsUiState.Success -> {
                 val entry = state.data.entry
                 if (entry == null) {
-                    item { Text(stringResource(Res.string.details_not_found), color = AiFinderPalette.Muted) }
+                    item {
+                        Text(
+                            stringResource(Res.string.details_not_found),
+                            color = AiFinderPalette.Muted
+                        )
+                    }
                 } else {
                     item(key = "preview") {
                         ItemPhoto(
@@ -78,11 +90,16 @@ fun DetailsScreen(state: DetailsUiState, onBack: () -> Unit, onRetry: () -> Unit
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             SectionTitle(entry.item.name)
-                            Text(entry.item.category, color = AiFinderPalette.Muted, fontSize = 16.sp)
+                            Text(
+                                entry.item.category,
+                                color = AiFinderPalette.Muted,
+                                fontSize = 16.sp
+                            )
                         }
                     }
                     item(key = "location") {
-                        val path = entry.path.split("›").map(String::trim).filter(String::isNotEmpty)
+                        val path =
+                            entry.path.split("›").map(String::trim).filter(String::isNotEmpty)
                         Column(
                             modifier = Modifier.padding(top = 20.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -141,7 +158,10 @@ fun DetailsScreen(state: DetailsUiState, onBack: () -> Unit, onRetry: () -> Unit
                                     contentColor = AiFinderPalette.Teal
                                 )
                             ) {
-                                Text(stringResource(Res.string.details_move), fontWeight = FontWeight.Bold)
+                                Text(
+                                    stringResource(Res.string.details_move),
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                             PrimaryAction(
                                 stringResource(Res.string.details_edit),

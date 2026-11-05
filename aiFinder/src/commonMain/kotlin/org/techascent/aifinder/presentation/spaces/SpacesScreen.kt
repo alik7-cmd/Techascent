@@ -31,7 +31,15 @@ fun SpacesScreen(
                 item(key = "spaces-skeleton") { SpacesHeaderSkeleton() }
                 items(HOME_SKELETON_CARDS, key = { "space-skeleton-$it" }) { SpaceCardSkeleton() }
             }
-            is SpacesUiState.Error -> item { ErrorContent(state.message, onRetry) }
+
+            is SpacesUiState.Error -> item {
+                ErrorCard(
+                    title = stringResource(Res.string.home_spaces_error_title),
+                    message = state.message,
+                    onRetry = onRetry,
+                )
+            }
+
             is SpacesUiState.Success -> {
                 if (state.spaces.isEmpty()) {
                     item(key = "empty") {
@@ -46,7 +54,11 @@ fun SpacesScreen(
                     }
                 }
                 items(state.spaces, key = { it.location.id }) { entry ->
-                    SpaceCard(entry.location, onClick = { onSpace(entry.location.id) }, parentPath = entry.parentPath)
+                    SpaceCard(
+                        entry.location,
+                        onClick = { onSpace(entry.location.id) },
+                        parentPath = entry.parentPath
+                    )
                 }
             }
         }
