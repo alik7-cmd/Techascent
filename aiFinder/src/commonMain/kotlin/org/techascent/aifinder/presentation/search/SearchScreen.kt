@@ -24,6 +24,7 @@ import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.*
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
+import org.techascent.composa.theming.ComposaTheme
 
 @Composable
 fun SearchScreen(
@@ -86,8 +87,8 @@ private fun LazyListScope.searchContent(
         Text(
             stringResource(Res.string.search_tip),
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
-            color = AiFinderPalette.Muted,
-            fontSize = 14.sp
+            style = ComposaTheme.typography.caption,
+            color = AiFinderPalette.Muted
         )
     }
     if (data.results.isNotEmpty()) item(key = "count") {

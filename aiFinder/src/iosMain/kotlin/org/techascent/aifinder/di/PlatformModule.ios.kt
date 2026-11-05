@@ -7,8 +7,9 @@ import org.techascent.aifinder.data.location.LocationRemoteDataSource
 import org.techascent.aifinder.data.location.UnavailableLocationDataSource
 import org.techascent.aifinder.data.auth.GoogleAuthDataSource
 import org.techascent.aifinder.data.auth.SignInRemoteDataSource
-import org.techascent.aifinder.data.auth.UnavailableSignInDataSource
-import org.techascent.aifinder.data.auth.UnavailableGoogleAuthDataSource
+import org.techascent.aifinder.data.auth.IosAuthBridgeRegistry
+import org.techascent.aifinder.data.auth.IosGoogleAuthDataSource
+import org.techascent.aifinder.data.auth.IosSignInDataSource
 import org.techascent.aifinder.data.inventory.ItemRemoteDataSource
 import org.techascent.aifinder.data.inventory.UnavailableItemDataSource
 import org.techascent.aifinder.data.photo.FilePhotoLocalDataSource
@@ -20,8 +21,8 @@ import org.techascent.aifinder.data.subscription.UnavailableScanAccessDataSource
 
 actual val platformModule = module {
     single<ScanAccessRemoteDataSource> { UnavailableScanAccessDataSource() }
-    single<GoogleAuthDataSource> { UnavailableGoogleAuthDataSource() }
-    single<SignInRemoteDataSource> { UnavailableSignInDataSource() }
+    single<GoogleAuthDataSource> { IosGoogleAuthDataSource(IosAuthBridgeRegistry.requireBridge()) }
+    single<SignInRemoteDataSource> { IosSignInDataSource(IosAuthBridgeRegistry.requireBridge()) }
     single<LocationRemoteDataSource> { UnavailableLocationDataSource() }
     single<ItemRemoteDataSource> { UnavailableItemDataSource() }
     single<PhotoRemoteDataSource> { UnavailablePhotoDataSource() }

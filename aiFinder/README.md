@@ -13,7 +13,7 @@ Photograph a drawer, shelf or storage box. Confirm the objects recognized by AI.
 5. Move, edit, remove and manually add items.
 6. Store an offline inventory and basic usage accounting.
 
-**Current implementation:** camera capture, editable scan review, Android Google/Firebase authentication, Gemini (Vertex AI) photo analysis, and user-scoped Firebase locations and items with a persistent Room cache. Home, spaces, search and item details read from that cache. iOS authentication and Firebase location/item access still need native integration.
+**Current implementation:** camera capture, editable scan review, Android and iOS Google/Firebase authentication, Gemini (Vertex AI) photo analysis, and user-scoped Firebase locations and items with a persistent Room cache. Home, spaces, search and item details read from that cache. iOS Firebase location/item access still needs native integration.
 
 ## Location cache
 Room Multiplatform stores locations in `aifinder.db` on Android and iOS, using a shared entity/DAO and bundled SQLite driver. Rows are keyed by Firebase user ID and location ID. The repository reads Firebase only when that user's local cache is empty; subsequent reads observe Room. Creating a location writes Firebase first and then upserts Room. Remote failures are surfaced without inserting a local-only location.
@@ -55,9 +55,9 @@ Welcome checks the restored Firebase session and a device-local Room welcome fla
 `AiFinderNavigation` uses Navigation Compose's multiplatform `NavHost`, with all routes defined in the sealed `AiFinderScreen` class. Space and item details receive encoded IDs as navigation arguments. Back returns to the actual originating screen, including when opening Scan from a space. Welcome completion, sign-in and sign-out replace the back stack, preventing Back from reopening authentication screens or a signed-out session. Saving a review returns to Home and removes the scan/review flow from the stack. Shared ViewModels retain the scan-to-review handoff and existing logout cleanup.
 
 ## Account settings
-After authentication, Android updates `aifinder/users/{uid}/signedIn` with `platform` (`ANDROID` or `IOS`), `provider` (`Google` or `Apple`), and `deviceName`. This stores the latest sign-in, not a history, and leaves locations/items untouched. Login navigates only after the write succeeds; failures or a 15-second timeout show a retryable error. Realtime Database rules must permit writes to this node only when `auth.uid == uid`. Restored sessions do not trigger another write.
+After authentication, Android and iOS update `aifinder/users/{uid}/signedIn` with `platform` (`ANDROID` or `IOS`), `provider` (`Google` or `Apple`), and `deviceName`. This stores the latest sign-in, not a history, and leaves locations/items untouched. The write is best-effort with a 15-second timeout: failures are logged without blocking successful login. Realtime Database rules must permit writes to this node only when `auth.uid == uid`. Restored sessions do not trigger another write.
 
-Device names require no permissions: Android uses manufacturer/model and iOS uses `UIDevice.name` (often a generic name such as “iPhone”). iOS metadata collection is implemented, but Firebase writes remain unavailable until native iOS authentication/database integration is added.
+Device names require no permissions: Android uses manufacturer/model and iOS uses `UIDevice.name` (often a generic name such as “iPhone”).
 
 The account icon on Home opens `AccountScreen`. It shows the signed-in Firebase user's name, email, initial and sign-in provider (Google or Apple). The Subscription, Household & sharing and Privacy & data cells are placeholders for now. Log out asks for confirmation in a native dialog (Material `AlertDialog` on Android, `UIAlertController` on iOS). It then calls `SignOutUseCase`, clears the location state and returns to Login.
 
@@ -78,7 +78,15 @@ Account's Subscription row opens a compact, content-sized modal bottom sheet ove
 
 Open `aiFinderIos/aiFinderIos.xcodeproj` from the repository root and select the `aiFinderIos` scheme. The build phase runs `:aiFinder:embedAndSignAppleFrameworkForXcode` and the SwiftUI host launches `AiFinderApp` through `MainViewController`. Java 17 is required; the script discovers it with `/usr/libexec/java_home` when `JAVA_HOME` is unset. For a physical device, select your signing team in Xcode.
 
-The existing `iosApp` project still runs `composeApp` and is unchanged. Xcode merges generated app metadata with `aiFinderIos/aiFinderIos/Info.plist`, which sets the Boolean `CADisableMinimumFrameDurationOnPhone = YES` required by Compose at startup. Preserve this Boolean if you replace the plist. Add your own permission descriptions (including camera usage) to this plist before using the camera. Add `GoogleService-Info.plist` to the new target when configuring Firebase; it is git-ignored. Firebase authentication, inventory and wallet adapters on iOS are still placeholders, so adding the Firebase plist alone does not enable those features.
+The existing `iosApp` project still runs `composeApp` and is unchanged. Xcode merges generated app metadata with `aiFinderIos/aiFinderIos/Info.plist`, which sets the Boolean `CADisableMinimumFrameDurationOnPhone = YES` required by Compose at startup. Preserve this Boolean if you replace the plist. Add your own permission descriptions (including camera usage) to this plist before using the camera. Firebase inventory, photo and wallet adapters on iOS are still placeholders.
+
+### iOS Google sign-in
+
+The Swift host links FirebaseCore, FirebaseAuth, FirebaseDatabase and GoogleSignIn through Swift Package Manager. It configures Firebase and installs `FirebaseAuthBridge` before creating the Compose view, then forwards `.onOpenURL` to Google Sign-In. The iOS Kotlin `IosGoogleAuthDataSource` and `IosSignInDataSource` adapt the bridge callbacks to suspending operations, preserving cancellation and shared auth error handling. Firebase's persisted current user drives startup routing; logout clears the existing local caches and signs out of Firebase and Google. No OAuth tokens are stored by the bridge.
+
+Register bundle ID `org.techascent.aifinder` in the same Firebase project as Android and enable the Google Authentication provider. Download `GoogleService-Info.plist`, add it to the aiFinderIos target's Copy Bundle Resources exactly once, and keep it local (git-ignored). The bridge reads `CLIENT_ID` and `DATABASE_URL` from Firebase's configured options. In the app's `Info.plist`, set `CFBundleURLTypes` / `CFBundleURLSchemes` to that file's `REVERSED_CLIENT_ID`; update it when switching Firebase projects. Never embed an OAuth client secret. The selected Firebase 13 and Google Sign-In 10 packages support the project's iOS 15 minimum.
+
+Verify Google login and cancellation on a simulator/device, check the Firebase Authentication user and `aifinder/users/{uid}/signedIn` record, then relaunch to verify session restoration and log out to verify session/cache cleanup. Apple sign-in remains unavailable.
 
 ## Prepaid scan access: model and flow
 

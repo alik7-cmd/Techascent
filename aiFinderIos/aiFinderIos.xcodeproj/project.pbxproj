@@ -1,74 +1,175 @@
 // !$*UTF8*$!
 {
 	archiveVersion = 1;
-	classes = {};
+	classes = {
+	};
 	objectVersion = 56;
 	objects = {
-		A10000000000000000000001 = {isa = PBXBuildFile; fileRef = A10000000000000000000002; };
-		A10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AiFinderIosApp.swift; sourceTree = "<group>"; };
-		A10000000000000000000003 = {isa = PBXFileReference; explicitFileType = wrapper.application; path = AiFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A10000000000000000000016 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+
+/* Begin PBXBuildFile section */
+		C20000000000000000000001 = {isa = PBXBuildFile; fileRef = C20000000000000000000002; };
+		C20000000000000000000003 = {isa = PBXBuildFile; productRef = C20000000000000000000004; };
+		C20000000000000000000005 = {isa = PBXBuildFile; productRef = C20000000000000000000006; };
+		C20000000000000000000007 = {isa = PBXBuildFile; productRef = C20000000000000000000008; };
+		A10000000000000000000001 /* AiFinderIosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* AiFinderIosApp.swift */; };
+		B5AEEE25309BE0D700CFEBE4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5AEEE24309BE0D700CFEBE4 /* GoogleService-Info.plist */; };
+		B5AEEE29309BE45700CFEBE4 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B5AEEE28309BE45700CFEBE4 /* GoogleSignIn */; };
+		B5AEEE2B309BE45700CFEBE4 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B5AEEE2A309BE45700CFEBE4 /* GoogleSignInSwift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		C20000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthBridge.swift; sourceTree = "<group>"; };
+		A10000000000000000000002 /* AiFinderIosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AiFinderIosApp.swift; sourceTree = "<group>"; };
+		A10000000000000000000003 /* AiFinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = AiFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000016 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B5AEEE24309BE0D700CFEBE4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1000000000000000000000B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C20000000000000000000003,
+				C20000000000000000000005,
+				C20000000000000000000007,
+				B5AEEE29309BE45700CFEBE4 /* GoogleSignIn in Frameworks */,
+				B5AEEE2B309BE45700CFEBE4 /* GoogleSignInSwift in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
 		A10000000000000000000004 = {
 			isa = PBXGroup;
-			children = (A10000000000000000000005, A10000000000000000000006);
+			children = (
+				A10000000000000000000005 /* aiFinderIos */,
+				A10000000000000000000006 /* Products */,
+			);
 			sourceTree = "<group>";
 		};
-		A10000000000000000000005 = {
+		A10000000000000000000005 /* aiFinderIos */ = {
 			isa = PBXGroup;
-			children = (A10000000000000000000002, A10000000000000000000016);
+			children = (
+				A10000000000000000000002 /* AiFinderIosApp.swift */,
+				C20000000000000000000002,
+				A10000000000000000000016 /* Info.plist */,
+				B5AEEE24309BE0D700CFEBE4 /* GoogleService-Info.plist */,
+			);
 			path = aiFinderIos;
 			sourceTree = "<group>";
 		};
-		A10000000000000000000006 = {
+		A10000000000000000000006 /* Products */ = {
 			isa = PBXGroup;
-			children = (A10000000000000000000003);
+			children = (
+				A10000000000000000000003 /* AiFinder.app */,
+			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A10000000000000000000007 = {
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000008 /* aiFinderIos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000011 /* Build configuration list for PBXNativeTarget "aiFinderIos" */;
+			buildPhases = (
+				A10000000000000000000009 /* Compile AiFinder Kotlin Framework */,
+				A1000000000000000000000A /* Sources */,
+				A1000000000000000000000B /* Frameworks */,
+				A1000000000000000000000C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = aiFinderIos;
+			packageProductDependencies = (
+				C20000000000000000000004,
+				C20000000000000000000006,
+				C20000000000000000000008,
+				B5AEEE28309BE45700CFEBE4 /* GoogleSignIn */,
+				B5AEEE2A309BE45700CFEBE4 /* GoogleSignInSwift */,
+			);
+			productName = AiFinder;
+			productReference = A10000000000000000000003 /* AiFinder.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000007 /* Project object */ = {
 			isa = PBXProject;
-			attributes = {BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 1620; };
-			buildConfigurationList = A10000000000000000000010;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1620;
+			};
+			buildConfigurationList = A10000000000000000000010 /* Build configuration list for PBXProject "aiFinderIos" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
-			knownRegions = (en, Base);
+			knownRegions = (
+				en,
+				Base,
+			);
 			mainGroup = A10000000000000000000004;
-			productRefGroup = A10000000000000000000006;
+			packageReferences = (
+				B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				B5AEEE27309BE45700CFEBE4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
+			productRefGroup = A10000000000000000000006 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
-			targets = (A10000000000000000000008);
+			targets = (
+				A10000000000000000000008 /* aiFinderIos */,
+			);
 		};
-		A10000000000000000000008 = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A10000000000000000000011;
-			buildPhases = (A10000000000000000000009, A1000000000000000000000A, A1000000000000000000000B, A1000000000000000000000C);
-			buildRules = ();
-			dependencies = ();
-			name = aiFinderIos;
-			packageProductDependencies = ();
-			productName = AiFinder;
-			productReference = A10000000000000000000003;
-			productType = "com.apple.product-type.application";
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1000000000000000000000C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5AEEE25309BE0D700CFEBE4 /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A10000000000000000000009 = {
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A10000000000000000000009 /* Compile AiFinder Kotlin Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
-			files = ();
-			inputPaths = ();
+			files = (
+			);
+			inputPaths = (
+			);
 			name = "Compile AiFinder Kotlin Framework";
-			outputPaths = ();
+			outputPaths = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -eu\nif [ \"${OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED:-NO}\" = \"YES\" ]; then exit 0; fi\nif [ -z \"${JAVA_HOME:-}\" ]; then export JAVA_HOME=\"$(/usr/libexec/java_home -v 17)\"; fi\ncd \"$SRCROOT/..\"\n./gradlew :aiFinder:embedAndSignAppleFrameworkForXcode\n";
 		};
-		A1000000000000000000000A = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000001); runOnlyForDeploymentPostprocessing = 0; };
-		A1000000000000000000000B = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-		A1000000000000000000000C = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-		A10000000000000000000010 = {isa = XCConfigurationList; buildConfigurations = (A10000000000000000000012, A10000000000000000000013); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-		A10000000000000000000011 = {isa = XCConfigurationList; buildConfigurations = (A10000000000000000000014, A10000000000000000000015); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-		A10000000000000000000012 = {
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1000000000000000000000A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* AiFinderIosApp.swift in Sources */,
+				C20000000000000000000001,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A10000000000000000000012 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
@@ -81,7 +182,7 @@
 			};
 			name = Debug;
 		};
-		A10000000000000000000013 = {
+		A10000000000000000000013 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
@@ -93,50 +194,143 @@
 			};
 			name = Release;
 		};
-		A10000000000000000000014 = {
+		A10000000000000000000014 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				FRAMEWORK_SEARCH_PATHS = ("$(inherited)", "$(SRCROOT)/../aiFinder/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)");
+				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../aiFinder/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = aiFinderIos/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Where Did I Put It?";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
-				OTHER_LDFLAGS = ("$(inherited)", "-framework", AiFinder, "-lsqlite3");
-				PRODUCT_BUNDLE_IDENTIFIER = org.techascent.aifinder;
-				PRODUCT_NAME = AiFinder;
-				PRODUCT_MODULE_NAME = AiFinderIos;
-				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					AiFinder,
+					"-lsqlite3",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.techascent.aifinder;
+				PRODUCT_MODULE_NAME = AiFinderIos;
+				PRODUCT_NAME = AiFinder;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		A10000000000000000000015 = {
+		A10000000000000000000015 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				FRAMEWORK_SEARCH_PATHS = ("$(inherited)", "$(SRCROOT)/../aiFinder/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)");
+				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../aiFinder/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = aiFinderIos/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Where Did I Put It?";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
-				OTHER_LDFLAGS = ("$(inherited)", "-framework", AiFinder, "-lsqlite3");
-				PRODUCT_BUNDLE_IDENTIFIER = org.techascent.aifinder;
-				PRODUCT_NAME = AiFinder;
-				PRODUCT_MODULE_NAME = AiFinderIos;
-				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					AiFinder,
+					"-lsqlite3",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.techascent.aifinder;
+				PRODUCT_MODULE_NAME = AiFinderIos;
+				PRODUCT_NAME = AiFinder;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000010 /* Build configuration list for PBXProject "aiFinderIos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000012 /* Debug */,
+				A10000000000000000000013 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000011 /* Build configuration list for PBXNativeTarget "aiFinderIos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000014 /* Debug */,
+				A10000000000000000000015 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.1.1;
+			};
+		};
+		B5AEEE27309BE45700CFEBE4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C20000000000000000000004 = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4;
+			productName = FirebaseCore;
+		};
+		C20000000000000000000006 = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4;
+			productName = FirebaseAuth;
+		};
+		C20000000000000000000008 = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4;
+			productName = FirebaseDatabase;
+		};
+		B5AEEE28309BE45700CFEBE4 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE27309BE45700CFEBE4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		B5AEEE2A309BE45700CFEBE4 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE27309BE45700CFEBE4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = A10000000000000000000007;
+	rootObject = A10000000000000000000007 /* Project object */;
 }
