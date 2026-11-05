@@ -8,6 +8,9 @@ data class ScanContent(
     val access: ScanAccess? = null,
     val isLoadingBalance: Boolean = true,
     val balanceError: Boolean = false,
+    val requiresPurchase: Boolean = false,
+    val isPreparingPurchase: Boolean = false,
+    val purchasePreparationError: Boolean = false,
 )
 
 sealed interface ScanUiState {

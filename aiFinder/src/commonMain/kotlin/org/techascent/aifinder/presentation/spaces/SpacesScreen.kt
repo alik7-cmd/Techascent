@@ -2,7 +2,6 @@ package org.techascent.aifinder.presentation.spaces
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,8 +23,7 @@ fun SpacesScreen(
     onBack: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    ScreenLayout(topBar = { BackBar(onBack) }) {
-        item(key = "title") { SectionTitle(stringResource(Res.string.spaces_title)) }
+    ScreenLayout(topBar = { ScreenTopBar(stringResource(Res.string.spaces_title), onBack) }) {
         when (state) {
             is SpacesUiState.Loading -> {
                 item(key = "spaces-skeleton") { SpacesHeaderSkeleton() }
@@ -61,18 +59,6 @@ fun SpacesScreen(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-internal fun BackBar(onBack: () -> Unit) {
-    Surface(color = AiFinderPalette.Background) {
-        Row(
-            modifier = Modifier.fillMaxWidth().statusBarsPadding()
-                .padding(horizontal = 24.dp, vertical = 4.dp)
-        ) {
-            BackButton(onBack)
         }
     }
 }

@@ -17,6 +17,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.ErrorCard
 import org.techascent.aifinder.presentation.components.EmptyListCard
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
+import org.techascent.aifinder.presentation.scan.ScanBalanceCard
+import org.techascent.aifinder.presentation.scan.ScanContent
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -28,6 +30,9 @@ fun HomeScreen(
     onAccount: () -> Unit,
     onSpace: (String) -> Unit,
     onSeeAll: () -> Unit,
+    scanBalance: ScanContent,
+    onRetryBalance: () -> Unit,
+    onGetScans: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -41,6 +46,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item(key = "header") { HomeHeader(onAccount) }
+            item(key = "credits") { ScanBalanceCard(scanBalance, onRetryBalance, onGetScans) }
             item(key = "search") { HomeSearch(onSearch) }
             item(key = "scan") { ScanPrompt(onScan, isCheckingScan) }
             when (val state = uiState) {

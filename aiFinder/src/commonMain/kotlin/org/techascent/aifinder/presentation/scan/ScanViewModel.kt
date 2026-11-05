@@ -17,6 +17,7 @@ import org.techascent.aifinder.domain.vision.RecognizedObject
 import org.techascent.aifinder.domain.vision.toItemDetections
 import org.techascent.aifinder.util.logDebug
 import org.techascent.aifinder.domain.subscription.ScanAccessRepository
+import org.techascent.aifinder.domain.subscription.ScanAccessRequiredException
 import kotlin.math.roundToInt
 
 /** A photo and the items found in it, handed to Review. */
@@ -32,6 +33,7 @@ class ScanViewModel(
     val detections: StateFlow<ScanResult?> = _detections.asStateFlow()
     private var analysisJob: Job? = null
     private var balanceJob: Job? = null
+    private var pendingPhoto: CapturedPhoto? = null
 
     fun loadBalance() {
         balanceJob?.cancel()
@@ -51,13 +53,31 @@ class ScanViewModel(
 
     fun analyze(camera: CameraCaptureController) {
         val current = (_state.value as? ScanUiState.Success)?.data ?: return
-        if (current.isAnalyzing || current.access?.canScan != true) return
-        updateContent { it.copy(isAnalyzing = true, errorMessage = null) }
+        if (current.isAnalyzing || current.requiresPurchase) return
+        pendingPhoto = null
+        analyzePhoto { camera.capture() }
+    }
+
+    fun resumeAfterPurchase() {
+        val photo = pendingPhoto ?: return
+        if ((_state.value as? ScanUiState.Success)?.data?.isAnalyzing == true) return
+        analyzePhoto { photo }
+    }
+
+    fun dismissPurchase() {
+        pendingPhoto = null
+        updateContent { it.copy(requiresPurchase = false) }
+    }
+
+    private fun analyzePhoto(capture: suspend () -> CapturedPhoto) {
+        updateContent { it.copy(isAnalyzing = true, errorMessage = null, requiresPurchase = false) }
         analysisJob = viewModelScope.launch {
             try {
-                val photo = camera.capture()
+                val photo = capture()
+                pendingPhoto = photo
                 val recognized = analyzer.analyze(photo)
                 coroutineContext.ensureActive()
+                pendingPhoto = null
                 logRaw(photo.id, recognized)
                 val detections = recognized.toItemDetections(photo.id)
                 logTransformed(detections)
@@ -71,12 +91,15 @@ class ScanViewModel(
                 }
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: ScanAccessRequiredException) {
+                updateContent { it.copy(isAnalyzing = false, requiresPurchase = true) }
             } catch (e: Exception) {
+                pendingPhoto = null
                 updateContent {
                     it.copy(isAnalyzing = false, errorMessage = e.message ?: "Couldn't analyze the photo. Please try again.")
                 }
             } finally {
-                loadBalance()
+                if (coroutineContext[Job]?.isActive == true) loadBalance()
             }
         }
     }
@@ -84,7 +107,8 @@ class ScanViewModel(
     fun cancelAnalysis() {
         analysisJob?.cancel()
         analysisJob = null
-        updateContent { it.copy(isAnalyzing = false) }
+        pendingPhoto = null
+        updateContent { it.copy(isAnalyzing = false, requiresPurchase = false) }
         consumeDetections()
     }
 

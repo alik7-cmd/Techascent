@@ -28,7 +28,7 @@ internal fun ScanBalanceCard(
     Surface(
         modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
         shape = RoundedCornerShape(24.dp),
-        color = if (empty) MaterialTheme.colorScheme.errorContainer else AiFinderPalette.Mint,
+        color = AiFinderPalette.Mint,
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
@@ -37,7 +37,7 @@ internal fun ScanBalanceCard(
             ) {
                 Icon(
                     Icons.Outlined.AutoAwesome, null,
-                    tint = if (empty) MaterialTheme.colorScheme.onErrorContainer else AiFinderPalette.Teal,
+                    tint = AiFinderPalette.Teal,
                     modifier = Modifier.size(24.dp),
                 )
                 Column(Modifier.weight(1f)) {
@@ -61,7 +61,7 @@ internal fun ScanBalanceCard(
                         else -> Text(
                             if (data.access?.isMaster == true) stringResource(Res.string.scan_balance_unlimited)
                             else stringResource(Res.string.subscription_scans_remaining, data.access?.remainingScans ?: 0L),
-                            color = if (empty) MaterialTheme.colorScheme.onErrorContainer else AiFinderPalette.Teal,
+                            color = AiFinderPalette.Teal,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                         )
@@ -74,12 +74,29 @@ internal fun ScanBalanceCard(
             if (empty) {
                 Text(
                     stringResource(Res.string.scan_balance_empty),
-                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    color = AiFinderPalette.Ink.copy(alpha = 0.72f),
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                 )
-                TextButton(onClick = onGetScans, enabled = !data.isAnalyzing) {
-                    Text(stringResource(Res.string.scan_get_scans))
+                if (data.purchasePreparationError) {
+                    Text(
+                        stringResource(Res.string.subscription_access_error),
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 14.sp,
+                    )
+                }
+                if (data.isPreparingPurchase) {
+                    Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.CenterStart) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = AiFinderPalette.Teal,
+                            strokeWidth = 2.dp,
+                        )
+                    }
+                } else {
+                    TextButton(onClick = onGetScans, enabled = !data.isAnalyzing) {
+                        Text(stringResource(Res.string.scan_get_scans))
+                    }
                 }
             }
         }

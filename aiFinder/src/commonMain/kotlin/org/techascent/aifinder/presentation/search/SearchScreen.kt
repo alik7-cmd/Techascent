@@ -36,17 +36,9 @@ fun SearchScreen(
 ) {
     ScreenLayout(
         topBar = {
-            Surface(color = AiFinderPalette.Background) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().statusBarsPadding()
-                        .padding(horizontal = 24.dp, vertical = 4.dp)
-                ) {
-                    BackButton(onBack)
-                }
-            }
+            ScreenTopBar(stringResource(Res.string.search_title), onBack)
         }
     ) {
-        item(key = "title") { SectionTitle(stringResource(Res.string.search_title)) }
         when (state) {
             is SearchUiState.Loading -> searchLoadingContent()
             is SearchUiState.Error -> item {

@@ -60,6 +60,7 @@ class SubscriptionViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
+                logDebug(TAG, "Checking purchase access failed: ${e.message}")
                 _state.value = SubscriptionUiState.Error
             }
         }

@@ -48,7 +48,43 @@ fun AiFinderNavigation() {
     val subscriptionState by subscription.state.collectAsState()
     var choosingLocation by rememberSaveable { mutableStateOf(false) }
     var showingSubscription by rememberSaveable { mutableStateOf(false) }
-    var pendingScan by rememberSaveable { mutableStateOf(false) }
+    var preparingPurchase by remember { mutableStateOf(false) }
+    var purchasePreparationError by remember { mutableStateOf(false) }
+    var purchaseOrigin by remember { mutableStateOf<String?>(null) }
+    val scanContent = ((scanState as? ScanUiState.Success)?.data ?: ScanContent()).copy(
+        isPreparingPurchase = preparingPurchase,
+        purchasePreparationError = purchasePreparationError,
+    )
+    val displayedScanState = (scanState as? ScanUiState.Success)?.copy(data = scanContent) ?: scanState
+    val preparePurchase: () -> Unit = {
+        if (!preparingPurchase) {
+            subscription.reset()
+            purchaseOrigin = backStackEntry?.id
+            purchasePreparationError = false
+            preparingPurchase = true
+            subscription.refresh()
+        }
+    }
+
+    LaunchedEffect(subscriptionState, preparingPurchase) {
+        if (preparingPurchase) {
+            when (val state = subscriptionState) {
+                is SubscriptionUiState.Ready -> {
+                    preparingPurchase = false
+                    if (state.purchasesEnabled) {
+                        showingSubscription = true
+                    } else {
+                        purchasePreparationError = true
+                    }
+                }
+                SubscriptionUiState.Error -> {
+                    preparingPurchase = false
+                    purchasePreparationError = true
+                }
+                else -> Unit
+            }
+        }
+    }
 
     fun replaceRoot(screen: AiFinderScreen) {
         navController.navigate(screen.route) {
@@ -59,46 +95,50 @@ fun AiFinderNavigation() {
 
     val openScanner: () -> Unit = {
         showingSubscription = false
-        pendingScan = false
         navController.navigate(AiFinderScreen.Scan.route) { launchSingleTop = true }
     }
-    val checkingScan = pendingScan && !showingSubscription && subscriptionState is SubscriptionUiState.Loading
-    val requestScan: () -> Unit = {
-        pendingScan = true
-        subscription.refresh(onAllowed = openScanner)
+    val resumeAnalysis: () -> Unit = {
+        showingSubscription = false
+        scan.loadBalance()
+        scan.resumeAfterPurchase()
     }
     LaunchedEffect(Unit) {
-        if (pendingScan || showingSubscription) {
-            subscription.refresh(onAllowed = if (pendingScan) openScanner else null)
+        if (showingSubscription) {
+            subscription.refresh(onAllowed = if (scanContent.requiresPurchase) resumeAnalysis else null)
         }
     }
-    LaunchedEffect(subscriptionState, pendingScan) {
-        if (pendingScan && (subscriptionState is SubscriptionUiState.Error ||
-                (subscriptionState as? SubscriptionUiState.Ready)?.access?.canScan == false)) {
+    LaunchedEffect(scanContent.requiresPurchase) {
+        if (scanContent.requiresPurchase && destination == AiFinderScreen.Scan.route) {
             showingSubscription = true
+            subscription.refresh(onAllowed = resumeAnalysis)
         }
     }
-    var scanCheckOrigin by remember { mutableStateOf(backStackEntry?.id) }
     LaunchedEffect(backStackEntry?.id) {
-        if (backStackEntry?.id != scanCheckOrigin && pendingScan && !showingSubscription) {
-            pendingScan = false
-            subscription.reset()
+        if (purchaseOrigin != backStackEntry?.id) {
+            if (preparingPurchase) subscription.reset()
+            preparingPurchase = false
+            purchasePreparationError = false
+            purchaseOrigin = null
         }
-        scanCheckOrigin = backStackEntry?.id
         when (destination) {
-            AiFinderScreen.Home.route -> home.start()
+            AiFinderScreen.Home.route -> {
+                home.start()
+                scan.loadBalance()
+            }
             AiFinderScreen.Scan.route -> scan.loadBalance()
             AiFinderScreen.Search.route -> search.start()
             AiFinderScreen.Details.route -> details.start()
             AiFinderScreen.Spaces.route, AiFinderScreen.Space.route -> spaces.start()
         }
+        if (destination != AiFinderScreen.Scan.route && scanContent.requiresPurchase) {
+            scan.dismissPurchase()
+            showingSubscription = false
+            subscription.reset()
+        }
     }
     val onBack: () -> Unit = {
         if (destination == AiFinderScreen.Scan.route) scan.cancelAnalysis()
-        if (pendingScan) {
-            pendingScan = false
-            subscription.reset()
-        }
+        subscription.reset()
         navController.popBackStack()
     }
     if (choosingLocation) {
@@ -142,8 +182,10 @@ fun AiFinderNavigation() {
                     search.clearQuery()
                     navController.navigate(AiFinderScreen.Search.route)
                 },
-                onScan = requestScan,
-                isCheckingScan = checkingScan,
+                onScan = openScanner,
+                scanBalance = scanContent,
+                onRetryBalance = scan::loadBalance,
+                onGetScans = preparePurchase,
                 onAccount = { navController.navigate(AiFinderScreen.Account.route) },
                 onSpace = { navController.navigate(AiFinderScreen.Space.createRoute(it)) },
                 onSeeAll = { navController.navigate(AiFinderScreen.Spaces.route) },
@@ -153,8 +195,7 @@ fun AiFinderNavigation() {
             SpacesScreen(
                 allSpacesState,
                 onSpace = { navController.navigate(AiFinderScreen.Space.createRoute(it)) },
-                onScan = requestScan,
-                isCheckingScan = checkingScan,
+                onScan = openScanner,
                 onBack = onBack,
                 onRetry = spaces::retry,
             )
@@ -168,8 +209,7 @@ fun AiFinderNavigation() {
             SpaceScreen(
                 spaceState,
                 onItem = { navController.navigate(AiFinderScreen.Details.createRoute(it)) },
-                onScan = requestScan,
-                isCheckingScan = checkingScan,
+                onScan = openScanner,
                 onBack = onBack,
                 onRetry = spaces::retry,
             )
@@ -179,7 +219,6 @@ fun AiFinderNavigation() {
                 viewModel = account,
                 onBack = onBack,
                 onSubscription = {
-                    pendingScan = false
                     showingSubscription = true
                     subscription.refresh()
                 },
@@ -193,7 +232,6 @@ fun AiFinderNavigation() {
                     spaces.reset()
                     choosingLocation = false
                     showingSubscription = false
-                    pendingScan = false
                     subscription.reset()
                     replaceRoot(AiFinderScreen.Login)
                 },
@@ -201,17 +239,14 @@ fun AiFinderNavigation() {
         }
         composable(AiFinderScreen.Scan.route) {
             ScanScreen(
-                scanState,
+                displayedScanState,
                 onAnalyze = scan::analyze,
                 onBack = onBack,
                 onRetry = scan::retry,
                 selectedLocation = locationState.selectedPath,
                 onChooseLocation = { choosingLocation = true },
                 onRetryBalance = scan::loadBalance,
-                onGetScans = {
-                    showingSubscription = true
-                    subscription.refresh()
-                },
+                onGetScans = preparePurchase,
             )
         }
         composable(AiFinderScreen.Review.route) {
@@ -256,20 +291,19 @@ fun AiFinderNavigation() {
     if (showingSubscription) {
         SubscriptionSheet(
             state = subscriptionState,
-            onRetry = { subscription.refresh(onAllowed = if (pendingScan) openScanner else null) },
+            onRetry = { subscription.refresh(onAllowed = if (scanContent.requiresPurchase) resumeAnalysis else null) },
             onPurchaseCompleted = { purchase ->
                 subscription.onPurchaseCompleted(purchase, onAllowed = when {
-                    pendingScan -> openScanner
-                    destination == AiFinderScreen.Scan.route -> ({
+                    scanContent.requiresPurchase -> resumeAnalysis
+                    else -> ({
                         showingSubscription = false
                         scan.loadBalance()
                     })
-                    else -> null
                 })
             },
             onDismiss = {
                 showingSubscription = false
-                pendingScan = false
+                scan.dismissPurchase()
                 subscription.reset()
             },
         )

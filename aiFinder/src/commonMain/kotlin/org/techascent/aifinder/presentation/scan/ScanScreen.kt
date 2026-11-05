@@ -35,14 +35,7 @@ fun ScanScreen(
     val camera = remember { CameraCaptureController() }
     ScreenLayout(
         topBar = {
-            Surface(color = AiFinderPalette.Background) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().statusBarsPadding()
-                        .padding(horizontal = 24.dp, vertical = 4.dp)
-                ) {
-                    BackButton(onBack)
-                }
-            }
+            ScreenTopBar(stringResource(Res.string.home_scan_action), onBack)
         }
     ) {
         when (state) {
@@ -71,7 +64,6 @@ private fun LazyListScope.scanContent(
 ) {
     item {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            SectionTitle(stringResource(Res.string.home_scan_action))
             Text(
                 stringResource(Res.string.scan_description),
                 color = AiFinderPalette.Muted
@@ -113,7 +105,7 @@ private fun LazyListScope.scanContent(
                 label = stringResource(if (data.isAnalyzing) Res.string.scan_analyzing else Res.string.scan_analyze),
                 onClick = { if (selectedLocation.isNotBlank() && !data.isAnalyzing) onAnalyze() },
                 isLoading = data.isAnalyzing,
-                enabled = selectedLocation.isNotBlank() && !data.isAnalyzing && data.access?.canScan == true
+                enabled = selectedLocation.isNotBlank() && !data.isAnalyzing && !data.requiresPurchase
             )
         }
     }

@@ -2,16 +2,25 @@ package org.techascent.aifinder.presentation.review
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.*
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
+import org.techascent.aifinder.config.AnalysisConfig
 
 @Composable
 fun ReviewScreen(
@@ -68,14 +77,7 @@ fun ReviewScreen(
 
     ScreenLayout(
         topBar = {
-            Surface(color = AiFinderPalette.Background) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().statusBarsPadding()
-                        .padding(horizontal = 24.dp, vertical = 4.dp)
-                ) {
-                    BackButton(onBack)
-                }
-            }
+            ScreenTopBar(stringResource(Res.string.review_title), onBack)
         },
         bottomBar = {
             if (state is ReviewUiState.Success && detections.isNotEmpty()) {
@@ -99,27 +101,57 @@ fun ReviewScreen(
             }
         }
     ) {
-        item(key = "header") { SectionTitle(stringResource(Res.string.review_title)) }
+        item(key = "header") {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    stringResource(Res.string.review_intro),
+                    color = AiFinderPalette.Muted,
+                    fontSize = 15.sp,
+                    lineHeight = 22.sp,
+                )
+            }
+        }
         when (state) {
             is ReviewUiState.Loading -> item { LoadingContent() }
             is ReviewUiState.Error -> item { ErrorContent(state.message, onRetry) }
             is ReviewUiState.Success -> {
                 item(key = "location") {
-                    InfoCard(
-                        title = stringResource(Res.string.location_save_into),
-                        subtitle = selectedLocation,
-                        onClick = onChooseLocation
-                    )
+                    Surface(
+                        onClick = onChooseLocation,
+                        enabled = !state.data.isSaving,
+                        color = AiFinderPalette.Surface,
+                        shape = RoundedCornerShape(24.dp),
+                        border = BorderStroke(1.dp, AiFinderPalette.Border),
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Icon(Icons.Outlined.LocationOn, null, tint = AiFinderPalette.Teal)
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(stringResource(Res.string.location_save_into), color = AiFinderPalette.Muted, fontSize = 13.sp)
+                                Text(
+                                    selectedLocation.ifBlank { stringResource(Res.string.review_choose_location) },
+                                    color = AiFinderPalette.Ink,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            }
+                            Icon(Icons.Outlined.ChevronRight, null, tint = AiFinderPalette.Teal)
+                        }
+                    }
                 }
-                if (detections.isNotEmpty()) item(key = "summary") {
-                    InfoCard(
-                        title = stringResource(Res.string.review_items_found, state.data.detections.size),
-                        subtitle = stringResource(Res.string.review_check_items),
-                        containerColor = AiFinderPalette.Mint,
-                        titleColor = AiFinderPalette.Teal,
-                        titleFontSize = 18.sp,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
+                if (detections.isNotEmpty()) {
+                    item(key = "ai-notice") { ReviewResultsNotice() }
+                    item(key = "summary") {
+                        Text(
+                            stringResource(Res.string.review_results_count, detections.size),
+                            color = AiFinderPalette.Ink,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
                 }
                 items(state.data.detections, key = { it.item.id }) { detection ->
                     DetectionCard(
@@ -128,9 +160,11 @@ fun ReviewScreen(
                             editedName = detection.item.name
                             editingId = detection.item.id
                         },
-                        onDelete = { deletingId = detection.item.id }
+                        onDelete = { deletingId = detection.item.id },
+                        enabled = !state.data.isSaving,
                     )
                 }
+
                 if (detections.isEmpty()) {
                     item(key = "empty") {
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -142,6 +176,38 @@ fun ReviewScreen(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewResultsNotice() {
+    Surface(color = AiFinderPalette.Mint, shape = RoundedCornerShape(24.dp)) {
+        Row(
+            Modifier.fillMaxWidth().padding(20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = AiFinderPalette.Teal)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    stringResource(
+                        if (AnalysisConfig.USE_FAKE_ANALYSIS) Res.string.review_sample_title
+                        else Res.string.review_ai_title
+                    ),
+                    color = AiFinderPalette.Teal,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    stringResource(
+                        if (AnalysisConfig.USE_FAKE_ANALYSIS) Res.string.review_sample_message
+                        else Res.string.review_ai_message
+                    ),
+                    color = AiFinderPalette.Ink.copy(alpha = 0.72f),
+                    fontSize = 14.sp,
+                    lineHeight = 21.sp,
+                )
             }
         }
     }

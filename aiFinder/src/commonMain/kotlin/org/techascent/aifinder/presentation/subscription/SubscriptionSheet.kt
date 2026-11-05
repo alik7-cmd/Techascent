@@ -2,6 +2,15 @@ package org.techascent.aifinder.presentation.subscription
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
+import apphub.aifinder.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import org.techascent.aifinder.presentation.components.PrimaryAction
+import org.techascent.aifinder.presentation.theme.AiFinderPalette
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -27,7 +36,39 @@ fun SubscriptionSheet(
     onPurchaseCompleted: (StorePurchase) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    RevenueCatPaywall(onPurchaseCompleted = onPurchaseCompleted, onDismiss = onDismiss)
+    if (state is SubscriptionUiState.Ready && state.purchasesEnabled && !state.creditsPending) {
+        RevenueCatPaywall(onPurchaseCompleted = onPurchaseCompleted, onDismiss = onDismiss)
+    } else {
+        Dialog(onDismissRequest = onDismiss) {
+            Surface(shape = MaterialTheme.shapes.extraLarge, color = AiFinderPalette.Surface) {
+                Column(
+                    Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    if (state is SubscriptionUiState.Loading || state is SubscriptionUiState.AddingScans) {
+                        CircularProgressIndicator(color = AiFinderPalette.Teal)
+                    }
+                    Text(
+                        stringResource(when (state) {
+                            SubscriptionUiState.Loading -> Res.string.subscription_checking
+                            SubscriptionUiState.AddingScans -> Res.string.subscription_adding_scans
+                            SubscriptionUiState.Error -> Res.string.subscription_access_error
+                            is SubscriptionUiState.Ready -> if (state.creditsPending) Res.string.subscription_credits_pending
+                                else Res.string.subscription_preview_notice
+                        }),
+                        color = AiFinderPalette.Ink,
+                        textAlign = TextAlign.Center,
+                    )
+                    if (state is SubscriptionUiState.Error ||
+                        (state is SubscriptionUiState.Ready && state.creditsPending)) {
+                        PrimaryAction(stringResource(Res.string.scan_balance_retry), onRetry)
+                    }
+                    TextButton(onClick = onDismiss) { Text(stringResource(Res.string.review_cancel)) }
+                }
+            }
+        }
+    }
 }
 
 @Composable

@@ -1,6 +1,5 @@
 package org.techascent.aifinder.presentation.components
 
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBackIos
@@ -14,10 +13,10 @@ import apphub.aifinder.generated.resources.back
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
-/** Shared top-bar back chevron; offset so the glyph lines up with the screen's content edge. */
+/** Shared back chevron with a full-size touch target. */
 @Composable
 fun BackButton(onBack: () -> Unit, modifier: Modifier = Modifier) {
-    IconButton(onClick = onBack, modifier = modifier.offset(x = (-12).dp)) {
+    IconButton(onClick = onBack, modifier = modifier) {
         Icon(
             Icons.AutoMirrored.Outlined.ArrowBackIos,
             contentDescription = stringResource(Res.string.back),

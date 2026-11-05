@@ -33,7 +33,7 @@ import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.domain.auth.AuthProvider
-import org.techascent.aifinder.presentation.components.BackButton
+import org.techascent.aifinder.presentation.components.ScreenTopBar
 import org.techascent.aifinder.presentation.components.NativeConfirmDialog
 import org.techascent.aifinder.presentation.components.ScreenLayout
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
@@ -69,8 +69,10 @@ fun AccountScreen(
             onDismiss = viewModel::dismissLogout,
         )
     }
-    ScreenLayout(snackbarHost = { SnackbarHost(snackbar) }) {
-        item(key = "header") { AccountHeader(onBack) }
+    ScreenLayout(
+        snackbarHost = { SnackbarHost(snackbar) },
+        topBar = { ScreenTopBar(stringResource(Res.string.account_title), onBack) },
+    ) {
         item(key = "profile") { ProfileCard(success.profile) }
         item(key = "preferences") {
             SettingsSection(stringResource(Res.string.account_section_preferences)) {
@@ -108,20 +110,6 @@ fun AccountScreen(
 }
 
 private val LogoutRed = Color(0xFFB04A4A)
-
-@Composable
-private fun AccountHeader(onBack: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        BackButton(onBack)
-        Text(
-            stringResource(Res.string.account_title),
-            color = AiFinderPalette.Ink,
-            fontWeight = FontWeight.Bold,
-            fontSize = 28.sp,
-            modifier = Modifier.offset(x = (-8).dp)
-        )
-    }
-}
 
 @Composable
 private fun ProfileCard(profile: AccountProfile) {

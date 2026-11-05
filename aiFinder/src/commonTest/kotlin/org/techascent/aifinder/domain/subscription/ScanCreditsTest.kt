@@ -55,6 +55,20 @@ class ScanCreditsTest {
     }
 
     @Test
+    fun failedAccessCheckBlocksAiCall() = runTest {
+        val analyzer = FakeAnalyzer()
+        val access = object : ScanAccessRepository {
+            override suspend fun refresh(): ScanAccess = error("Wallet unavailable")
+            override suspend fun consume(userId: String, scanId: String): ScanAccess = error("Must not spend")
+            override suspend fun recordPurchase(purchase: ScanPurchase): ScanAccess = error("Unused")
+        }
+        assertFailsWith<IllegalStateException> {
+            MeteredPhotoAnalyzer(analyzer, access).analyze(CapturedPhoto("scan", byteArrayOf()))
+        }
+        assertEquals(0, analyzer.calls)
+    }
+
+    @Test
     fun balanceWriteFailureDoesNotReturnSuccess() = runTest {
         val access = FakeAccess(failConsume = true)
         assertFailsWith<IllegalStateException> {
