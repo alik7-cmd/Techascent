@@ -7,7 +7,7 @@ object AiFinderPalette {
     val Background = Color(0xFFF7FAF8)
     val Surface = Color.White
     val Mint = Color(0xFFE8F6F2)
-    /** Matches the welcome illustration's baked-in background so its edges stay invisible. */
+    /** Soft backdrop for onboarding illustrations. */
     val IllustrationMint = Color(0xFFDEF3EE)
     val Teal = Color(0xFF137E78)
     val Ink = Color(0xFF193437)

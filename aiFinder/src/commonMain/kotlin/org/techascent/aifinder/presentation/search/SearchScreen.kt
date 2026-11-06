@@ -86,7 +86,8 @@ private fun LazyListScope.searchContent(
             stringResource(Res.string.search_tip),
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
             style = ComposaTheme.typography.caption,
-            color = AiFinderPalette.Muted
+            color = AiFinderPalette.Muted,
+            fontSize = 14.sp
         )
     }
     if (data.results.isNotEmpty()) item(key = "count") {

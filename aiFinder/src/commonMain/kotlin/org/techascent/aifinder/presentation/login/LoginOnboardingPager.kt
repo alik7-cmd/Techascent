@@ -2,7 +2,6 @@ package org.techascent.aifinder.presentation.login
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -15,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -23,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.SectionTitle
+import org.techascent.aifinder.presentation.components.WelcomeIllustration
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 private enum class OnboardingSlide(val title: StringResource, val description: StringResource) {
@@ -87,12 +85,7 @@ private fun SlideContent(slide: OnboardingSlide, modifier: Modifier = Modifier) 
             .clip(RoundedCornerShape(28.dp))
             .background(AiFinderPalette.IllustrationMint)
         when (slide) {
-            OnboardingSlide.Welcome -> Image(
-                painter = painterResource(Res.drawable.welcome_illustration),
-                contentDescription = stringResource(Res.string.welcome_illustration_description),
-                modifier = illustrationModifier.padding(12.dp),
-                contentScale = ContentScale.Fit
-            )
+            OnboardingSlide.Welcome -> WelcomeIllustration(illustrationModifier.padding(12.dp))
             OnboardingSlide.Scan -> {
                 val description = stringResource(Res.string.login_slide_scan_illustration_description)
                 ScanIllustration(illustrationModifier.semantics(mergeDescendants = true) {

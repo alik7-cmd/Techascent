@@ -58,6 +58,11 @@ The photo is also cached on the device for each user: in Android app files and i
 You need Storage rules that allow `aifinder/users/{uid}/**` when `request.auth.uid == uid`.
 
 ## Startup routing
+### App icon
+Android and iOS share a deep-teal storage-drawer and magnifying-glass mark, with AI sparkles inside the lens and mint scan brackets. Android includes adaptive and Android 13 themed icons, plus density-specific legacy icons. iOS includes opaque iPhone, iPad and App Store assets. Regenerate the artwork with `python3 aiFinder/tools/generate_app_icon.py` (requires Pillow); the generator owns the shared geometry, colors, raster exports and Android foreground vectors.
+
+Welcome and the first Login slide share `WelcomeIllustration`, a Compose Canvas drawing of the drawer, stored objects, storage box and magnifying glass. It has no embedded background or bitmap dependency; its surface, accent, outline and inset colors can be supplied by a future theme. The surrounding mint panel remains owned by each screen.
+
 Welcome checks the restored Firebase session and a device-local Room welcome flag while showing only the background (no content or spinner). Signed-in users go directly to Home. Signed-out users see welcome content once per app data installation; subsequent launches go directly to Login. The flag is saved before the first welcome content is shown. Continuing replaces Welcome with Login, and Login has no route back to Welcome. Room migration 2-to-3 adds the flag table without changing cached locations.
 
 ## Navigation

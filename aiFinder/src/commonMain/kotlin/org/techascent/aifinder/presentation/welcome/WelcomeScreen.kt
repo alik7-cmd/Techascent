@@ -1,6 +1,5 @@
 package org.techascent.aifinder.presentation.welcome
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,16 +14,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.welcome_app_name
-import apphub.aifinder.generated.resources.welcome_illustration_description
 import apphub.aifinder.generated.resources.welcome_tagline
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -72,16 +68,13 @@ fun WelcomeScreen(
                                 textAlign = TextAlign.Center
                             )
                             Spacer(Modifier.height(32.dp))
-                            Image(
-                                painter = painterResource(content.boxRes),
-                                contentDescription = stringResource(Res.string.welcome_illustration_description),
+                            WelcomeIllustration(
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                                     .widthIn(max = 480.dp).fillMaxWidth()
                                     .aspectRatio(770f / 520f)
                                     .clip(RoundedCornerShape(28.dp))
                                     .background(AiFinderPalette.IllustrationMint)
                                     .padding(12.dp),
-                                contentScale = ContentScale.Fit
                             )
                             Spacer(Modifier.height(40.dp))
                             SectionTitle(
