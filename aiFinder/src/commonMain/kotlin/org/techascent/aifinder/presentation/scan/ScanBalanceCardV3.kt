@@ -38,11 +38,26 @@ internal fun ScanBalanceCardV3(
         color = AiFinderPalette.Teal,
     ) {
         Box(
-            Modifier.background(Brush.linearGradient(listOf(Color(0xFF174A48), AiFinderPalette.Teal)))
+            Modifier.background(
+                Brush.linearGradient(
+                    listOf(
+                        Color(0xFF174A48),
+                        AiFinderPalette.Teal
+                    )
+                )
+            )
         ) {
             Canvas(Modifier.matchParentSize()) {
-                drawCircle(Color.White.copy(alpha = 0.04f), size.width * 0.45f, Offset(size.width, 0f))
-                drawCircle(Color.White.copy(alpha = 0.05f), size.width * 0.28f, Offset(size.width, 0f))
+                drawCircle(
+                    Color.White.copy(alpha = 0.04f),
+                    size.width * 0.45f,
+                    Offset(size.width, 0f)
+                )
+                drawCircle(
+                    Color.White.copy(alpha = 0.05f),
+                    size.width * 0.28f,
+                    Offset(size.width, 0f)
+                )
             }
             Column(
                 Modifier.fillMaxWidth().padding(20.dp),
@@ -52,7 +67,12 @@ internal fun ScanBalanceCardV3(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Icon(Icons.Outlined.AutoAwesome, null, tint = accent, modifier = Modifier.size(18.dp))
+                    Icon(
+                        Icons.Outlined.AutoAwesome,
+                        null,
+                        tint = accent,
+                        modifier = Modifier.size(18.dp)
+                    )
                     Text(
                         stringResource(Res.string.scan_balance_title),
                         color = Color.White.copy(alpha = 0.8f),
@@ -69,21 +89,23 @@ internal fun ScanBalanceCardV3(
                             data.isLoadingBalance -> CircularProgressIndicator(
                                 Modifier.size(24.dp), color = accent, strokeWidth = 2.dp,
                             )
+
                             !hasBalance -> Text(
                                 stringResource(Res.string.scan_balance_error),
                                 color = Color.White,
                                 fontSize = 14.sp,
                                 lineHeight = 20.sp,
                             )
+
                             else -> Text(
-                                stringResource(Res.string.subscription_scans_remaining, checkNotNull(data.access).remainingScans),
+                                text = data.access.remainingScans.generateText(),
                                 color = Color.White,
                                 fontSize = 24.sp,
                                 lineHeight = 30.sp,
                                 fontWeight = FontWeight.Bold,
                             )
                         }
-                        if (hasBalance && data.access?.canScan == false) {
+                        if (hasBalance && !data.access.canScan) {
                             Text(
                                 stringResource(Res.string.credit_preview_add_credits),
                                 color = Color.White.copy(alpha = 0.8f),
@@ -96,12 +118,18 @@ internal fun ScanBalanceCardV3(
                         data.isPreparingPurchase -> Box(
                             Modifier.size(48.dp), contentAlignment = Alignment.Center,
                         ) {
-                            CircularProgressIndicator(Modifier.size(22.dp), color = accent, strokeWidth = 2.dp)
+                            CircularProgressIndicator(
+                                Modifier.size(22.dp),
+                                color = accent,
+                                strokeWidth = 2.dp
+                            )
                         }
+
                         !data.isLoadingBalance && !hasBalance -> TextButton(
                             onClick = onRetry,
                             colors = ButtonDefaults.textButtonColors(contentColor = accent),
                         ) { Text(stringResource(Res.string.scan_balance_retry)) }
+
                         hasBalance -> TextButton(
                             onClick = onGetScans,
                             enabled = !data.isAnalyzing,
@@ -128,5 +156,14 @@ internal fun ScanBalanceCardV3(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun Long.generateText(): String {
+    val remainingScan = checkNotNull(this)
+    return when (remainingScan > 0) {
+        true -> stringResource(Res.string.subscription_scans_remaining, remainingScan)
+        false -> stringResource(Res.string.subscription_no_scan_left)
     }
 }

@@ -14,6 +14,7 @@
     <string name="subscription_checking">Checking your scan credits…</string>
     <string name="subscription_access_error">Could not check your scan credits. Check your connection and try again.</string>
     <string name="subscription_scans_remaining">%1$d scans remaining</string>
+    <string name="subscription_no_scan_left">No scans available</string>
     <string name="subscription_close">Close scan credits</string>
     <string name="subscription_headline">Find it faster.</string>
     <string name="subscription_description">Use AI to identify items in your storage spaces.</string>

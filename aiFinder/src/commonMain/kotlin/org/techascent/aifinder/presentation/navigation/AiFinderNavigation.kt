@@ -218,10 +218,9 @@ fun AiFinderNavigation() {
             AccountScreen(
                 viewModel = account,
                 onBack = onBack,
-                onSubscription = {
-                    showingSubscription = true
-                    subscription.refresh()
-                },
+                onSubscription = preparePurchase,
+                isLoadingSubscription = preparingPurchase,
+                subscriptionError = purchasePreparationError,
                 onSignedOut = {
                     scan.reset()
                     review.show(emptyList())

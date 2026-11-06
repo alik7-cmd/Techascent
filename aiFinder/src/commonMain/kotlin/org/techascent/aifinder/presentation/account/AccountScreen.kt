@@ -44,9 +44,14 @@ fun AccountScreen(
     onBack: () -> Unit,
     onSignedOut: () -> Unit,
     onSubscription: () -> Unit,
+    isLoadingSubscription: Boolean = false,
+    subscriptionError: Boolean = false,
 ) {
     val state by viewModel.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
+    LaunchedEffect(subscriptionError) {
+        if (subscriptionError) snackbar.showSnackbar(getString(Res.string.subscription_access_error))
+    }
     LaunchedEffect(Unit) { viewModel.load() }
     LaunchedEffect(state) {
         when (val current = state) {
@@ -76,7 +81,12 @@ fun AccountScreen(
         item(key = "profile") { ProfileCard(success.profile) }
         item(key = "preferences") {
             SettingsSection(stringResource(Res.string.account_section_preferences)) {
-                SettingsCell(Icons.Outlined.AutoAwesome, stringResource(Res.string.account_subscription), onClick = onSubscription)
+                SettingsCell(
+                    Icons.Outlined.AutoAwesome,
+                    stringResource(Res.string.account_subscription),
+                    onClick = onSubscription,
+                    isLoading = isLoadingSubscription,
+                )
                 CellDivider()
                 SettingsCell(Icons.Outlined.Home, stringResource(Res.string.account_household), onClick = {})
                 CellDivider()
