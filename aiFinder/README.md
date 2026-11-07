@@ -16,6 +16,8 @@ Photograph a drawer, shelf or storage box. Confirm the objects recognized by AI.
 **Current implementation:** camera capture, editable scan review, Android and iOS Google/Firebase authentication, Gemini (Vertex AI) photo analysis, and user-scoped Firebase locations and items with a persistent Room cache. Home, spaces, search and item details read from that cache. iOS Firebase location/item access still needs native integration.
 
 ## Location cache
+When Home has no places, its section action is **Add location** instead of See all. It verifies remote scan access through the same subscription access check used by the analysis purchase flow. Existing credits open standalone-place creation; zero credits prepare the paywall inline, and a completed purchase continues to creation. Access-check failures remain visible on Home and can be retried with Add location. Creating a place does not consume a scan. Home Search has a subtle teal gradient outline and sparkle accent; its search behavior is unchanged.
+
 Room Multiplatform stores locations in `aifinder.db` on Android and iOS, using a shared entity/DAO and bundled SQLite driver. Rows are keyed by Firebase user ID and location ID. The repository reads Firebase only when that user's local cache is empty; subsequent reads observe Room. Creating a location writes Firebase first and then upserts Room. Remote failures are surfaced without inserting a local-only location.
 
 Room adopts the existing version-1 SQLite cache without deleting its records. KSP generates the platform database constructors; exported Room schemas live in `aiFinder/schemas`. Commit schema changes alongside future migrations.

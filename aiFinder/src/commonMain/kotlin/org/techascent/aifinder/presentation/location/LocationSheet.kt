@@ -34,11 +34,16 @@ import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationSheet(viewModel: LocationViewModel, itemCount: Int?, onDismiss: () -> Unit) {
+fun LocationSheet(
+    viewModel: LocationViewModel,
+    itemCount: Int?,
+    onDismiss: () -> Unit,
+    startCreating: Boolean = false,
+) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.start() }
     var browsingId by rememberSaveable { mutableStateOf<String?>(null) }
-    var creating by rememberSaveable { mutableStateOf(false) }
+    var creating by rememberSaveable { mutableStateOf(startCreating) }
     var showingHelp by rememberSaveable { mutableStateOf(false) }
     var name by rememberSaveable { mutableStateOf("") }
     var query by rememberSaveable { mutableStateOf("") }

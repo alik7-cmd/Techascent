@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -13,6 +14,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.home_spaces_error_title
+import apphub.aifinder.generated.resources.subscription_access_error
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.ErrorCard
 import org.techascent.aifinder.presentation.components.EmptyListCard
@@ -35,6 +37,9 @@ fun HomeScreen(
     scanBalance: ScanContent,
     onRetryBalance: () -> Unit,
     onGetScans: () -> Unit,
+    onAddLocation: () -> Unit,
+    isCheckingLocationAccess: Boolean = false,
+    locationAccessError: Boolean = false,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -73,9 +78,18 @@ fun HomeScreen(
                 is HomeUiState.Success -> {
                     item(key = "spaces") {
                         SpacesHeader(
-                            onSeeAll,
-                            showSeeAll = state.data.spaces.isNotEmpty()
+                            onSeeAll = if (state.data.spaces.isEmpty()) onAddLocation else onSeeAll,
+                            isEmpty = state.data.spaces.isEmpty(),
+                            isLoading = isCheckingLocationAccess,
                         )
+                    }
+                    if (locationAccessError) {
+                        item(key = "location-access-error") {
+                            Text(
+                                stringResource(Res.string.subscription_access_error),
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.error,
+                            )
+                        }
                     }
                     if (state.data.spaces.isEmpty()) {
                         item(key = "empty") {

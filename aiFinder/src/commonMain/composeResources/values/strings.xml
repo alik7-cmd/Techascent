@@ -1,4 +1,5 @@
 <resources>
+    <string name="home_add_location">Add location</string>
     <string name="history_title">Purchase history</string>
     <string name="history_subtitle">Your scan-pack purchases, newest first. Scan packs are one-time purchases, not recurring subscriptions.</string>
     <string name="history_scan_pack">%1$d-scan pack</string>

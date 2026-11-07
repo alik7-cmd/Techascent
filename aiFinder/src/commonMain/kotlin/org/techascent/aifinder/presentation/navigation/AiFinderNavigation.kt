@@ -51,6 +51,16 @@ fun AiFinderNavigation() {
     var preparingPurchase by remember { mutableStateOf(false) }
     var purchasePreparationError by remember { mutableStateOf(false) }
     var purchaseOrigin by remember { mutableStateOf<String?>(null) }
+    var addingLocation by rememberSaveable { mutableStateOf(false) }
+    var creatingLocationFromHome by rememberSaveable { mutableStateOf(false) }
+    val openLocationCreation: () -> Unit = {
+        preparingPurchase = false
+        showingSubscription = false
+        addingLocation = false
+        creatingLocationFromHome = true
+        choosingLocation = true
+        scan.loadBalance()
+    }
     val scanContent = ((scanState as? ScanUiState.Success)?.data ?: ScanContent()).copy(
         isPreparingPurchase = preparingPurchase,
         purchasePreparationError = purchasePreparationError,
@@ -58,11 +68,22 @@ fun AiFinderNavigation() {
     val displayedScanState = (scanState as? ScanUiState.Success)?.copy(data = scanContent) ?: scanState
     val preparePurchase: () -> Unit = {
         if (!preparingPurchase) {
+            addingLocation = false
             subscription.reset()
             purchaseOrigin = backStackEntry?.id
             purchasePreparationError = false
             preparingPurchase = true
             subscription.refresh()
+        }
+    }
+    val addLocation: () -> Unit = {
+        if (!preparingPurchase) {
+            subscription.reset()
+            addingLocation = true
+            purchaseOrigin = backStackEntry?.id
+            purchasePreparationError = false
+            preparingPurchase = true
+            subscription.refresh(onAllowed = openLocationCreation)
         }
     }
 
@@ -104,7 +125,11 @@ fun AiFinderNavigation() {
     }
     LaunchedEffect(Unit) {
         if (showingSubscription) {
-            subscription.refresh(onAllowed = if (scanContent.requiresPurchase) resumeAnalysis else null)
+            subscription.refresh(onAllowed = when {
+                addingLocation -> openLocationCreation
+                scanContent.requiresPurchase -> resumeAnalysis
+                else -> null
+            })
         }
     }
     LaunchedEffect(scanContent.requiresPurchase) {
@@ -119,6 +144,8 @@ fun AiFinderNavigation() {
             preparingPurchase = false
             purchasePreparationError = false
             purchaseOrigin = null
+            addingLocation = false
+            creatingLocationFromHome = false
         }
         when (destination) {
             AiFinderScreen.Home.route -> {
@@ -147,7 +174,8 @@ fun AiFinderNavigation() {
             itemCount = if (destination == AiFinderScreen.Review.route) {
                 (review.state as? ReviewUiState.Success)?.data?.detections?.size
             } else null,
-            onDismiss = { choosingLocation = false },
+            onDismiss = { choosingLocation = false; creatingLocationFromHome = false },
+            startCreating = creatingLocationFromHome,
         )
     }
     val detections by scan.detections.collectAsState()
@@ -186,6 +214,9 @@ fun AiFinderNavigation() {
                 scanBalance = scanContent,
                 onRetryBalance = scan::loadBalance,
                 onGetScans = preparePurchase,
+                onAddLocation = addLocation,
+                isCheckingLocationAccess = preparingPurchase && addingLocation,
+                locationAccessError = purchasePreparationError && addingLocation,
                 onAccount = { navController.navigate(AiFinderScreen.Account.route) },
                 onSpace = { navController.navigate(AiFinderScreen.Space.createRoute(it)) },
                 onSeeAll = { navController.navigate(AiFinderScreen.Spaces.route) },
@@ -291,12 +322,20 @@ fun AiFinderNavigation() {
     if (showingSubscription) {
         SubscriptionSheet(
             state = subscriptionState,
-            onRetry = { subscription.refresh(onAllowed = if (scanContent.requiresPurchase) resumeAnalysis else null) },
+            onRetry = {
+                subscription.refresh(onAllowed = when {
+                    addingLocation -> openLocationCreation
+                    scanContent.requiresPurchase -> resumeAnalysis
+                    else -> null
+                })
+            },
             onPurchaseCompleted = { purchase ->
                 subscription.onPurchaseCompleted(purchase, onAllowed = when {
+                    addingLocation -> openLocationCreation
                     scanContent.requiresPurchase -> resumeAnalysis
                     else -> ({
                         showingSubscription = false
+                        addingLocation = false
                         scan.loadBalance()
                     })
                 })

@@ -3,6 +3,7 @@ package org.techascent.aifinder.presentation.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,17 +15,23 @@ import org.techascent.aifinder.presentation.components.SectionTitle
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @Composable
-internal fun SpacesHeader(onSeeAll: () -> Unit, showSeeAll: Boolean = true) {
+internal fun SpacesHeader(
+    onSeeAll: () -> Unit,
+    isEmpty: Boolean = false,
+    isLoading: Boolean = false,
+) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         SectionTitle(stringResource(Res.string.home_spaces_title))
-        if (showSeeAll) {
-            TextButton(onClick = onSeeAll) {
+        TextButton(onClick = onSeeAll, enabled = !isLoading) {
+            if (isLoading) {
+                CircularProgressIndicator(Modifier.size(18.dp), color = AiFinderPalette.Teal, strokeWidth = 2.dp)
+            } else {
                 Text(
-                    stringResource(Res.string.home_see_all),
+                    stringResource(if (isEmpty) Res.string.home_add_location else Res.string.home_see_all),
                     color = AiFinderPalette.Teal,
                     fontWeight = FontWeight.Bold
                 )

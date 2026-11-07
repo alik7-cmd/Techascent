@@ -2,16 +2,20 @@ package org.techascent.aifinder.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apphub.aifinder.generated.resources.*
@@ -24,6 +28,15 @@ internal fun HomeSearch(onClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(AiFinderPalette.Surface)
+            .border(
+                1.5.dp,
+                Brush.linearGradient(listOf(
+                    AiFinderPalette.Teal.copy(alpha = 0.65f),
+                    AiFinderPalette.IllustrationMint,
+                    AiFinderPalette.Teal.copy(alpha = 0.35f),
+                )),
+                RoundedCornerShape(20.dp),
+            )
             .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -38,7 +51,11 @@ internal fun HomeSearch(onClick: () -> Unit) {
         Text(
             stringResource(Res.string.home_search_hint),
             color = AiFinderPalette.Muted,
-            fontSize = 17.sp
+            fontSize = 17.sp,
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
+        Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = AiFinderPalette.Teal, modifier = Modifier.size(20.dp))
     }
 }
