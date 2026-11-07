@@ -5,7 +5,55 @@ import FirebaseDatabase
 import GoogleSignIn
 import UIKit
 
-final class FirebaseAuthBridge: NSObject, IosAuthBridge {
+final class FirebaseAuthBridge: NSObject, IosAuthBridge, IosPurchaseHistoryBridge {
+    func loadPurchases(userId: String, completion: @escaping ([ScanPurchase]?, String?) -> Void) {
+        guard Auth.auth().currentUser?.uid == userId else {
+            completion(nil, "Sign in to view your purchases.")
+            return
+        }
+        guard let databaseURL = FirebaseApp.app()?.options.databaseURL, !databaseURL.isEmpty else {
+            completion(nil, "Missing Firebase database URL.")
+            return
+        }
+        Database.database(url: databaseURL).reference()
+            .child("aifinder").child("users").child(userId).child("purchases")
+            .getData { error, snapshot in
+                if let error {
+                    completion(nil, error.localizedDescription)
+                    return
+                }
+                guard let snapshot else {
+                    completion(nil, "Missing purchase history response.")
+                    return
+                }
+                var purchases: [ScanPurchase] = []
+                for case let child as DataSnapshot in snapshot.children {
+                    guard let row = child.value as? [String: Any],
+                          let purchaseId = row["purchaseId"] as? String,
+                          let productId = row["productId"] as? String,
+                          let scans = row["scansGranted"] as? NSNumber,
+                          let date = row["purchasedAt"] as? NSNumber,
+                          let store = row["store"] as? String,
+                          let status = row["status"] as? String,
+                          scans.int64Value >= 0, date.int64Value >= 0,
+                          scans.doubleValue == Double(scans.int64Value),
+                          date.doubleValue == Double(date.int64Value) else {
+                        completion(nil, "Purchase history contains an invalid record.")
+                        return
+                    }
+                    purchases.append(ScanPurchase(
+                        purchaseId: purchaseId,
+                        productId: productId,
+                        scansGranted: scans.int64Value,
+                        purchasedAt: date.int64Value,
+                        store: store,
+                        status: status
+                    ))
+                }
+                completion(purchases, nil)
+            }
+    }
+
     var currentUser: AuthUser? {
         Auth.auth().currentUser.map(Self.authUser)
     }

@@ -1,4 +1,14 @@
 <resources>
+    <string name="history_title">Purchase history</string>
+    <string name="history_subtitle">Your scan-pack purchases, newest first. Scan packs are one-time purchases, not recurring subscriptions.</string>
+    <string name="history_scan_pack">%1$d-scan pack</string>
+    <string name="history_credited">Scans added</string>
+    <string name="history_pending">Processing credits</string>
+    <string name="history_status_unknown">Status unavailable</string>
+    <string name="history_empty_title">No purchases yet</string>
+    <string name="history_empty_message">Your scan-pack purchases will appear here.</string>
+    <string name="history_error_title">Couldn't load purchases</string>
+    <string name="history_error_message">Check your connection and try again. Your existing scan credits are unchanged.</string>
     <string name="app_name">Muslim – Namaz &amp; Halal Scanner</string>
 
     <string name="welcome_title">Stop searching, Start finding!</string>
@@ -140,7 +150,31 @@
     <string name="review_empty_message">All items have been removed. Scan again to start a new review.</string>
     <string name="review_scan_again">Scan again</string>
     <string name="location_save_into">Save into</string>
-    <string name="location_choose_title">Choose a location</string>
+    <string name="location_choose_title">Choose a place</string>
+    <string name="place_all">All places</string>
+    <string name="place_open">Look inside</string>
+    <string name="place_add_title">Add a place</string>
+    <string name="place_add_subtitle">Give it a name you will recognize. A room, shelf or box is enough.</string>
+    <string name="place_where">Where is it?</string>
+    <string name="place_standalone">Not inside another place</string>
+    <string name="place_name">What's this place called?</string>
+    <string name="place_name_hint">e.g. Bedroom, Wardrobe or Top drawer</string>
+    <string name="place_preview">Your items will be saved here</string>
+    <string name="place_add_use">Add and use this place</string>
+    <string name="place_add_inside">Add a place inside %1$s</string>
+    <string name="place_use">Use %1$s</string>
+    <string name="place_empty">No places yet. Add your first place, such as Bedroom or Garage.</string>
+    <string name="place_empty_inside">Nothing added inside yet. Use this place as it is, or add a shelf, drawer or box inside it.</string>
+    <string name="place_help_action">See how it works</string>
+    <string name="place_help_title">A place for everything</string>
+    <string name="place_help_intro">Start with a place you know. Add smaller places inside it only when that helps you find things.</string>
+    <string name="place_example_room">Bedroom</string>
+    <string name="place_example_wardrobe">Wardrobe inside Bedroom</string>
+    <string name="place_example_drawer">Top drawer inside Wardrobe</string>
+    <string name="place_help_items">Your scanned items go in the place you choose.</string>
+    <string name="place_help_optional">Keep it simple: Garage alone works too. You don't need to add every shelf or drawer.</string>
+    <string name="place_help_steps">Tap a place to look inside. Choose Use this place when you reach the right spot, or Add a place inside to be more specific. Tap All places to add somewhere separate.</string>
+    <string name="place_help_done">Got it</string>
     <string name="location_choose_subtitle">Where will these items be stored?</string>
     <string name="location_create_title">Create a location</string>
     <string name="location_create_subtitle">Organize your home from big areas to small spaces.</string>

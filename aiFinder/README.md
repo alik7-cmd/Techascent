@@ -32,6 +32,8 @@ Space details show a mint location summary, saved-item cards with nested locatio
 ## Inventory cache
 Scanning requires a selected storage location. Analyze stays disabled with a warning until a location is selected; the selection carries over to review, where it can be changed before saving.
 
+The place picker browses one level at a time, with tappable breadcrumbs, full-path search results and explicit `Use [place]` / `Add a place inside [place]` actions. It opens at All places rather than silently using the previous selection as a new place's parent. Adding requires only a name and shows the containing place and resulting path; standalone places use the existing ROOM type and nested places use CONTAINER internally. Existing types and relationships remain unchanged, including legacy Home roots. A `See how it works` guide illustrates Bedroom → Wardrobe → Top drawer and explains that nesting is optional.
+
 ### Development: fake analysis
 Set `AnalysisConfig.USE_FAKE_ANALYSIS` in `aiFinder/src/commonMain/kotlin/org/techascent/aifinder/config/AnalysisConfig.kt`, then rebuild and restart the app. It is currently `true`: Android and iOS return sample HDMI cable, passport and key detections without creating the AI HTTP client or calling Vertex AI, so analysis incurs no Google Cloud AI charges and needs no Vertex API key. Samples ignore the photo and omit bounding boxes rather than inventing positions. Set it to `false` before shipping to restore real analysis.
 
@@ -74,6 +76,8 @@ All back-enabled screens use the shared `ScreenTopBar`: a fixed back chevron and
 `AiFinderNavigation` uses Navigation Compose's multiplatform `NavHost`, with all routes defined in the sealed `AiFinderScreen` class. Space and item details receive encoded IDs as navigation arguments. Back returns to the actual originating screen, including when opening Scan from a space. Welcome completion, sign-in and sign-out replace the back stack, preventing Back from reopening authentication screens or a signed-out session. Saving a review returns to Home and removes the scan/review flow from the stack. Shared ViewModels retain the scan-to-review handoff and existing logout cleanup.
 
 ## Account settings
+Account's Subscription row opens Purchase history, a read-only list of the signed-in user's Firebase `aifinder/users/{uid}/purchases` records, newest first. It shows the scan pack, local purchase date and crediting status, with loading, empty and retry states. Android reads Firebase directly; iOS uses the native Firebase bridge. This list reflects recorded scan-pack purchases, not a recurring subscription or a full store billing/refund ledger; prices are not stored and are not invented. Firebase rules must allow the owner to read their purchases. Home and Scan retain their existing Get more purchase flow.
+
 After authentication, Android and iOS update `aifinder/users/{uid}/signedIn` with `platform` (`ANDROID` or `IOS`), `provider` (`Google` or `Apple`), and `deviceName`. This stores the latest sign-in, not a history, and leaves locations/items untouched. The write is best-effort with a 15-second timeout: failures are logged without blocking successful login. Realtime Database rules must permit writes to this node only when `auth.uid == uid`. Restored sessions do not trigger another write.
 
 Device names require no permissions: Android uses manufacturer/model and iOS uses `UIDevice.name` (often a generic name such as “iPhone”).

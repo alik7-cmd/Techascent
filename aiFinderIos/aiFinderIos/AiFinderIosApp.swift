@@ -7,7 +7,9 @@ import AiFinder
 struct AiFinderIosApp: App {
     init() {
         FirebaseApp.configure()
-        IosAuthBridgeRegistry.shared.install(bridge: FirebaseAuthBridge())
+        let bridge = FirebaseAuthBridge()
+        IosAuthBridgeRegistry.shared.install(bridge: bridge)
+        IosPurchaseHistoryBridgeRegistry.shared.install(bridge: bridge)
     }
 
     private struct AiFinderView: UIViewControllerRepresentable {

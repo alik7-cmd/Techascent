@@ -218,9 +218,7 @@ fun AiFinderNavigation() {
             AccountScreen(
                 viewModel = account,
                 onBack = onBack,
-                onSubscription = preparePurchase,
-                isLoadingSubscription = preparingPurchase,
-                subscriptionError = purchasePreparationError,
+                onSubscription = { navController.navigate(AiFinderScreen.PurchaseHistory.route) { launchSingleTop = true } },
                 onSignedOut = {
                     scan.reset()
                     review.show(emptyList())
@@ -235,6 +233,9 @@ fun AiFinderNavigation() {
                     replaceRoot(AiFinderScreen.Login)
                 },
             )
+        }
+        composable(AiFinderScreen.PurchaseHistory.route) {
+            PurchaseHistoryScreen(viewModel = koinViewModel<PurchaseHistoryViewModel>(), onBack = onBack)
         }
         composable(AiFinderScreen.Scan.route) {
             ScanScreen(

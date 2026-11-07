@@ -49,8 +49,13 @@ import org.techascent.aifinder.presentation.subscription.SubscriptionViewModel
 import org.techascent.aifinder.domain.subscription.PurchaseGateway
 import org.techascent.aifinder.data.subscription.RevenueCatPurchaseGateway
 import org.techascent.aifinder.data.subscription.revenueCatApiKey
+import org.techascent.aifinder.data.subscription.PurchaseHistoryRepository
+import org.techascent.aifinder.data.subscription.createPurchaseHistoryRemote
+import org.techascent.aifinder.presentation.subscription.PurchaseHistoryViewModel
 
 val aiFinderModule = module {
+    single { PurchaseHistoryRepository(auth = get(), remote = createPurchaseHistoryRemote()) }
+    viewModel { PurchaseHistoryViewModel(repository = get()) }
     single<ScanAccessRepository> {
         ScanAccessRepositoryImpl(auth = get(), remote = get(), cache = get<AiFinderDatabase>().scanWalletDao())
     }
