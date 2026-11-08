@@ -5,6 +5,10 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class FilePhotoLocalDataSource(private val root: File) : PhotoLocalDataSource {
+    override suspend fun delete(userId: String, photoId: String): Unit = withContext(Dispatchers.IO) {
+        val target = file(userId, photoId)
+        check(!target.exists() || target.delete()) { "Couldn't delete cached photo." }
+    }
     override suspend fun deleteForUser(userId: String): Unit = withContext(Dispatchers.IO) {
         val directory = File(root, StoragePaths.safeName(userId))
         check(!directory.exists() || directory.deleteRecursively()) { "Couldn't clear cached photos." }

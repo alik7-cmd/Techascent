@@ -39,15 +39,27 @@ data class InventorySnapshot(
         val words = query.lowercase().split(Regex("[^\\p{L}\\p{N}]+"))
             .filter { it.isNotBlank() && it !in searchStopWords }
         if (words.isEmpty()) return items
-        return items.filter { located ->
+        return items.mapNotNull { located ->
             val haystack = buildString {
                 append(located.item.name).append(' ')
                 append(located.item.category).append(' ')
                 located.item.tags.forEach { append(it).append(' ') }
                 append(located.path)
             }.lowercase()
-            words.all { it in haystack }
-        }
+            val tokens = haystack.split(Regex("[^\\p{L}\\p{N}]+")).filter(String::isNotBlank)
+            var score = 0
+            for (word in words) {
+                val match = when {
+                    word in haystack -> 3
+                    tokens.any { canonicalSearchWord(it) == canonicalSearchWord(word) } -> 2
+                    word.length >= 5 && word.all(Char::isLetter) &&
+                        tokens.any { it.all(Char::isLetter) && oneEditApart(word, it) } -> 1
+                    else -> return@mapNotNull null
+                }
+                score += match
+            }
+            located to score
+        }.sortedByDescending { it.second }.map { it.first }
     }
 
     private fun StorageLocation.withCounts(): StorageLocation {
@@ -76,7 +88,7 @@ fun buildSnapshot(locations: List<StorageLocation>, items: List<StoredItem>): In
         locations = locations,
         items = items.mapNotNull { stored ->
             val location = byId[stored.locationId] ?: return@mapNotNull null
-            LocatedItem(stored.item, location, locations.pathOf(location.id))
+            LocatedItem(stored.item, location, locations.pathOf(location.id), stored.createdAt, stored.confirmedAt, stored.bounds)
         },
     )
 }
@@ -85,3 +97,32 @@ fun buildSnapshot(locations: List<StorageLocation>, items: List<StoredItem>): In
 private val searchStopWords = setOf(
     "where", "is", "are", "my", "the", "a", "an", "did", "i", "put", "it", "find", "in", "of",
 )
+
+private val searchAliases = listOf(
+    setOf("charger", "chargers", "adapter", "adaptor", "adapters", "adaptors"),
+    setOf("headphones", "headphone", "earphones", "earbuds", "headset"),
+    setOf("sofa", "couch"),
+    setOf("wardrobe", "closet"),
+    setOf("usb", "usbc"),
+    setOf("keys", "key"),
+    setOf("cables", "cable", "cord", "cords"),
+)
+
+private fun canonicalSearchWord(word: String): String =
+    searchAliases.firstOrNull { word in it }?.first() ?: word
+
+/** At most one insertion, deletion, substitution or adjacent transposition; no fuzzy numeric IDs. */
+internal fun oneEditApart(a: String, b: String): Boolean {
+    if (kotlin.math.abs(a.length - b.length) > 1) return false
+    if (a == b) return true
+    var i = 0
+    while (i < minOf(a.length, b.length) && a[i] == b[i]) i++
+    if (i == minOf(a.length, b.length)) return true
+    if (a.length == b.length) {
+        return a.substring(i + 1) == b.substring(i + 1) ||
+            (i + 1 < a.length && a[i] == b[i + 1] && a[i + 1] == b[i] &&
+                a.substring(i + 2) == b.substring(i + 2))
+    }
+    return if (a.length > b.length) a.substring(i + 1) == b.substring(i)
+    else a.substring(i) == b.substring(i + 1)
+}

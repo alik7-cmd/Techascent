@@ -13,6 +13,9 @@ data class ItemDto(
     val photoId: String?,
     val confidence: Float?,
     val createdAt: Long,
+    val description: String = "",
+    val confirmedAt: Long = createdAt,
+    val bounds: List<Float>? = null,
 ) {
     fun toMap(): Map<String, Any?> = mapOf(
         "name" to name,
@@ -22,12 +25,17 @@ data class ItemDto(
         "photoId" to photoId,
         "confidence" to confidence?.toDouble(),
         "createdAt" to createdAt,
+        "description" to description,
+        "confirmedAt" to confirmedAt,
+        "bounds" to bounds?.map { it.toDouble() },
     )
 
     fun toDomain(id: String) = StoredItem(
-        item = InventoryItem(id = id, name = name, category = category, tags = tags, photoId = photoId),
+        item = InventoryItem(id = id, name = name, category = category, tags = tags, photoId = photoId, description = description),
         locationId = locationId,
         createdAt = createdAt,
+        confirmedAt = confirmedAt,
+        bounds = bounds,
     )
 
     companion object {
@@ -36,9 +44,11 @@ data class ItemDto(
             category = detection.item.category,
             tags = detection.item.tags,
             locationId = locationId,
-            photoId = detection.photoId,
+            photoId = detection.photoId.takeIf { it.isNotBlank() },
             confidence = detection.confidence,
             createdAt = createdAt,
+            description = detection.item.description,
+            bounds = detection.bounds,
         )
 
         /** Returns null for malformed nodes so one bad record can't break the whole list. */
@@ -53,6 +63,10 @@ data class ItemDto(
                 photoId = value["photoId"] as? String,
                 confidence = (value["confidence"] as? Number)?.toFloat(),
                 createdAt = (value["createdAt"] as? Number)?.toLong() ?: 0L,
+                description = value["description"] as? String ?: "",
+                confirmedAt = (value["confirmedAt"] as? Number)?.toLong()
+                    ?: (value["createdAt"] as? Number)?.toLong() ?: 0L,
+                bounds = (value["bounds"] as? List<*>)?.mapNotNull { (it as? Number)?.toFloat() },
             )
         }
     }

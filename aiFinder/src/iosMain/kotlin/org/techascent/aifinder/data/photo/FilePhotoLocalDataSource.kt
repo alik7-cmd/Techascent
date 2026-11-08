@@ -18,6 +18,12 @@ import platform.posix.memcpy
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 class FilePhotoLocalDataSource : PhotoLocalDataSource {
+    override suspend fun delete(userId: String, photoId: String): Unit = withContext(Dispatchers.IO) {
+        val target = path(userId, photoId)
+        check(!fileManager.fileExistsAtPath(target) || fileManager.removeItemAtPath(target, error = null)) {
+            "Couldn't delete cached photo."
+        }
+    }
     private val fileManager get() = NSFileManager.defaultManager
 
     override suspend fun deleteForUser(userId: String): Unit = withContext(Dispatchers.IO) {

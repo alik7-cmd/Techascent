@@ -14,6 +14,8 @@ import org.techascent.aifinder.domain.model.CreateLocationRequest
 import org.techascent.aifinder.domain.model.StorageLocation
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * Offline-first: reads always come from [local]. Firebase is only read when the user's cache is empty,
@@ -27,6 +29,22 @@ class LocationRepositoryImpl(
     private val now: () -> Long = ::currentTimeMillis,
     private val remoteTimeoutMillis: Long = REMOTE_TIMEOUT_MILLIS,
 ) : LocationRepository {
+    private val mutations = Mutex()
+
+    override suspend fun refresh(): Result<Unit> = mutations.withLock {
+        val userId = auth.currentUser?.id ?: return@withLock Result.failure(LocationError.NotSignedIn)
+        try {
+            val nodes = withTimeoutOrNull(remoteTimeoutMillis) { remote.fetchAll(userId) }
+                ?: error("Refreshing places timed out. Try again.")
+            check(auth.currentUser?.id == userId) { "The signed-in user changed." }
+            local.replaceAll(userId, nodes)
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e.asLocationError())
+        }
+    }
 
     override fun observeLocations(): Flow<List<StorageLocation>> = flow {
         val userId = auth.currentUser?.id ?: throw LocationError.NotSignedIn
@@ -36,16 +54,17 @@ class LocationRepositoryImpl(
 
     override suspend fun createLocation(request: CreateLocationRequest): Result<StorageLocation> {
         val userId = auth.currentUser?.id ?: return Result.failure(LocationError.NotSignedIn)
-        return try {
+        return mutations.withLock { try {
             val dto = LocationDto.from(request, now())
             val id = remote.create(userId, dto)
+            check(auth.currentUser?.id == userId) { "The signed-in user changed." }
             local.upsert(userId, id, dto)
             Result.success(dto.toDomain(id))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Result.failure(e.asLocationError())
-        }
+        } }
     }
 
     private suspend fun syncFromRemote(userId: String) {

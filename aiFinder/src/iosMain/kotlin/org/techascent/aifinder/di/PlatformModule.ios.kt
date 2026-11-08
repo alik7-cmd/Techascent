@@ -18,14 +18,15 @@ import org.techascent.aifinder.data.photo.PhotoRemoteDataSource
 import org.techascent.aifinder.data.photo.UnavailablePhotoDataSource
 import org.techascent.aifinder.data.subscription.ScanAccessRemoteDataSource
 import org.techascent.aifinder.data.subscription.UnavailableScanAccessDataSource
+import org.techascent.aifinder.data.firebase.*
 
 actual val platformModule = module {
-    single<ScanAccessRemoteDataSource> { UnavailableScanAccessDataSource() }
+    single<ScanAccessRemoteDataSource> { IosScanAccessDataSource() }
     single<GoogleAuthDataSource> { IosGoogleAuthDataSource(IosAuthBridgeRegistry.requireBridge()) }
     single<SignInRemoteDataSource> { IosSignInDataSource(IosAuthBridgeRegistry.requireBridge()) }
-    single<LocationRemoteDataSource> { UnavailableLocationDataSource() }
-    single<ItemRemoteDataSource> { UnavailableItemDataSource() }
-    single<PhotoRemoteDataSource> { UnavailablePhotoDataSource() }
+    single<LocationRemoteDataSource> { IosLocationDataSource() }
+    single<ItemRemoteDataSource> { IosItemDataSource() }
+    single<PhotoRemoteDataSource> { IosPhotoDataSource() }
     single<PhotoLocalDataSource> { FilePhotoLocalDataSource() }
     single { databaseBuilder().buildAiFinderDatabase() }
 }

@@ -51,15 +51,22 @@ import org.techascent.aifinder.presentation.theme.AiFinderPalette
 private enum class CameraAccess { Checking, Granted, Denied, DeniedAlways, Unavailable }
 
 @Composable
-fun ScanCameraCard(
-    controller: CameraCaptureController,
-    isAnalyzing: Boolean,
-    modifier: Modifier = Modifier
-) {
+internal fun rememberCameraPermissions(): PermissionsController {
     val factory = rememberPermissionsControllerFactory()
     val permissions = remember(factory) { factory.createPermissionsController() }
     BindEffect(permissions)
+    return permissions
+}
 
+@Composable
+fun ScanCameraCard(
+    controller: CameraCaptureController,
+    isAnalyzing: Boolean,
+    modifier: Modifier = Modifier,
+    permissions: PermissionsController = rememberCameraPermissions(),
+    expanded: Boolean = false,
+    framingHint: String = "Fit the whole place in the frame",
+) {
     val scope = rememberCoroutineScope()
     var access by remember { mutableStateOf(CameraAccess.Checking) }
 
@@ -72,7 +79,7 @@ fun ScanCameraCard(
     }
 
     Box(
-        modifier.fillMaxWidth().height(310.dp)
+        modifier.fillMaxWidth().then(if (expanded) Modifier else Modifier.height(310.dp))
             .clip(RoundedCornerShape(24.dp))
             .background(if (access == CameraAccess.Granted) Color.Black else AiFinderPalette.Mint),
         contentAlignment = Alignment.Center
@@ -85,7 +92,7 @@ fun ScanCameraCard(
                     modifier = Modifier.fillMaxSize(),
                     onUnavailable = { access = CameraAccess.Unavailable }
                 )
-                if (isAnalyzing) AnalyzingOverlay() else ViewfinderOverlay()
+                if (isAnalyzing) AnalyzingOverlay() else ViewfinderOverlay(framingHint)
             }
             CameraAccess.Denied -> CameraMessage(
                 icon = Icons.Outlined.CameraAlt,
@@ -134,7 +141,7 @@ private fun AnalyzingOverlay() {
 }
 
 @Composable
-private fun ViewfinderOverlay() {
+private fun ViewfinderOverlay(hint: String) {
     Box(Modifier.fillMaxSize()) {
         Canvas(Modifier.fillMaxSize().padding(20.dp)) {
             val len = 28.dp.toPx()
@@ -150,7 +157,7 @@ private fun ViewfinderOverlay() {
             }
         }
         Text(
-            "Fit the whole space in the frame",
+            hint,
             color = Color.White,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp)

@@ -21,6 +21,8 @@ class RoomItemLocalDataSource(
         dao.upsertAll(items.map { (id, dto) -> dto.toEntity(userId, id) })
     }
 
+    override suspend fun delete(userId: String, itemId: String) = dao.delete(userId, itemId)
+
     private fun ItemDto.toEntity(userId: String, id: String) = CachedItem(
         userId = userId,
         id = id,
@@ -31,6 +33,9 @@ class RoomItemLocalDataSource(
         photoId = photoId,
         confidence = confidence,
         createdAt = createdAt,
+        description = description,
+        confirmedAt = confirmedAt,
+        bounds = bounds?.joinToString(","),
     )
 
     private fun CachedItem.toNode() = id to ItemDto(
@@ -41,6 +46,9 @@ class RoomItemLocalDataSource(
         photoId = photoId,
         confidence = confidence,
         createdAt = createdAt,
+        description = description,
+        confirmedAt = confirmedAt,
+        bounds = bounds?.split(",")?.mapNotNull { it.toFloatOrNull() },
     )
 
     private companion object {

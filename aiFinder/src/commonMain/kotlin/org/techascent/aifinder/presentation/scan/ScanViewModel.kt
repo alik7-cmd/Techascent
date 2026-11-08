@@ -35,6 +35,27 @@ class ScanViewModel(
     private var balanceJob: Job? = null
     private var pendingPhoto: CapturedPhoto? = null
 
+    fun capture(camera: CameraCaptureController) {
+        val current = (_state.value as? ScanUiState.Success)?.data ?: return
+        if (current.isAnalyzing || current.isCapturing) return
+        updateContent { it.copy(isCapturing = true, errorMessage = null) }
+        analysisJob = viewModelScope.launch {
+            try {
+                val photo = camera.capture()
+                updateContent { it.copy(previewPhoto = photo) }
+            } catch (e: CancellationException) { throw e }
+            catch (e: Exception) {
+                updateContent { it.copy(errorMessage = e.message ?: "Couldn't capture photo. Try again.") }
+            } finally { updateContent { it.copy(isCapturing = false) } }
+        }
+    }
+
+    fun retake() {
+        if ((_state.value as? ScanUiState.Success)?.data?.isAnalyzing == true) return
+        pendingPhoto = null
+        updateContent { it.copy(previewPhoto = null, errorMessage = null, requiresPurchase = false) }
+    }
+
     fun loadBalance() {
         balanceJob?.cancel()
         updateContent { it.copy(access = null, isLoadingBalance = true, balanceError = false) }
@@ -53,9 +74,9 @@ class ScanViewModel(
 
     fun analyze(camera: CameraCaptureController) {
         val current = (_state.value as? ScanUiState.Success)?.data ?: return
-        if (current.isAnalyzing || current.requiresPurchase) return
+        if (current.isAnalyzing || current.isCapturing || current.requiresPurchase) return
         pendingPhoto = null
-        analyzePhoto { camera.capture() }
+        analyzePhoto { current.previewPhoto ?: camera.capture() }
     }
 
     fun resumeAfterPurchase() {
@@ -86,7 +107,7 @@ class ScanViewModel(
                         it.copy(isAnalyzing = false, errorMessage = "No items recognized. Try moving closer or adding more light.")
                     }
                 } else {
-                    updateContent { it.copy(isAnalyzing = false) }
+                    updateContent { it.copy(isAnalyzing = false, previewPhoto = null) }
                     _detections.value = ScanResult(photo, detections)
                 }
             } catch (e: CancellationException) {
@@ -108,7 +129,7 @@ class ScanViewModel(
         analysisJob?.cancel()
         analysisJob = null
         pendingPhoto = null
-        updateContent { it.copy(isAnalyzing = false, requiresPurchase = false) }
+        updateContent { it.copy(isAnalyzing = false, isCapturing = false, previewPhoto = null, requiresPurchase = false) }
         consumeDetections()
     }
 

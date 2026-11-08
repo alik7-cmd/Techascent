@@ -20,6 +20,9 @@ abstract class ItemDao {
     @Query("DELETE FROM CachedItem WHERE userId = :userId")
     abstract suspend fun deleteForUser(userId: String)
 
+    @Query("DELETE FROM CachedItem WHERE userId = :userId AND id = :id")
+    abstract suspend fun delete(userId: String, id: String)
+
     @Transaction
     open suspend fun replaceAll(userId: String, items: List<CachedItem>) {
         deleteForUser(userId)

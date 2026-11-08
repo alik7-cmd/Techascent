@@ -18,6 +18,9 @@ class ObserveInventoryUseCase(
 ) {
     operator fun invoke(): Flow<InventorySnapshot> =
         combine(locations.observeLocations(), items.observeItems(), ::buildSnapshot)
+
+    fun observeItems(): Flow<List<StoredItem>> = items.observeItems()
+    suspend fun refreshItems(): Result<Unit> = items.refresh()
 }
 
 /** Uploads the scan photo (when there is one) before saving its items, so saved items never point at a missing photo. */
@@ -29,12 +32,13 @@ class SaveDetectionsUseCase(
         locationId: String?,
         detections: List<ItemDetection>,
         photo: CapturedPhoto? = null,
+        replacements: Map<String, StoredItem> = emptyMap(),
     ): Result<List<StoredItem>> {
         if (locationId.isNullOrBlank()) return Result.failure(InventoryError.NoLocation)
         val valid = detections.filter { it.item.name.isNotBlank() }
         if (valid.isEmpty()) return Result.failure(InventoryError.NothingToSave)
         if (photo != null) photos.save(photo.id, photo.jpegBytes)
             .onFailure { return Result.failure(it) }
-        return repository.saveDetections(locationId, valid)
+        return repository.saveReviewed(locationId, valid, replacements)
     }
 }

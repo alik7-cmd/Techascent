@@ -25,7 +25,9 @@ internal fun SpacesHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        SectionTitle(stringResource(Res.string.home_spaces_title))
+        Box(Modifier.weight(1f)) {
+            SectionTitle(stringResource(Res.string.home_spaces_title))
+        }
         TextButton(onClick = onSeeAll, enabled = !isLoading) {
             if (isLoading) {
                 CircularProgressIndicator(Modifier.size(18.dp), color = AiFinderPalette.Teal, strokeWidth = 2.dp)

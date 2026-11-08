@@ -22,6 +22,7 @@ fun SpacesScreen(
     isCheckingScan: Boolean = false,
     onBack: () -> Unit,
     onRetry: () -> Unit,
+    onAddPlace: () -> Unit,
 ) {
     ScreenLayout(topBar = { ScreenTopBar(stringResource(Res.string.spaces_title), onBack) }) {
         when (state) {
@@ -39,6 +40,12 @@ fun SpacesScreen(
             }
 
             is SpacesUiState.Success -> {
+                item(key = "add-place") {
+                    androidx.compose.material3.TextButton(onClick = onAddPlace) {
+                        androidx.compose.material3.Text(
+                            stringResource(Res.string.home_add_location), color = AiFinderPalette.Teal)
+                    }
+                }
                 if (state.spaces.isEmpty()) {
                     item(key = "empty") {
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -55,7 +62,8 @@ fun SpacesScreen(
                     SpaceCard(
                         entry.location,
                         onClick = { onSpace(entry.location.id) },
-                        parentPath = entry.parentPath
+                        parentPath = entry.parentPath,
+                        coverPhotoId = entry.coverPhotoId,
                     )
                 }
             }

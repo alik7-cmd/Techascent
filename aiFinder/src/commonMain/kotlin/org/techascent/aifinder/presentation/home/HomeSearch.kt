@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +51,7 @@ internal fun HomeSearch(onClick: () -> Unit) {
         )
         Text(
             stringResource(Res.string.home_search_hint),
-            color = AiFinderPalette.Muted,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 17.sp,
             modifier = Modifier.weight(1f),
             maxLines = 1,

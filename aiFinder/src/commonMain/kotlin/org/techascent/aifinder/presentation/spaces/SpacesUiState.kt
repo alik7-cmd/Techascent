@@ -3,7 +3,7 @@ package org.techascent.aifinder.presentation.spaces
 import org.techascent.aifinder.domain.model.LocatedItem
 import org.techascent.aifinder.domain.model.StorageLocation
 
-data class SpaceListEntry(val location: StorageLocation, val parentPath: String?)
+data class SpaceListEntry(val location: StorageLocation, val parentPath: String?, val coverPhotoId: String? = null)
 
 sealed interface SpacesUiState {
     data object Loading : SpacesUiState

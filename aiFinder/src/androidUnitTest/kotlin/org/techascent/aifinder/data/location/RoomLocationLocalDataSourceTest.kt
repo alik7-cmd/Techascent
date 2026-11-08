@@ -170,4 +170,39 @@ class RoomLocationLocalDataSourceTest {
         assertTrue(items.isEmpty("a"))
         assertFalse(items.isEmpty("b"))
     }
+
+    @Test
+    fun migratesVersionFiveItemsWithoutLosingTheirPhotosOrOriginalDates() = runBlocking<Unit> {
+        val context = RuntimeEnvironment.getApplication()
+        val name = "inventory-v5-migration-test.db"
+        context.deleteDatabase(name)
+        val file = context.getDatabasePath(name)
+        check(file.parentFile!!.mkdirs() || file.parentFile!!.isDirectory)
+        AndroidSQLiteDriver().open(file.absolutePath).use { connection ->
+            listOf(
+                "CREATE TABLE CachedLocation (userId TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, parentId TEXT, createdAt INTEGER NOT NULL, PRIMARY KEY(userId,id))",
+                "CREATE INDEX CachedLocation_user_created ON CachedLocation(userId,createdAt)",
+                "CREATE TABLE WelcomePreference (id INTEGER NOT NULL PRIMARY KEY, seen INTEGER NOT NULL)",
+                "CREATE TABLE CachedScanWallet (userId TEXT NOT NULL PRIMARY KEY, remainingScans INTEGER NOT NULL)",
+                "CREATE TABLE CachedItem (userId TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, category TEXT NOT NULL, tags TEXT NOT NULL, locationId TEXT NOT NULL, photoId TEXT, confidence REAL, createdAt INTEGER NOT NULL, PRIMARY KEY(userId,id))",
+                "CREATE INDEX CachedItem_user_created ON CachedItem(userId,createdAt)",
+                "INSERT INTO CachedItem VALUES ('a','i','Keys','Accessories','spare','p','photo',0.9,12345)",
+                "INSERT INTO CachedScanWallet VALUES ('a',3)",
+                "PRAGMA user_version = 5",
+            ).forEach { sql -> connection.prepare(sql).use { it.step() } }
+        }
+        try {
+            val migrated = Room.databaseBuilder<AiFinderDatabase>(context, file.absolutePath)
+                .buildAiFinderDatabase(AndroidSQLiteDriver())
+            try {
+                val dto = RoomItemLocalDataSource(migrated.itemDao()).observe("a").first().single().second
+                assertEquals(12345L, dto.createdAt)
+                assertEquals(12345L, dto.confirmedAt)
+                assertEquals("photo", dto.photoId)
+                assertEquals("", dto.description)
+                assertEquals(null, dto.bounds)
+                assertEquals(3L, migrated.scanWalletDao().get("a")!!.remainingScans)
+            } finally { migrated.close() }
+        } finally { context.deleteDatabase(name) }
+    }
 }

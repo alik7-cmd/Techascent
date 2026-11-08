@@ -3,6 +3,8 @@ package org.techascent.aifinder.presentation.scan
 import org.techascent.aifinder.domain.subscription.ScanAccess
 
 data class ScanContent(
+    val previewPhoto: org.techascent.aifinder.domain.vision.CapturedPhoto? = null,
+    val isCapturing: Boolean = false,
     val isAnalyzing: Boolean = false,
     val errorMessage: String? = null,
     val access: ScanAccess? = null,

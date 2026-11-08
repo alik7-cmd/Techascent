@@ -9,10 +9,70 @@ import kotlinx.coroutines.launch
 import org.techascent.aifinder.domain.inventory.usecase.SaveDetectionsUseCase
 import org.techascent.aifinder.domain.model.ItemDetection
 import org.techascent.aifinder.domain.vision.CapturedPhoto
+import org.techascent.aifinder.domain.inventory.StoredItem
+import org.techascent.aifinder.domain.inventory.usecase.ObserveInventoryUseCase
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 
-class ReviewViewModel(private val saveDetections: SaveDetectionsUseCase) : ViewModel() {
+class ReviewViewModel(
+    private val saveDetections: SaveDetectionsUseCase,
+    private val observeInventory: ObserveInventoryUseCase? = null,
+) : ViewModel() {
     private var detections: List<ItemDetection> = emptyList()
     private var photo: CapturedPhoto? = null
+    private var existing = emptyList<StoredItem>()
+    private var locationId: String? = null
+    private var observeJob: Job? = null
+    private var choices = emptyMap<String, RescanChoice>()
+    private var checkingExisting = false
+    private var existingError: String? = null
+
+    fun setLocation(id: String?) {
+        if (isSaving) return
+        locationId = id
+        choices = emptyMap()
+        publish()
+        if (observeJob?.isActive == true || observeInventory == null) return
+        checkingExisting = true
+        existingError = null
+        publish()
+        observeJob = viewModelScope.launch {
+            val refreshed = observeInventory.refreshItems()
+            if (refreshed.isFailure) {
+                checkingExisting = false
+                existingError = "Couldn't check existing items. Check your connection and retry before saving."
+                publish()
+                return@launch
+            }
+            observeInventory.observeItems().catch {
+                checkingExisting = false
+                existingError = "Couldn't check existing items. Try again before saving."
+                publish(saveError = existingError)
+            }.collect {
+                existing = it
+                checkingExisting = false
+                publish(isSaving = isSaving)
+            }
+        }
+    }
+
+    private fun matches(): Map<String, StoredItem> = detections.mapNotNull { detection ->
+        val candidates = existing.filter {
+            it.locationId == locationId && it.item.name.trim().equals(detection.item.name.trim(), ignoreCase = true)
+        }
+        candidates.firstOrNull()?.let { detection.item.id to it }
+    }.toMap()
+
+    private fun ambiguousMatches(): Set<String> = detections.filter { detection ->
+        existing.count { it.locationId == locationId &&
+            it.item.name.trim().equals(detection.item.name.trim(), ignoreCase = true) } > 1
+    }.map { it.item.id }.toSet()
+
+    fun choose(itemId: String, choice: RescanChoice) {
+        if (isSaving || itemId !in matches() || choice == RescanChoice.UPDATE && itemId in ambiguousMatches()) return
+        choices = choices + (itemId to choice)
+        publish()
+    }
 
     var state: ReviewUiState by mutableStateOf(ReviewUiState.Success(ReviewContent(detections)))
         private set
@@ -20,8 +80,15 @@ class ReviewViewModel(private val saveDetections: SaveDetectionsUseCase) : ViewM
     private val isSaving get() = (state as? ReviewUiState.Success)?.data?.isSaving == true
 
     fun show(newDetections: List<ItemDetection>, newPhoto: CapturedPhoto? = null) {
+        observeJob?.cancel()
+        observeJob = null
+        existing = emptyList()
+        existingError = null
+        checkingExisting = observeInventory != null && newDetections.isNotEmpty()
+        locationId = null
         detections = newDetections
         photo = newPhoto
+        choices = emptyMap()
         publish()
     }
 
@@ -36,6 +103,7 @@ class ReviewViewModel(private val saveDetections: SaveDetectionsUseCase) : ViewM
                 detection
             }
         }
+        choices = choices - itemId
         publish()
     }
 
@@ -47,23 +115,51 @@ class ReviewViewModel(private val saveDetections: SaveDetectionsUseCase) : ViewM
 
     /** Saves the reviewed items into [locationId]; [onSaved] runs once they are in Firebase and the cache. */
     fun save(locationId: String?, onSaved: () -> Unit) {
-        if (isSaving) return
+        if (observeInventory != null && locationId != this.locationId) setLocation(locationId)
+        if (isSaving || checkingExisting || existingError != null) return
         publish(isSaving = true)
         viewModelScope.launch {
-            saveDetections(locationId, detections, photo)
+            val matched = matches()
+            val selected = detections.filter {
+                it.item.id !in matched || (choices[it.item.id] ?: RescanChoice.KEEP) != RescanChoice.KEEP
+            }
+            if (selected.isEmpty() && matched.isNotEmpty()) {
+                reset()
+                onSaved()
+                return@launch
+            }
+            val replacements = matched.filterKeys { choices[it] == RescanChoice.UPDATE }
+            saveDetections(locationId, selected, photo, replacements)
                 .onSuccess {
-                    detections = emptyList()
-                    photo = null
-                    publish()
+                    reset()
                     onSaved()
                 }
                 .onFailure { e -> publish(saveError = e.message ?: "Couldn't save your items.") }
         }
     }
 
-    fun retry() = publish()
+    fun retry() {
+        if (existingError != null) {
+            observeJob?.cancel()
+            observeJob = null
+            setLocation(locationId)
+        } else publish()
+    }
+
+    fun reset() {
+        observeJob?.cancel()
+        observeJob = null
+        existing = emptyList()
+        checkingExisting = false
+        existingError = null
+        locationId = null
+        show(emptyList())
+    }
 
     private fun publish(isSaving: Boolean = false, saveError: String? = null) {
-        state = ReviewUiState.Success(ReviewContent(detections, isSaving, saveError))
+        state = ReviewUiState.Success(ReviewContent(
+            detections, isSaving, saveError ?: existingError, matches(), choices, checkingExisting,
+            ambiguousMatches(), photo,
+        ))
     }
 }

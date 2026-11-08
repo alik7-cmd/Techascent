@@ -10,6 +10,8 @@ struct AiFinderIosApp: App {
         let bridge = FirebaseAuthBridge()
         IosAuthBridgeRegistry.shared.install(bridge: bridge)
         IosPurchaseHistoryBridgeRegistry.shared.install(bridge: bridge)
+        IosFirebaseBridgeRegistry.shared.install(bridge: bridge)
+        IosDeviceFilesBridgeRegistry.shared.install(bridge: bridge)
     }
 
     private struct AiFinderView: UIViewControllerRepresentable {

@@ -12,8 +12,10 @@ sealed class AiFinderScreen(val route: String) {
         fun createRoute(id: String) = "space/${id.encodeURLPathPart()}"
     }
     data object Account : AiFinderScreen("account")
+    data object PrivacyData : AiFinderScreen("privacyData")
     data object PurchaseHistory : AiFinderScreen("purchaseHistory")
     data object Scan : AiFinderScreen("scan")
+    data object Capture : AiFinderScreen("scan/capture")
     data object Review : AiFinderScreen("review")
     data object Search : AiFinderScreen("search")
     data object Details : AiFinderScreen("details/{itemId}") {

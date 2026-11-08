@@ -126,6 +126,7 @@ kotlin {
         }
 
         androidMain.dependencies {
+            implementation("com.google.zxing:core:3.5.3")
             implementation(libs.androidx.activity.compose)
             implementation(libs.bundles.camera)
             implementation(libs.ktor.client.okhttp)

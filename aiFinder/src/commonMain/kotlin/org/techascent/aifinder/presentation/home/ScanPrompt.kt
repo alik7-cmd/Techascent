@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.animation.Crossfade
@@ -34,7 +34,7 @@ internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false) {
         SectionTitle(stringResource(Res.string.home_scan_title))
         Text(
             stringResource(Res.string.home_scan_description),
-            color = AiFinderPalette.Muted,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 16.sp,
             lineHeight = 24.sp
         )
@@ -62,7 +62,7 @@ internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false) {
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Outlined.CameraAlt, contentDescription = null, modifier = Modifier.size(20.dp))
                     }
                 }
             }

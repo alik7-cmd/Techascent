@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E40000000000000000000001 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = E40000000000000000000002; };
 		D30000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D30000000000000000000002 /* Assets.xcassets */; };
 		C20000000000000000000001 = {isa = PBXBuildFile; fileRef = C20000000000000000000002; };
 		C20000000000000000000003 = {isa = PBXBuildFile; productRef = C20000000000000000000004; };
@@ -35,6 +36,7 @@
 				C20000000000000000000003,
 				C20000000000000000000005,
 				C20000000000000000000007,
+				E40000000000000000000001 /* FirebaseStorage in Frameworks */,
 				B5AEEE29309BE45700CFEBE4 /* GoogleSignIn in Frameworks */,
 				B5AEEE2B309BE45700CFEBE4 /* GoogleSignInSwift in Frameworks */,
 			);
@@ -89,6 +91,7 @@
 			);
 			name = aiFinderIos;
 			packageProductDependencies = (
+				E40000000000000000000002 /* FirebaseStorage */,
 				C20000000000000000000004,
 				C20000000000000000000006,
 				C20000000000000000000008,
@@ -311,6 +314,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E40000000000000000000002 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		C20000000000000000000004 = {
 			isa = XCSwiftPackageProductDependency;
 			package = B5AEEE26309BE41A00CFEBE4;

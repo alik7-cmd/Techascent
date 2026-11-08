@@ -34,6 +34,8 @@ fun SpaceScreen(
     isCheckingScan: Boolean = false,
     onBack: () -> Unit,
     onRetry: () -> Unit,
+    onAddItem: () -> Unit,
+    onQrLabel: () -> Unit,
 ) {
     val content = (state as? SpaceUiState.Success)?.data
     ScreenLayout(
@@ -76,6 +78,21 @@ fun SpaceScreen(
                 item(key = "title") {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         SectionTitle(location.name)
+                        androidx.compose.material3.TextButton(onClick = onAddItem) {
+                            Text(stringResource(Res.string.item_add), color = AiFinderPalette.Teal)
+                        }
+                        state.data.items.filter { it.location.id == location.id && it.item.photoId != null }
+                            .maxByOrNull { it.createdAt }?.let { representative ->
+                                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    ItemPhoto(representative.item.photoId, location.name, RoundedCornerShape(24.dp),
+                                        modifier = Modifier.fillMaxWidth().height(180.dp))
+                                    Text(stringResource(Res.string.place_scan_photo, location.name),
+                                        color = AiFinderPalette.Muted, fontSize = 12.sp)
+                                }
+                            }
+                        androidx.compose.material3.TextButton(onClick = onQrLabel) {
+                            Text(stringResource(Res.string.qr_label), color = AiFinderPalette.Teal)
+                        }
                     }
                 }
                 item(key = "overview") {

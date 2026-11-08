@@ -13,7 +13,7 @@ import kotlinx.coroutines.IO
 
 internal const val DATABASE_NAME = "aifinder.db"
 
-@Database(entities = [CachedLocation::class, WelcomePreference::class, CachedItem::class, CachedScanWallet::class], version = 5)
+@Database(entities = [CachedLocation::class, WelcomePreference::class, CachedItem::class, CachedScanWallet::class], version = 6)
 @ConstructedBy(AiFinderDatabaseConstructor::class)
 abstract class AiFinderDatabase : RoomDatabase() {
     abstract fun locationDao(): LocationDao
@@ -61,10 +61,21 @@ private val migration4To5 = object : Migration(4, 5) {
     }
 }
 
+private val migration5To6 = object : Migration(5, 6) {
+    override fun migrate(connection: SQLiteConnection) {
+        listOf(
+            "ALTER TABLE CachedItem ADD COLUMN description TEXT NOT NULL DEFAULT ''",
+            "ALTER TABLE CachedItem ADD COLUMN confirmedAt INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE CachedItem ADD COLUMN bounds TEXT",
+            "UPDATE CachedItem SET confirmedAt = createdAt",
+        ).forEach { sql -> connection.prepare(sql).use { it.step() } }
+    }
+}
+
 fun RoomDatabase.Builder<AiFinderDatabase>.buildAiFinderDatabase(
     driver: SQLiteDriver = BundledSQLiteDriver(),
 ): AiFinderDatabase =
     setDriver(driver)
         .setQueryCoroutineContext(Dispatchers.IO)
-        .addMigrations(migration1To2, migration2To3, migration3To4, migration4To5)
+        .addMigrations(migration1To2, migration2To3, migration3To4, migration4To5, migration5To6)
         .build()

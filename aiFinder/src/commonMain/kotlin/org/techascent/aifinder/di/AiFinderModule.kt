@@ -56,6 +56,8 @@ import org.techascent.aifinder.presentation.subscription.PurchaseHistoryViewMode
 val aiFinderModule = module {
     single { PurchaseHistoryRepository(auth = get(), remote = createPurchaseHistoryRemote()) }
     viewModel { PurchaseHistoryViewModel(repository = get()) }
+    viewModel { org.techascent.aifinder.presentation.inventory.InventoryActionsViewModel(repository = get(), photos = get()) }
+    viewModel { org.techascent.aifinder.presentation.inventory.InventorySyncViewModel(items = get(), locations = get()) }
     single<ScanAccessRepository> {
         ScanAccessRepositoryImpl(auth = get(), remote = get(), cache = get<AiFinderDatabase>().scanWalletDao())
     }
@@ -111,7 +113,7 @@ val aiFinderModule = module {
     viewModel { AccountViewModel(getCurrentUser = get(), signOut = get(), purchases = get()) }
     viewModel { HomeViewModel(observeInventory = get()) }
     viewModel { ScanViewModel(analyzer = get(), access = get()) }
-    viewModel { ReviewViewModel(saveDetections = get()) }
+    viewModel { ReviewViewModel(saveDetections = get(), observeInventory = get()) }
     viewModel { LocationViewModel(observeLocations = get(), createLocation = get()) }
     viewModel { SearchViewModel(observeInventory = get()) }
     viewModel { DetailsViewModel(observeInventory = get()) }

@@ -44,6 +44,7 @@ fun AccountScreen(
     onBack: () -> Unit,
     onSignedOut: () -> Unit,
     onSubscription: () -> Unit,
+    onPrivacy: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
@@ -82,9 +83,7 @@ fun AccountScreen(
                     onClick = onSubscription,
                 )
                 CellDivider()
-                SettingsCell(Icons.Outlined.Home, stringResource(Res.string.account_household), onClick = {})
-                CellDivider()
-                SettingsCell(Icons.Outlined.Diamond, stringResource(Res.string.account_privacy), onClick = {})
+                SettingsCell(Icons.Outlined.Diamond, stringResource(Res.string.account_privacy), onClick = onPrivacy)
             }
         }
         item(key = "account") {

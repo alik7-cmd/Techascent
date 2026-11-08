@@ -8,4 +8,7 @@ interface ItemLocalDataSource {
     suspend fun isEmpty(userId: String): Boolean
     suspend fun replaceAll(userId: String, items: List<Pair<String, ItemDto>>)
     suspend fun upsertAll(userId: String, items: List<Pair<String, ItemDto>>)
+    suspend fun delete(userId: String, itemId: String) {
+        error("Deleting cached items is unavailable.")
+    }
 }

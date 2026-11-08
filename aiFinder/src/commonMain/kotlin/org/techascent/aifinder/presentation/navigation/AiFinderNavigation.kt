@@ -22,6 +22,10 @@ import org.techascent.aifinder.presentation.search.*
 import org.techascent.aifinder.presentation.spaces.*
 import org.techascent.aifinder.presentation.subscription.*
 import org.techascent.aifinder.presentation.welcome.*
+import org.techascent.aifinder.presentation.inventory.InventoryActionsViewModel
+import org.techascent.aifinder.presentation.inventory.ItemEditorSheet
+import org.techascent.aifinder.domain.model.LocatedItem
+import org.techascent.aifinder.presentation.inventory.InventorySyncViewModel
 
 @Composable
 fun AiFinderNavigation() {
@@ -36,6 +40,17 @@ fun AiFinderNavigation() {
     val searchState by search.state.collectAsState()
     val details = koinViewModel<DetailsViewModel>()
     val detailsState by details.state.collectAsState()
+    val inventoryActions = koinViewModel<InventoryActionsViewModel>()
+    val inventorySync = koinViewModel<InventorySyncViewModel>()
+    val syncState by inventorySync.state.collectAsState()
+    val inventoryActionState by inventoryActions.state.collectAsState()
+    var editingItem by remember { mutableStateOf(false) }
+    var editorEntry by remember { mutableStateOf<LocatedItem?>(null) }
+    var editorLocationId by remember { mutableStateOf<String?>(null) }
+    var movingItem by remember { mutableStateOf(false) }
+    var showingQr by remember { mutableStateOf(false) }
+    var qrPlaceId by remember { mutableStateOf<String?>(null) }
+    var pendingScanPlaceId by remember { mutableStateOf<String?>(null) }
     val spaces = koinViewModel<SpacesViewModel>()
     val allSpacesState by spaces.allSpaces.collectAsState()
     val spaceState by spaces.space.collectAsState()
@@ -51,15 +66,13 @@ fun AiFinderNavigation() {
     var preparingPurchase by remember { mutableStateOf(false) }
     var purchasePreparationError by remember { mutableStateOf(false) }
     var purchaseOrigin by remember { mutableStateOf<String?>(null) }
-    var addingLocation by rememberSaveable { mutableStateOf(false) }
     var creatingLocationFromHome by rememberSaveable { mutableStateOf(false) }
     val openLocationCreation: () -> Unit = {
         preparingPurchase = false
         showingSubscription = false
-        addingLocation = false
+        subscription.reset()
         creatingLocationFromHome = true
         choosingLocation = true
-        scan.loadBalance()
     }
     val scanContent = ((scanState as? ScanUiState.Success)?.data ?: ScanContent()).copy(
         isPreparingPurchase = preparingPurchase,
@@ -68,7 +81,6 @@ fun AiFinderNavigation() {
     val displayedScanState = (scanState as? ScanUiState.Success)?.copy(data = scanContent) ?: scanState
     val preparePurchase: () -> Unit = {
         if (!preparingPurchase) {
-            addingLocation = false
             subscription.reset()
             purchaseOrigin = backStackEntry?.id
             purchasePreparationError = false
@@ -77,14 +89,7 @@ fun AiFinderNavigation() {
         }
     }
     val addLocation: () -> Unit = {
-        if (!preparingPurchase) {
-            subscription.reset()
-            addingLocation = true
-            purchaseOrigin = backStackEntry?.id
-            purchasePreparationError = false
-            preparingPurchase = true
-            subscription.refresh(onAllowed = openLocationCreation)
-        }
+        openLocationCreation()
     }
 
     LaunchedEffect(subscriptionState, preparingPurchase) {
@@ -125,15 +130,11 @@ fun AiFinderNavigation() {
     }
     LaunchedEffect(Unit) {
         if (showingSubscription) {
-            subscription.refresh(onAllowed = when {
-                addingLocation -> openLocationCreation
-                scanContent.requiresPurchase -> resumeAnalysis
-                else -> null
-            })
+            subscription.refresh(onAllowed = if (scanContent.requiresPurchase) resumeAnalysis else null)
         }
     }
     LaunchedEffect(scanContent.requiresPurchase) {
-        if (scanContent.requiresPurchase && destination == AiFinderScreen.Scan.route) {
+        if (scanContent.requiresPurchase && destination == AiFinderScreen.Capture.route) {
             showingSubscription = true
             subscription.refresh(onAllowed = resumeAnalysis)
         }
@@ -144,29 +145,38 @@ fun AiFinderNavigation() {
             preparingPurchase = false
             purchasePreparationError = false
             purchaseOrigin = null
-            addingLocation = false
             creatingLocationFromHome = false
         }
         when (destination) {
             AiFinderScreen.Home.route -> {
                 home.start()
                 scan.loadBalance()
+                inventorySync.refresh()
             }
-            AiFinderScreen.Scan.route -> scan.loadBalance()
+            AiFinderScreen.Scan.route -> { scan.loadBalance(); locations.start() }
             AiFinderScreen.Search.route -> search.start()
             AiFinderScreen.Details.route -> details.start()
             AiFinderScreen.Spaces.route, AiFinderScreen.Space.route -> spaces.start()
         }
-        if (destination != AiFinderScreen.Scan.route && scanContent.requiresPurchase) {
+        if (destination != AiFinderScreen.Capture.route && scanContent.requiresPurchase) {
             scan.dismissPurchase()
             showingSubscription = false
             subscription.reset()
         }
     }
     val onBack: () -> Unit = {
-        if (destination == AiFinderScreen.Scan.route) scan.cancelAnalysis()
+        if (destination == AiFinderScreen.Scan.route || destination == AiFinderScreen.Capture.route) {
+            scan.cancelAnalysis()
+            pendingScanPlaceId = null
+        }
         subscription.reset()
         navController.popBackStack()
+    }
+    LaunchedEffect(pendingScanPlaceId, locationState.locations) {
+        pendingScanPlaceId?.takeIf { id -> locationState.locations.any { it.id == id } }?.let {
+            locations.select(it)
+            pendingScanPlaceId = null
+        }
     }
     if (choosingLocation) {
         LocationSheet(
@@ -176,6 +186,33 @@ fun AiFinderNavigation() {
             } else null,
             onDismiss = { choosingLocation = false; creatingLocationFromHome = false },
             startCreating = creatingLocationFromHome,
+        )
+    }
+    if (editingItem) {
+        LaunchedEffect(Unit) { locations.start() }
+        ItemEditorSheet(
+            entry = editorEntry,
+            initialLocationId = editorLocationId,
+            locations = locationState,
+            action = inventoryActionState,
+            moveOnly = movingItem,
+            onSave = { item, place ->
+                inventoryActions.save(editorEntry, item, place) { editingItem = false; editorEntry = null }
+            },
+            onDismiss = { editingItem = false; editorEntry = null },
+        )
+    }
+    if (showingQr) {
+        LaunchedEffect(Unit) { locations.start() }
+        PlaceQrSheet(
+            placeId = qrPlaceId,
+            placePath = qrPlaceId?.let(locationState::path).orEmpty(),
+            knownPlaceIds = locationState.locations.map { it.id }.toSet(),
+            onOpenPlace = {
+                showingQr = false
+                navController.navigate(AiFinderScreen.Space.createRoute(it)) { launchSingleTop = true }
+            },
+            onDismiss = { showingQr = false },
         )
     }
     val detections by scan.detections.collectAsState()
@@ -214,12 +251,13 @@ fun AiFinderNavigation() {
                 scanBalance = scanContent,
                 onRetryBalance = scan::loadBalance,
                 onGetScans = preparePurchase,
+                syncState = syncState,
+                onSync = inventorySync::refresh,
                 onAddLocation = addLocation,
-                isCheckingLocationAccess = preparingPurchase && addingLocation,
-                locationAccessError = purchasePreparationError && addingLocation,
                 onAccount = { navController.navigate(AiFinderScreen.Account.route) },
                 onSpace = { navController.navigate(AiFinderScreen.Space.createRoute(it)) },
                 onSeeAll = { navController.navigate(AiFinderScreen.Spaces.route) },
+                onScanLabel = { qrPlaceId = null; showingQr = true },
             )
         }
         composable(AiFinderScreen.Spaces.route) {
@@ -229,6 +267,7 @@ fun AiFinderNavigation() {
                 onScan = openScanner,
                 onBack = onBack,
                 onRetry = spaces::retry,
+                onAddPlace = addLocation,
             )
         }
         composable(
@@ -240,9 +279,17 @@ fun AiFinderNavigation() {
             SpaceScreen(
                 spaceState,
                 onItem = { navController.navigate(AiFinderScreen.Details.createRoute(it)) },
-                onScan = openScanner,
+                onScan = { pendingScanPlaceId = id; openScanner() },
                 onBack = onBack,
                 onRetry = spaces::retry,
+                onAddItem = {
+                    editorEntry = null
+                    editorLocationId = id
+                    movingItem = false
+                    inventoryActions.clearError()
+                    editingItem = true
+                },
+                onQrLabel = { qrPlaceId = id; showingQr = true },
             )
         }
         composable(AiFinderScreen.Account.route) {
@@ -250,15 +297,22 @@ fun AiFinderNavigation() {
                 viewModel = account,
                 onBack = onBack,
                 onSubscription = { navController.navigate(AiFinderScreen.PurchaseHistory.route) { launchSingleTop = true } },
+                onPrivacy = { navController.navigate(AiFinderScreen.PrivacyData.route) { launchSingleTop = true } },
                 onSignedOut = {
                     scan.reset()
-                    review.show(emptyList())
+                    inventorySync.reset()
+                    inventoryActions.reset()
+                    review.reset()
                     locations.reset()
                     home.reset()
                     search.reset()
                     details.reset()
                     spaces.reset()
                     choosingLocation = false
+                    editingItem = false
+                    showingQr = false
+                    pendingScanPlaceId = null
+                    editorEntry = null
                     showingSubscription = false
                     subscription.reset()
                     replaceRoot(AiFinderScreen.Login)
@@ -268,19 +322,32 @@ fun AiFinderNavigation() {
         composable(AiFinderScreen.PurchaseHistory.route) {
             PurchaseHistoryScreen(viewModel = koinViewModel<PurchaseHistoryViewModel>(), onBack = onBack)
         }
+        composable(AiFinderScreen.PrivacyData.route) { PrivacyDataScreen(onBack) }
         composable(AiFinderScreen.Scan.route) {
             ScanScreen(
-                displayedScanState,
-                onAnalyze = scan::analyze,
+                onOpenCamera = {
+                    if (locationState.selectedLocation != null) {
+                        navController.navigate(AiFinderScreen.Capture.route) { launchSingleTop = true }
+                    }
+                },
                 onBack = onBack,
-                onRetry = scan::retry,
                 selectedLocation = locationState.selectedPath,
                 onChooseLocation = { choosingLocation = true },
-                onRetryBalance = scan::loadBalance,
-                onGetScans = preparePurchase,
+            )
+        }
+        composable(AiFinderScreen.Capture.route) {
+            ScanCaptureScreen(
+                displayedScanState,
+                onAnalyze = scan::analyze,
+                onCapture = scan::capture,
+                onRetake = scan::retake,
+                onBack = onBack,
+                selectedLocation = locationState.selectedPath,
+                onChooseLocation = { choosingLocation = true },
             )
         }
         composable(AiFinderScreen.Review.route) {
+            LaunchedEffect(locationState.selectedId) { review.setLocation(locationState.selectedId) }
             ReviewScreen(
                 review.state,
                 onSave = {
@@ -294,6 +361,7 @@ fun AiFinderNavigation() {
                 onRetry = review::retry,
                 selectedLocation = locationState.selectedPath,
                 onChooseLocation = { choosingLocation = true },
+                onRescanChoice = review::choose,
             )
         }
         composable(AiFinderScreen.Search.route) {
@@ -303,6 +371,12 @@ fun AiFinderNavigation() {
                 onItemSelected = { navController.navigate(AiFinderScreen.Details.createRoute(it)) },
                 onBack = onBack,
                 onRetry = search::retry,
+                onConfirm = inventoryActions::confirm,
+                onMove = {
+                    editorEntry = it; movingItem = true; inventoryActions.clearError(); editingItem = true
+                },
+                busy = inventoryActionState.busy,
+                actionError = inventoryActionState.error,
             )
         }
         composable(
@@ -311,31 +385,39 @@ fun AiFinderNavigation() {
         ) { entry ->
             val id = checkNotNull(entry.arguments?.read { getString(AiFinderScreen.Details.ITEM_ID) })
             LaunchedEffect(id) { details.select(id) }
-            DetailsScreen(detailsState, onBack = onBack, onRetry = details::retry)
+            val selected = (detailsState as? DetailsUiState.Success)?.data?.entry
+            DetailsScreen(
+                detailsState, onBack = onBack, onRetry = details::retry,
+                onEdit = {
+                    editorEntry = selected; movingItem = false; inventoryActions.clearError(); editingItem = true
+                },
+                onMove = {
+                    editorEntry = selected; movingItem = true; inventoryActions.clearError(); editingItem = true
+                },
+                onDelete = { selected?.let { inventoryActions.delete(it, onBack) } },
+                onConfirm = { selected?.let(inventoryActions::confirm) },
+                onDeletePhoto = { selected?.let(inventoryActions::deletePhoto) },
+                busy = inventoryActionState.busy,
+                actionError = inventoryActionState.error,
+            )
         }
     }
     // Registered after NavHost so hardware Back also cancels an active scan before popping.
     SystemBackHandler(
-        enabled = !showingSubscription && !choosingLocation && navController.previousBackStackEntry != null,
+        enabled = !showingSubscription && !choosingLocation && !editingItem && !showingQr && navController.previousBackStackEntry != null,
         onBack = onBack,
     )
     if (showingSubscription) {
         SubscriptionSheet(
             state = subscriptionState,
             onRetry = {
-                subscription.refresh(onAllowed = when {
-                    addingLocation -> openLocationCreation
-                    scanContent.requiresPurchase -> resumeAnalysis
-                    else -> null
-                })
+                subscription.refresh(onAllowed = if (scanContent.requiresPurchase) resumeAnalysis else null)
             },
             onPurchaseCompleted = { purchase ->
                 subscription.onPurchaseCompleted(purchase, onAllowed = when {
-                    addingLocation -> openLocationCreation
                     scanContent.requiresPurchase -> resumeAnalysis
                     else -> ({
                         showingSubscription = false
-                        addingLocation = false
                         scan.loadBalance()
                     })
                 })

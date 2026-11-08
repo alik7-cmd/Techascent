@@ -2,6 +2,7 @@ package org.techascent.aifinder.data.cache
 
 import androidx.room.Entity
 import androidx.room.Index
+import androidx.room.ColumnInfo
 
 @Entity(
     primaryKeys = ["userId", "id"],
@@ -17,4 +18,7 @@ data class CachedItem(
     val photoId: String?,
     val confidence: Float?,
     val createdAt: Long,
+    @ColumnInfo(defaultValue = "''") val description: String = "",
+    @ColumnInfo(defaultValue = "0") val confirmedAt: Long = 0,
+    val bounds: String? = null,
 )

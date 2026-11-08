@@ -5,7 +5,7 @@ import org.koin.compose.KoinIsolatedContext
 import org.koin.dsl.koinApplication
 import org.techascent.aifinder.di.aiFinderModule
 import org.techascent.aifinder.di.platformModule
-import org.techascent.composa.theming.ComposaTheme
+import org.techascent.aifinder.presentation.theme.AiFinderTheme
 import org.techascent.aifinder.presentation.navigation.AiFinderNavigation
 
 // Keep dependencies alive across activity recreation without sharing another app's Koin context.
@@ -16,6 +16,6 @@ private val aiFinderKoin by lazy {
 @Composable
 fun AiFinderApp() {
     KoinIsolatedContext(context = aiFinderKoin) {
-        ComposaTheme { AiFinderNavigation() }
+        AiFinderTheme { AiFinderNavigation() }
     }
 }

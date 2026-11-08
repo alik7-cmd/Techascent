@@ -69,7 +69,7 @@ class VertexGeminiPhotoAnalyzer(
         return withContext(dispatcher) { parseItems(text) }
     }
 
-    private fun buildRequest(imageBase64: String): JsonObject = buildJsonObject {
+    internal fun buildRequest(imageBase64: String): JsonObject = buildJsonObject {
         putJsonObject("systemInstruction") {
             putJsonArray("parts") { add(buildJsonObject { put("text", ItemDetectionPrompt.system) }) }
         }
@@ -89,14 +89,17 @@ class VertexGeminiPhotoAnalyzer(
         }
         putJsonObject("generationConfig") {
             put("temperature", 0.1)
-            put("maxOutputTokens", 4096)
+            put("maxOutputTokens", 2048)
+            if (model.startsWith("gemini-2.5-flash")) {
+                putJsonObject("thinkingConfig") { put("thinkingBudget", 0) }
+            }
             put("responseMimeType", "application/json")
             put("responseSchema", responseSchema)
         }
     }
 
     private fun parseItems(text: String): List<RecognizedObject> =
-        json.decodeFromString<DetectedItemsResponse>(text).items.mapNotNull { item ->
+        json.decodeFromString<DetectedItemsResponse>(text).items.take(15).mapNotNull { item ->
             val name = item.name.trim()
             if (name.isEmpty()) return@mapNotNull null
             RecognizedObject(
@@ -137,6 +140,7 @@ class VertexGeminiPhotoAnalyzer(
             putJsonObject("properties") {
                 putJsonObject("items") {
                     put("type", "ARRAY")
+                    put("maxItems", 15)
                     putJsonObject("items") {
                         put("type", "OBJECT")
                         putJsonObject("properties") {
@@ -148,6 +152,8 @@ class VertexGeminiPhotoAnalyzer(
                             putJsonObject("confidence") { put("type", "NUMBER") }
                             putJsonObject("box_2d") {
                                 put("type", "ARRAY")
+                                put("minItems", 4)
+                                put("maxItems", 4)
                                 putJsonObject("items") { put("type", "INTEGER") }
                             }
                         }

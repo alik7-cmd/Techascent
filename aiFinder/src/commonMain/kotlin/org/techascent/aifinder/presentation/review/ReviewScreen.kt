@@ -31,11 +31,13 @@ fun ReviewScreen(
     onRename: (String, String) -> Unit,
     onDelete: (String) -> Unit,
     selectedLocation: String,
-    onChooseLocation: () -> Unit
+    onChooseLocation: () -> Unit,
+    onRescanChoice: (String, RescanChoice) -> Unit,
 ) {
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var editedName by rememberSaveable { mutableStateOf("") }
     var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
+    var pointedId by remember { mutableStateOf<String?>(null) }
     val detections = (state as? ReviewUiState.Success)?.data?.detections.orEmpty()
     val editing = detections.firstOrNull { it.item.id == editingId }
     val deleting = detections.firstOrNull { it.item.id == deletingId }
@@ -87,6 +89,9 @@ fun ReviewScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     state.data.saveError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    if (state.data.saveError != null) {
+                        TextButton(onClick = onRetry) { Text(stringResource(Res.string.location_retry)) }
+                    }
                     PrimaryAction(
                         if (state.data.isSaving) {
                             stringResource(Res.string.review_saving)
@@ -94,8 +99,8 @@ fun ReviewScreen(
                             stringResource(Res.string.review_save_items, state.data.detections.size)
                         },
                         onSave,
-                        enabled = selectedLocation.isNotBlank() && !state.data.isSaving,
-                        isLoading = state.data.isSaving
+                        enabled = selectedLocation.isNotBlank() && !state.data.isSaving && !state.data.checkingExisting,
+                        isLoading = state.data.isSaving || state.data.checkingExisting,
                     )
                 }
             }
@@ -115,6 +120,18 @@ fun ReviewScreen(
             is ReviewUiState.Loading -> item { LoadingContent() }
             is ReviewUiState.Error -> item { ErrorContent(state.message, onRetry) }
             is ReviewUiState.Success -> {
+                state.data.photo?.let { photo ->
+                    item(key = "source-photo") {
+                        val pointed = detections.firstOrNull { it.item.id == pointedId } ?: detections.firstOrNull()
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ItemPhoto(photo.id, pointed?.item?.name, RoundedCornerShape(24.dp),
+                                modifier = Modifier.fillMaxWidth().height(240.dp),
+                                bounds = pointed?.bounds, jpegBytes = photo.jpegBytes,
+                                contentScale = androidx.compose.ui.layout.ContentScale.Fit)
+                            Text(stringResource(Res.string.review_pointer_hint), color = AiFinderPalette.Muted, fontSize = 13.sp)
+                        }
+                    }
+                }
                 item(key = "location") {
                     Surface(
                         onClick = onChooseLocation,
@@ -154,6 +171,7 @@ fun ReviewScreen(
                     }
                 }
                 items(state.data.detections, key = { it.item.id }) { detection ->
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     DetectionCard(
                         detection,
                         onEdit = {
@@ -163,6 +181,35 @@ fun ReviewScreen(
                         onDelete = { deletingId = detection.item.id },
                         enabled = !state.data.isSaving,
                     )
+                    if (detection.bounds != null && state.data.photo != null) {
+                        TextButton(onClick = { pointedId = detection.item.id }) {
+                            Text(stringResource(Res.string.review_show_spot), color = AiFinderPalette.Teal)
+                        }
+                    }
+                    if (detection.item.id in state.data.matches) {
+                        Text(stringResource(if (detection.item.id in state.data.ambiguousMatches)
+                            Res.string.rescan_ambiguous else Res.string.rescan_match),
+                            color = AiFinderPalette.Teal, fontSize = 13.sp)
+                        Column {
+                            RescanChoice.entries.forEach { choice ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    RadioButton(
+                                        selected = (state.data.choices[detection.item.id] ?: RescanChoice.KEEP) == choice,
+                                        onClick = { onRescanChoice(detection.item.id, choice) },
+                                        enabled = !state.data.isSaving && (choice != RescanChoice.UPDATE ||
+                                            detection.item.id !in state.data.ambiguousMatches),
+                                        colors = RadioButtonDefaults.colors(selectedColor = AiFinderPalette.Teal),
+                                    )
+                                    Text(stringResource(when (choice) {
+                                        RescanChoice.KEEP -> Res.string.rescan_keep
+                                        RescanChoice.UPDATE -> Res.string.rescan_update
+                                        RescanChoice.ADD -> Res.string.rescan_add
+                                    }), color = AiFinderPalette.Ink, fontSize = 13.sp)
+                                }
+                            }
+                        }
+                    }
+                    }
                 }
 
                 if (detections.isEmpty()) {

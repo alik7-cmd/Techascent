@@ -19,6 +19,8 @@ class ItemPhotoRepositoryImpl(
     private val auth: AuthRepository,
     private val memoryLimit: Int = 24,
 ) : ItemPhotoRepository {
+    private val revision = kotlinx.coroutines.flow.MutableStateFlow(0L)
+    override val changes: kotlinx.coroutines.flow.Flow<Long> = revision
     private val lock = Mutex()
     private val memory = LinkedHashMap<String, ByteArray>()
     private val inFlight = mutableMapOf<String, CompletableDeferred<ByteArray?>>()
@@ -26,19 +28,42 @@ class ItemPhotoRepositoryImpl(
 
     suspend fun clearCache(userId: String) = lock.withLock {
         cacheGeneration++
+        revision.value++
         memory.clear()
         inFlight.values.forEach { it.complete(null) }
         inFlight.clear()
         local.deleteForUser(userId)
     }
 
+    override suspend fun delete(photoId: String): Result<Unit> {
+        val userId = auth.currentUser?.id ?: return Result.failure(PhotoError.NotSignedIn)
+        return try {
+            kotlinx.coroutines.withTimeout(15_000) { remote.delete(userId, photoId) }
+            check(auth.currentUser?.id == userId) { "The signed-in user changed." }
+            lock.withLock {
+                cacheGeneration++
+                memory.remove("$userId/$photoId")
+                inFlight.remove("$userId/$photoId")?.complete(null)
+                local.delete(userId, photoId)
+                revision.value++
+            }
+            Result.success(Unit)
+        } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+            Result.failure(PhotoError.Remote("Deleting the photo timed out. Try again."))
+        } catch (e: CancellationException) { throw e }
+        catch (e: Exception) { Result.failure(PhotoError.Remote(e.message)) }
+    }
+
     override suspend fun save(photoId: String, jpegBytes: ByteArray): Result<Unit> {
         val userId = auth.currentUser?.id ?: return Result.failure(PhotoError.NotSignedIn)
         val generation = lock.withLock { cacheGeneration }
         return try {
-            remote.upload(userId, photoId, jpegBytes)
+            kotlinx.coroutines.withTimeout(30_000) { remote.upload(userId, photoId, jpegBytes) }
+            check(auth.currentUser?.id == userId) { "The signed-in user changed." }
             cacheLocally(userId, photoId, jpegBytes, generation)
             Result.success(Unit)
+        } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+            Result.failure(PhotoError.Remote("Uploading the photo timed out. Try again."))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

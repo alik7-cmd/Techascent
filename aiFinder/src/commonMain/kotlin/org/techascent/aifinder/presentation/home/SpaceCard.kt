@@ -25,7 +25,7 @@ import org.techascent.aifinder.domain.model.StorageLocation
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @Composable
-internal fun SpaceCard(location: StorageLocation, onClick: () -> Unit, parentPath: String? = null) {
+internal fun SpaceCard(location: StorageLocation, onClick: () -> Unit, parentPath: String? = null, coverPhotoId: String? = null) {
     val icon = when (location.type) {
         LocationType.HOME, LocationType.AREA -> Icons.Outlined.GridOn
         LocationType.ROOM -> Icons.Outlined.Widgets
@@ -41,10 +41,9 @@ internal fun SpaceCard(location: StorageLocation, onClick: () -> Unit, parentPat
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Box(
-            modifier = Modifier.size(60.dp)
-                .background(AiFinderPalette.Mint, RoundedCornerShape(16.dp)),
-            contentAlignment = Alignment.Center
+        org.techascent.aifinder.presentation.components.ItemPhoto(
+            coverPhotoId, stringResource(Res.string.place_scan_photo, location.name), RoundedCornerShape(16.dp),
+            modifier = Modifier.size(60.dp),
         ) {
             Icon(icon, contentDescription = null, tint = AiFinderPalette.Teal, modifier = Modifier.size(26.dp))
         }

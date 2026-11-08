@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.domain.model.CreateLocationRequest
 import org.techascent.aifinder.domain.model.LocationType
 import org.techascent.aifinder.presentation.components.InfoCard
-import org.techascent.aifinder.presentation.components.LoadingContent
+import org.techascent.aifinder.presentation.components.ShimmerBlock
 import org.techascent.aifinder.presentation.components.PrimaryAction
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
@@ -51,6 +51,9 @@ fun LocationSheet(
     val path = state.ancestors(browsingId).joinToString(" › ") { it.name }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val backLabel = stringResource(Res.string.back)
+    LaunchedEffect(browsingId, state.locations, state.isLoading) {
+        if (!state.isLoading && browsingId != null && current == null) browsingId = null
+    }
 
     ModalBottomSheet(
         onDismissRequest = { if (!state.isCreating) onDismiss() },
@@ -112,8 +115,14 @@ fun LocationSheet(
                         )
                     }
                     state.createError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    state.loadError?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                        TextButton(onClick = viewModel::retry) {
+                            Text(stringResource(Res.string.location_retry), color = AiFinderPalette.Teal)
+                        }
+                    }
                     PrimaryAction(
-                        stringResource(Res.string.place_add_use),
+                        stringResource(if (startCreating) Res.string.place_add_only else Res.string.place_add_use),
                         onClick = {
                             viewModel.create(
                                 CreateLocationRequest(
@@ -125,13 +134,22 @@ fun LocationSheet(
                             )
                         },
                         isLoading = state.isCreating,
-                        enabled = name.isNotBlank() && (browsingId == null || current != null),
+                        enabled = !state.isLoading && state.loadError == null &&
+                            name.isNotBlank() && (browsingId == null || current != null),
                     )
                     TextButton(
                         onClick = { creating = false; viewModel.clearError() },
                         enabled = !state.isCreating,
                     ) { Text(backLabel, color = AiFinderPalette.Teal) }
                 } else {
+                    if (browsingId == null && query.isBlank()) state.selectedLocation?.let {
+                        InfoCard(
+                            title = stringResource(Res.string.place_current_selection),
+                            subtitle = state.selectedPath,
+                            containerColor = AiFinderPalette.Mint,
+                            onClick = { browsingId = it.id },
+                        )
+                    }
                     PlaceTextField(query, { query = it }, stringResource(Res.string.location_search_hint), search = true)
                     if (query.isBlank()) {
                         // Each ancestor is a separate action, so users can return to any level.
@@ -148,12 +166,26 @@ fun LocationSheet(
                             }
                         }
                     }
-                    if (state.isLoading) LoadingContent()
+                    if (state.isLoading) repeat(3) {
+                        ShimmerBlock(Modifier.fillMaxWidth().height(64.dp))
+                    }
                     state.loadError?.let {
                         Text(it, color = MaterialTheme.colorScheme.error)
                         TextButton(onClick = viewModel::retry) {
                             Text(stringResource(Res.string.location_retry), color = AiFinderPalette.Teal)
                         }
+                    }
+                    if (current != null && query.isBlank()) {
+                        InfoCard(
+                            title = stringResource(Res.string.place_preview),
+                            subtitle = path,
+                            containerColor = AiFinderPalette.Mint,
+                        )
+                        PrimaryAction(
+                            stringResource(Res.string.place_use, current.name),
+                            onClick = { viewModel.select(current.id); onDismiss() },
+                            enabled = !state.isLoading && state.loadError == null,
+                        )
                     }
                     val matches = if (query.isBlank()) state.placesInside(browsingId) else {
                         state.locations.filter {
@@ -217,17 +249,7 @@ fun LocationSheet(
                                 color = AiFinderPalette.Teal,
                             )
                         }
-                        if (current != null) {
-                            InfoCard(
-                                title = stringResource(Res.string.place_preview),
-                                subtitle = path,
-                                containerColor = AiFinderPalette.Mint,
-                            )
-                            PrimaryAction(
-                                stringResource(Res.string.place_use, current.name),
-                                onClick = { viewModel.select(current.id); onDismiss() },
-                            )
-                        } else if (itemCount != null) {
+                        if (current == null && itemCount != null) {
                             Text(stringResource(Res.string.location_choose_count, itemCount), color = AiFinderPalette.Muted)
                         }
                     }

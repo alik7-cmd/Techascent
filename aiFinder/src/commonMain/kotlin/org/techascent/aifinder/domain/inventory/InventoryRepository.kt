@@ -9,6 +9,8 @@ data class StoredItem(
     val item: InventoryItem,
     val locationId: String,
     val createdAt: Long,
+    val confirmedAt: Long = createdAt,
+    val bounds: List<Float>? = null,
 )
 
 interface InventoryRepository {
@@ -16,6 +18,19 @@ interface InventoryRepository {
     fun observeItems(): Flow<List<StoredItem>>
 
     suspend fun saveDetections(locationId: String, detections: List<ItemDetection>): Result<List<StoredItem>>
+
+    suspend fun update(item: StoredItem): Result<Unit> =
+        Result.failure(InventoryError.Unavailable)
+    suspend fun delete(itemId: String): Result<Unit> =
+        Result.failure(InventoryError.Unavailable)
+    suspend fun refresh(): Result<Unit> = Result.failure(InventoryError.Unavailable)
+    suspend fun clearPhotoReferences(photoId: String): Result<Unit> = Result.failure(InventoryError.Unavailable)
+    suspend fun saveReviewed(
+        locationId: String,
+        detections: List<ItemDetection>,
+        replacements: Map<String, StoredItem>,
+    ): Result<List<StoredItem>> = if (replacements.isEmpty()) saveDetections(locationId, detections)
+        else Result.failure(InventoryError.Unavailable)
 }
 
 sealed class InventoryError(message: String) : Exception(message) {

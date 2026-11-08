@@ -1,6 +1,14 @@
 package org.techascent.aifinder.presentation.home
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.QrCodeScanner
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
@@ -15,6 +23,10 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.home_spaces_error_title
 import apphub.aifinder.generated.resources.subscription_access_error
+import apphub.aifinder.generated.resources.inventory_sync_error
+import apphub.aifinder.generated.resources.inventory_syncing
+import apphub.aifinder.generated.resources.inventory_refresh
+import apphub.aifinder.generated.resources.qr_scan_action
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.ErrorCard
 import org.techascent.aifinder.presentation.components.EmptyListCard
@@ -38,8 +50,9 @@ fun HomeScreen(
     onRetryBalance: () -> Unit,
     onGetScans: () -> Unit,
     onAddLocation: () -> Unit,
-    isCheckingLocationAccess: Boolean = false,
-    locationAccessError: Boolean = false,
+    syncState: org.techascent.aifinder.presentation.inventory.InventorySyncState,
+    onSync: () -> Unit,
+    onScanLabel: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -53,12 +66,53 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item(key = "header") { HomeHeader(onAccount) }
+            item(key = "search") { HomeSearch(onSearch) }
+            item(key = "scan") { ScanPrompt(onScan, isCheckingScan) }
+            item(key = "sync") {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (syncState.failed) {
+                        androidx.compose.material3.Text(
+                            stringResource(apphub.aifinder.generated.resources.Res.string.inventory_sync_error),
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.error,
+                        )
+                    }
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        val chipColors = AssistChipDefaults.assistChipColors(
+                            labelColor = AiFinderPalette.Teal,
+                            leadingIconContentColor = AiFinderPalette.Teal,
+                            disabledLabelColor = AiFinderPalette.Teal.copy(alpha = 0.65f),
+                        )
+                        AssistChip(
+                            onClick = onSync,
+                            enabled = !syncState.busy,
+                            shape = RoundedCornerShape(50),
+                            border = BorderStroke(1.dp, AiFinderPalette.Teal.copy(alpha = if (syncState.busy) 0.25f else 0.5f)),
+                            colors = chipColors,
+                            leadingIcon = { Icon(Icons.Outlined.Refresh, null, modifier = Modifier.size(18.dp)) },
+                            label = { Text(
+                                stringResource(if (syncState.busy) Res.string.inventory_syncing
+                                    else Res.string.inventory_refresh),
+                            ) },
+                        )
+                        AssistChip(
+                            onClick = onScanLabel,
+                            shape = RoundedCornerShape(50),
+                            border = BorderStroke(1.dp, AiFinderPalette.Teal.copy(alpha = 0.5f)),
+                            colors = chipColors,
+                            leadingIcon = {
+                                Icon(Icons.Outlined.QrCodeScanner, null, modifier = Modifier.size(18.dp))
+                            },
+                            label = { Text(stringResource(Res.string.qr_scan_action)) },
+                        )
+                    }
+                }
+            }
             item(key = "credits") { ScanBalanceCardV3(scanBalance, onRetryBalance, onGetScans) }
             if (CreditCardPreviewConfig.SHOW_COMPARISON) {
                 item(key = "credit-design-comparison") { CreditCardComparison() }
             }
-            item(key = "search") { HomeSearch(onSearch) }
-            item(key = "scan") { ScanPrompt(onScan, isCheckingScan) }
             when (val state = uiState) {
                 is HomeUiState.Loading -> {
                     item(key = "spaces-skeleton") { SpacesHeaderSkeleton() }
@@ -80,16 +134,7 @@ fun HomeScreen(
                         SpacesHeader(
                             onSeeAll = if (state.data.spaces.isEmpty()) onAddLocation else onSeeAll,
                             isEmpty = state.data.spaces.isEmpty(),
-                            isLoading = isCheckingLocationAccess,
                         )
-                    }
-                    if (locationAccessError) {
-                        item(key = "location-access-error") {
-                            Text(
-                                stringResource(Res.string.subscription_access_error),
-                                color = androidx.compose.material3.MaterialTheme.colorScheme.error,
-                            )
-                        }
                     }
                     if (state.data.spaces.isEmpty()) {
                         item(key = "empty") {
@@ -101,6 +146,7 @@ fun HomeScreen(
                             entry.location,
                             onClick = { onSpace(entry.location.id) },
                             parentPath = entry.parentPath,
+                            coverPhotoId = entry.coverPhotoId,
                         )
                     }
                 }

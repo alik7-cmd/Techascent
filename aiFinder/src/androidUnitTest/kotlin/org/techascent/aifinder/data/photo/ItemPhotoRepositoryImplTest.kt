@@ -29,6 +29,12 @@ class ItemPhotoRepositoryImplTest {
         var downloads = 0
         var failUpload: Exception? = null
         var gate: CompletableDeferred<Unit>? = null
+        var failDelete: Exception? = null
+
+        override suspend fun delete(userId: String, photoId: String) {
+            failDelete?.let { throw it }
+            store.remove(StoragePaths.photo(userId, photoId))
+        }
 
         override suspend fun upload(userId: String, photoId: String, jpegBytes: ByteArray) {
             failUpload?.let { throw it }
@@ -84,6 +90,27 @@ class ItemPhotoRepositoryImplTest {
         // A fresh repository has no memory cache, so this proves the file cache is used.
         assertContentEquals(bytes, repository(remote).load("photo-1"))
         assertEquals(0, remote.downloads)
+    }
+
+    @Test
+    fun deletingPhotoRemovesCloudDiskAndMemoryAndIsSafeToRetry() = runBlocking<Unit> {
+        val remote = FakeRemote()
+        val repo = repository(remote)
+        repo.save("p", bytes).getOrThrow()
+        repo.delete("p").getOrThrow()
+        assertNull(remote.store[StoragePaths.photo("u1", "p")])
+        assertNull(FilePhotoLocalDataSource(folder.root).read("u1", "p"))
+        assertNull(repo.load("p"))
+        repo.delete("p").getOrThrow()
+    }
+
+    @Test
+    fun failedDeletionKeepsTheCachedPhotoAndReportsFailure() = runBlocking<Unit> {
+        val remote = FakeRemote().apply { failDelete = IllegalStateException("Storage denied") }
+        val repo = repository(remote)
+        repo.save("p", bytes).getOrThrow()
+        assertIs<PhotoError.Remote>(repo.delete("p").exceptionOrNull())
+        assertContentEquals(bytes, repo.load("p"))
     }
 
     @Test

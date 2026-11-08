@@ -1,0 +1,100 @@
+package org.techascent.aifinder.presentation.inventory
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import apphub.aifinder.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import org.techascent.aifinder.domain.model.InventoryItem
+import org.techascent.aifinder.domain.model.LocatedItem
+import org.techascent.aifinder.presentation.components.PrimaryAction
+import org.techascent.aifinder.presentation.components.SectionTitle
+import org.techascent.aifinder.presentation.location.LocationUiState
+import org.techascent.aifinder.presentation.theme.AiFinderPalette
+
+@OptIn(ExperimentalMaterial3Api::class, kotlin.uuid.ExperimentalUuidApi::class)
+@Composable
+fun ItemEditorSheet(
+    entry: LocatedItem?,
+    initialLocationId: String?,
+    locations: LocationUiState,
+    action: InventoryActionState,
+    moveOnly: Boolean,
+    onSave: (InventoryItem, String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var name by rememberSaveable { mutableStateOf(entry?.item?.name.orEmpty()) }
+    var category by rememberSaveable { mutableStateOf(entry?.item?.category ?: "General") }
+    var notes by rememberSaveable { mutableStateOf(entry?.item?.description.orEmpty()) }
+    var aliases by rememberSaveable { mutableStateOf(entry?.item?.tags?.joinToString(", ").orEmpty()) }
+    var locationId by rememberSaveable { mutableStateOf(entry?.location?.id ?: initialLocationId) }
+    var expanded by remember { mutableStateOf(false) }
+    val draftId = rememberSaveable { kotlin.uuid.Uuid.random().toString() }
+    ModalBottomSheet(
+        onDismissRequest = { if (!action.busy) onDismiss() },
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = AiFinderPalette.Surface,
+        contentColor = AiFinderPalette.Ink,
+    ) {
+        Column(
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            SectionTitle(stringResource(when {
+                moveOnly -> Res.string.details_move
+                entry != null -> Res.string.details_edit
+                else -> Res.string.item_add
+            }))
+            if (!moveOnly) {
+                OutlinedTextField(name, { name = it }, label = { Text(stringResource(Res.string.item_name)) },
+                    singleLine = true, enabled = !action.busy, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(category, { category = it }, label = { Text(stringResource(Res.string.item_category)) },
+                    singleLine = true, enabled = !action.busy, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(aliases, { aliases = it }, label = { Text(stringResource(Res.string.item_aliases)) },
+                    supportingText = { Text(stringResource(Res.string.item_aliases_hint)) },
+                    enabled = !action.busy, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(notes, { notes = it }, label = { Text(stringResource(Res.string.details_notes)) },
+                    enabled = !action.busy, modifier = Modifier.fillMaxWidth())
+            }
+            Text(stringResource(Res.string.place_where), color = AiFinderPalette.Muted)
+            Box {
+                OutlinedButton(onClick = { expanded = true }, enabled = !action.busy,
+                    shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
+                    Text(locationId?.let(locations::path).orEmpty().ifBlank { stringResource(Res.string.location_choose_title) },
+                        color = AiFinderPalette.Teal)
+                }
+                DropdownMenu(expanded, { expanded = false }, modifier = Modifier.heightIn(max = 280.dp)) {
+                    locations.locations.filter { it.type != org.techascent.aifinder.domain.model.LocationType.HOME }.forEach { place ->
+                        DropdownMenuItem(
+                            text = { Text(locations.path(place.id)) },
+                            onClick = { locationId = place.id; expanded = false },
+                        )
+                    }
+                }
+            }
+            locations.loadError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            action.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            PrimaryAction(
+                stringResource(Res.string.item_save),
+                onClick = {
+                    val id = locationId ?: return@PrimaryAction
+                    onSave(
+                        (entry?.item ?: InventoryItem(draftId, "", "")).copy(
+                            name = name.trim(), category = category.trim().ifBlank { "General" },
+                            description = notes.trim(),
+                            tags = aliases.split(",").map(String::trim).filter(String::isNotBlank).distinct(),
+                        ), id,
+                    )
+                },
+                enabled = name.isNotBlank() && locations.locations.any { it.id == locationId },
+                isLoading = action.busy,
+            )
+        }
+    }
+}

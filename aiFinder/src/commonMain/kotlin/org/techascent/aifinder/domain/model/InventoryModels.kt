@@ -25,4 +25,11 @@ data class ItemDetection(val photoId: String, val item: InventoryItem, val confi
 data class ItemEvent(val itemId: String, val previousLocationId: String?, val newLocationId: String?, val occurredAt: String)
 enum class SubscriptionTier { FREE, PLUS, LIFETIME }
 data class Subscription(val userId: String, val tier: SubscriptionTier = SubscriptionTier.FREE, val scansUsed: Int = 0, val scanLimit: Int = 10)
-data class LocatedItem(val item: InventoryItem, val location: StorageLocation, val path: String)
+data class LocatedItem(
+    val item: InventoryItem,
+    val location: StorageLocation,
+    val path: String,
+    val createdAt: Long = 0,
+    val confirmedAt: Long = createdAt,
+    val bounds: List<Float>? = null,
+)

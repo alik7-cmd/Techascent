@@ -28,6 +28,14 @@ class InventoryRepositoryImplTest {
         var fetchCount = 0
         var failWith: Exception? = null
         var hang = false
+        var failAfterWrite = false
+
+        override suspend fun writeAll(userId: String, items: List<Pair<String, ItemDto>>) {
+            failWith?.let { throw it }
+            val ids = items.map { it.first }.toSet()
+            store[userId] = (store[userId].orEmpty().filterNot { it.first in ids } + items).toMutableList()
+            if (failAfterWrite) error("Connection lost after write.")
+        }
 
         override suspend fun fetchAll(userId: String): List<Pair<String, ItemDto>> {
             fetchCount++
@@ -90,18 +98,54 @@ class InventoryRepositoryImplTest {
     }
 
     @Test
-    fun saveWritesRemoteThenCacheWithGeneratedIds() = runBlocking<Unit> {
+    fun saveWritesRemoteThenCacheWithStableIds() = runBlocking<Unit> {
         val remote = FakeRemote()
         val local = FakeLocal()
         val repository = InventoryRepositoryImpl(remote, local, FakeAuth(user), now = { 42 })
 
         val saved = repository.saveDetections("loc", listOf(detection)).getOrThrow()
 
-        assertEquals("id-0", saved.single().item.id)
+        val expectedId = "70686f746f3a74656d702d6964"
+        assertEquals(expectedId, saved.single().item.id)
         assertEquals("loc", saved.single().locationId)
         assertEquals(ItemDto("Scissors", "Tools", listOf("scissors"), "loc", "photo", 0.9f, 42), remote.store["u1"]!!.single().second)
-        assertEquals(listOf("id-0"), repository.observeItems().first().map { it.item.id })
+        assertEquals(listOf(expectedId), repository.observeItems().first().map { it.item.id })
         assertEquals(0, remote.fetchCount)
+    }
+
+    @Test
+    fun uncertainScanAndManualSaveRetriesDoNotDuplicateItems() = runBlocking<Unit> {
+        val remote = FakeRemote().apply { failAfterWrite = true }
+        val local = FakeLocal()
+        val repo = InventoryRepositoryImpl(remote, local, FakeAuth(user), now = { 42 })
+        assertTrue(repo.saveDetections("loc", listOf(detection)).isFailure)
+        assertTrue(local.isEmpty("u1"))
+        remote.failAfterWrite = false
+        repo.saveDetections("loc", listOf(detection)).getOrThrow()
+        assertEquals(1, remote.store["u1"]!!.size)
+
+        val manual = detection.copy(photoId = "", item = detection.item.copy(id = "draft-uuid"))
+        remote.failAfterWrite = true
+        assertTrue(repo.saveDetections("loc", listOf(manual)).isFailure)
+        remote.failAfterWrite = false
+        repo.saveDetections("loc", listOf(manual)).getOrThrow()
+        assertEquals(2, remote.store["u1"]!!.size)
+    }
+
+    @Test
+    fun rescanUpdatePreservesOriginalIdentityDateNotesAndAliases() = runBlocking<Unit> {
+        val remote = FakeRemote()
+        val repo = InventoryRepositoryImpl(remote, FakeLocal(), FakeAuth(user), now = { 42 })
+        val previous = org.techascent.aifinder.domain.inventory.StoredItem(
+            detection.item.copy(id = "saved-id", description = "My notes", tags = listOf("old alias")),
+            "loc", 5, 6,
+        )
+        val saved = repo.saveReviewed("loc", listOf(detection), mapOf(detection.item.id to previous)).getOrThrow().single()
+        assertEquals("saved-id", saved.item.id)
+        assertEquals(5L, saved.createdAt)
+        assertEquals(42L, saved.confirmedAt)
+        assertEquals("My notes", saved.item.description)
+        assertEquals(listOf("old alias", "scissors"), saved.item.tags)
     }
 
     @Test

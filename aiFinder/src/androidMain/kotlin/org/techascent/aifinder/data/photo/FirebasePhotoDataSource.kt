@@ -9,6 +9,10 @@ import org.techascent.aifinder.BuildConfig
 class FirebasePhotoDataSource(
     private val storage: FirebaseStorage = FirebaseStorage.getInstance(BuildConfig.FIREBASE_STORAGE_BUCKET),
 ) : PhotoRemoteDataSource {
+    override suspend fun delete(userId: String, photoId: String) {
+        try { storage.reference.child(StoragePaths.photo(userId, photoId)).delete().await() }
+        catch (e: StorageException) { if (e.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND) throw e }
+    }
 
     override suspend fun upload(userId: String, photoId: String, jpegBytes: ByteArray) {
         val metadata = StorageMetadata.Builder().setContentType("image/jpeg").build()

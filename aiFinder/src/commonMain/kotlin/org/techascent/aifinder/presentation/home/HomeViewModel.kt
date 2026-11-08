@@ -19,7 +19,9 @@ class HomeViewModel(observeInventory: ObserveInventoryUseCase) :
                 HomeContent(load.snapshot.allSpaces.map { space ->
                     val parentPath =
                         space.parentId?.let(load.snapshot::pathOf)?.takeIf { it.isNotEmpty() }
-                    SpaceListEntry(space, parentPath)
+                    SpaceListEntry(space, parentPath, load.snapshot.items
+                        .filter { it.location.id == space.id && it.item.photoId != null }
+                        .maxByOrNull { it.createdAt }?.item?.photoId)
                 }.take(3))
             )
         }

@@ -1,6 +1,7 @@
 package org.techascent.aifinder.data.photo
 
 interface PhotoRemoteDataSource {
+    suspend fun delete(userId: String, photoId: String) { error("Deleting photos is unavailable.") }
     suspend fun upload(userId: String, photoId: String, jpegBytes: ByteArray)
 
     /** Returns null when the photo doesn't exist remotely. */
@@ -9,6 +10,7 @@ interface PhotoRemoteDataSource {
 
 /** Persistent on-device photo files, separated per user. */
 interface PhotoLocalDataSource {
+    suspend fun delete(userId: String, photoId: String) { error("Deleting cached photos is unavailable.") }
     suspend fun read(userId: String, photoId: String): ByteArray?
     suspend fun write(userId: String, photoId: String, jpegBytes: ByteArray)
     suspend fun deleteForUser(userId: String)

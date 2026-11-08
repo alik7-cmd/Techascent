@@ -1,6 +1,7 @@
 package org.techascent.aifinder.presentation.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -10,6 +11,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.automirrored.outlined.DriveFileMove
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,7 +36,11 @@ fun SearchScreen(
     onQueryChange: (String) -> Unit,
     onItemSelected: (String) -> Unit,
     onBack: () -> Unit,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onConfirm: (org.techascent.aifinder.domain.model.LocatedItem) -> Unit,
+    onMove: (org.techascent.aifinder.domain.model.LocatedItem) -> Unit,
+    busy: Boolean,
+    actionError: String?,
 ) {
     ScreenLayout(
         topBar = {
@@ -48,7 +56,8 @@ fun SearchScreen(
                     onRetry = onRetry,
                 )
             }
-            is SearchUiState.Success -> searchContent(state.data, onQueryChange, onItemSelected)
+            is SearchUiState.Success -> searchContent(state.data, onQueryChange, onItemSelected,
+                onConfirm, onMove, busy, actionError)
         }
     }
 }
@@ -56,7 +65,11 @@ fun SearchScreen(
 private fun LazyListScope.searchContent(
     data: SearchContent,
     onQueryChange: (String) -> Unit,
-    onItemSelected: (String) -> Unit
+    onItemSelected: (String) -> Unit,
+    onConfirm: (org.techascent.aifinder.domain.model.LocatedItem) -> Unit,
+    onMove: (org.techascent.aifinder.domain.model.LocatedItem) -> Unit,
+    busy: Boolean,
+    actionError: String?,
 ) {
     item(key = "query") {
         val focusManager = LocalFocusManager.current
@@ -114,51 +127,61 @@ private fun LazyListScope.searchContent(
             )
         }
     }
+    actionError?.let { item(key = "action-error") { Text(it, color = MaterialTheme.colorScheme.error) } }
     items(data.results, key = { it.item.id }) { record ->
         Column(
             modifier = Modifier.fillMaxWidth()
                 .background(AiFinderPalette.Surface, RoundedCornerShape(24.dp))
-                .padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ItemPhoto(
-                photoId = record.item.photoId,
-                contentDescription = record.item.name,
-                shape = RoundedCornerShape(18.dp),
-                modifier = Modifier.fillMaxWidth().height(180.dp)
-            ) {
-                Text(
-                    text = if (record.item.name.contains("HDMI", ignoreCase = true)) {
-                        "HDMI"
-                    } else {
-                        record.item.category
-                    },
-                    modifier = Modifier.background(
-                        AiFinderPalette.Teal.copy(alpha = 0.3f),
-                        RoundedCornerShape(28.dp)
-                    ).padding(horizontal = 48.dp, vertical = 22.dp),
-                    color = AiFinderPalette.Teal,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            SectionTitle(record.item.name)
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                Modifier.fillMaxWidth().clickable { onItemSelected(record.item.id) },
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    Icons.Outlined.MyLocation,
-                    contentDescription = null,
-                    tint = AiFinderPalette.Muted,
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(record.path, color = AiFinderPalette.Muted, fontSize = 14.sp)
+                ItemPhoto(record.item.photoId, record.item.name, RoundedCornerShape(16.dp),
+                    modifier = Modifier.size(88.dp), bounds = record.bounds) {
+                    Icon(Icons.Outlined.MyLocation, null, tint = AiFinderPalette.Teal)
+                }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(record.item.name, color = AiFinderPalette.Ink, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                    Text(record.path, color = AiFinderPalette.Teal, fontSize = 14.sp)
+                    if (record.confirmedAt > 0) Text(
+                        stringResource(Res.string.item_confirmed,
+                            org.techascent.aifinder.data.subscription.formatPurchaseDate(record.confirmedAt)),
+                        color = AiFinderPalette.Muted, fontSize = 12.sp,
+                    )
+                }
             }
-            PrimaryAction(
-                stringResource(Res.string.search_view_location),
-                onClick = { onItemSelected(record.item.id) }
-            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                AssistChip(
+                    onClick = { onConfirm(record) },
+                    enabled = !busy,
+                    shape = RoundedCornerShape(50),
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = AiFinderPalette.Mint,
+                        labelColor = AiFinderPalette.Teal,
+                        leadingIconContentColor = AiFinderPalette.Teal,
+                    ),
+                    border = null,
+                    leadingIcon = { Icon(Icons.Outlined.CheckCircle, null, Modifier.size(18.dp)) },
+                    label = { Text(stringResource(Res.string.item_confirm)) },
+                )
+                AssistChip(
+                    onClick = { onMove(record) },
+                    enabled = !busy,
+                    shape = RoundedCornerShape(50),
+                    leadingIcon = { Icon(Icons.AutoMirrored.Outlined.DriveFileMove, null, Modifier.size(18.dp)) },
+                    label = { Text(stringResource(Res.string.details_move)) },
+                )
+                AssistChip(
+                    onClick = { onItemSelected(record.item.id) },
+                    shape = RoundedCornerShape(50),
+                    trailingIcon = { Icon(Icons.AutoMirrored.Outlined.ArrowForward, null, Modifier.size(18.dp)) },
+                    label = { Text(stringResource(Res.string.search_details)) },
+                )
+            }
         }
     }
 }
