@@ -301,6 +301,7 @@ fun AiFinderNavigation() {
                 onSubscription = { navController.navigate(AiFinderScreen.PurchaseHistory.route) { launchSingleTop = true } },
                 onPrivacy = { navController.navigate(AiFinderScreen.PrivacyData.route) { launchSingleTop = true } },
                 onExport = { navController.navigate(AiFinderScreen.ExportInventory.route) { launchSingleTop = true } },
+                onFeedback = { navController.navigate(AiFinderScreen.Feedback.route) { launchSingleTop = true } },
                 onSignedOut = {
                     scan.reset()
                     inventorySync.reset()
@@ -327,6 +328,7 @@ fun AiFinderNavigation() {
         }
         composable(AiFinderScreen.PrivacyData.route) { PrivacyDataScreen(onBack) }
         composable(AiFinderScreen.ExportInventory.route) { ExportInventoryScreen(onBack) }
+        composable(AiFinderScreen.Feedback.route) { FeedbackScreen(onBack) }
         composable(AiFinderScreen.Scan.route) {
             ScanScreen(
                 onOpenCamera = {

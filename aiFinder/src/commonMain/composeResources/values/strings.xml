@@ -327,4 +327,17 @@
     <string name="account_logout_cancel">Cancel</string>
     <string name="account_logout_error">Couldn't log out. Please try again.</string>
     <string name="account_footer">Your inventory stays in your household. You can sign back in anytime.</string>
+    <string name="feedback_section">Early access</string>
+    <string name="feedback_title">Share feedback</string>
+    <string name="feedback_intro">Help shape the app</string>
+    <string name="feedback_intro_hint">What works well? What could be easier? Tell us about your experience or suggest an improvement.</string>
+    <string name="feedback_label">Your feedback</string>
+    <string name="feedback_placeholder">I’d love to see…</string>
+    <string name="feedback_length">%1$d / %2$d characters</string>
+    <string name="feedback_private">Sent privately to the app team with your account ID and submission time. This is not a public Play Store review. Please don’t include passwords or sensitive information.</string>
+    <string name="feedback_send">Send feedback</string>
+    <string name="feedback_error">We couldn’t send your feedback. Your message is still here. Check your connection and try again.</string>
+    <string name="feedback_thanks">Thanks for helping us improve</string>
+    <string name="feedback_sent_hint">Your feedback has been received. Your ideas help guide what we build next.</string>
+    <string name="feedback_done">Back to account</string>
 </resources>

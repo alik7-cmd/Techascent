@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "aifinder": {
+      "appReviews": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          "$reviewId": {
+            ".write": "auth != null && auth.uid === $uid && newData.exists() && (!data.exists() || (newData.child('review').val() === data.child('review').val() && newData.child('userId').val() === data.child('userId').val()))",
+            ".validate": "newData.hasChildren(['userId', 'review', 'createdAt']) && $reviewId.matches(/^[a-f0-9-]{36}$/)",
+            "userId": {
+              ".validate": "newData.isString() && newData.val() === $uid"
+            },
+            "review": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber() && newData.val() === now"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

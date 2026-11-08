@@ -14,6 +14,7 @@ sealed class AiFinderScreen(val route: String) {
     data object Account : AiFinderScreen("account")
     data object PrivacyData : AiFinderScreen("privacyData")
     data object ExportInventory : AiFinderScreen("exportInventory")
+    data object Feedback : AiFinderScreen("feedback")
     data object PurchaseHistory : AiFinderScreen("purchaseHistory")
     data object Scan : AiFinderScreen("scan")
     data object Capture : AiFinderScreen("scan/capture")

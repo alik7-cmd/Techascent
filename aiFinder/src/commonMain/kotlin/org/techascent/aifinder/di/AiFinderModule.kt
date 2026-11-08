@@ -54,6 +54,10 @@ import org.techascent.aifinder.data.subscription.createPurchaseHistoryRemote
 import org.techascent.aifinder.presentation.subscription.PurchaseHistoryViewModel
 
 val aiFinderModule = module {
+    single<org.techascent.aifinder.data.feedback.FeedbackRemoteDataSource> {
+        org.techascent.aifinder.data.feedback.createFeedbackRemote()
+    }
+    viewModel { org.techascent.aifinder.presentation.account.FeedbackViewModel(auth = get(), remote = get()) }
     single { PurchaseHistoryRepository(auth = get(), remote = createPurchaseHistoryRemote()) }
     viewModel { PurchaseHistoryViewModel(repository = get()) }
     viewModel { org.techascent.aifinder.presentation.inventory.InventoryActionsViewModel(repository = get(), photos = get()) }

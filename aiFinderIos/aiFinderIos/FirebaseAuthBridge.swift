@@ -47,6 +47,24 @@ extension FirebaseAuthBridge {
     func write(path: String, json: String, completion: @escaping (String?) -> Void) {
         do {
             let value = try JSONSerialization.jsonObject(with: Data(json.utf8), options: [.fragmentsAllowed])
+            if path.hasPrefix("aifinder/appReviews/") {
+                let parts = path.split(separator: "/", omittingEmptySubsequences: false)
+                guard let uid = Auth.auth().currentUser?.uid,
+                      parts.count == 4, String(parts[2]) == uid,
+                      UUID(uuidString: String(parts[3])) != nil,
+                      let record = value as? [String: Any],
+                      record["userId"] as? String == uid,
+                      let review = record["review"] as? String,
+                      !review.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                      review.utf16.count <= 2000,
+                      let url = FirebaseApp.app()?.options.databaseURL, !url.isEmpty else {
+                    throw bridgeError("Unable to submit feedback. Check your account and message.")
+                }
+                Database.database(url: url).reference().child(path).setValue(value) { error, _ in
+                    completion(error?.localizedDescription)
+                }
+                return
+            }
             try reference(path).setValue(value) { error, _ in completion(error?.localizedDescription) }
         } catch { completion(error.localizedDescription) }
     }

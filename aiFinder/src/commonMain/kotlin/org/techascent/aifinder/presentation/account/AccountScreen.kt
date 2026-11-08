@@ -12,7 +12,7 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.PrivacyTip
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -47,6 +47,7 @@ fun AccountScreen(
     onSubscription: () -> Unit,
     onPrivacy: () -> Unit,
     onExport: () -> Unit,
+    onFeedback: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
@@ -88,6 +89,15 @@ fun AccountScreen(
                 SettingsCell(Icons.Outlined.FileDownload, stringResource(Res.string.export_title), onClick = onExport)
                 CellDivider()
                 SettingsCell(Icons.Outlined.PrivacyTip, stringResource(Res.string.account_privacy), onClick = onPrivacy)
+            }
+        }
+        item(key = "early-access") {
+            SettingsSection(stringResource(Res.string.feedback_section)) {
+                SettingsCell(
+                    Icons.Outlined.ChatBubbleOutline,
+                    stringResource(Res.string.feedback_title),
+                    onClick = onFeedback,
+                )
             }
         }
         item(key = "account") {
