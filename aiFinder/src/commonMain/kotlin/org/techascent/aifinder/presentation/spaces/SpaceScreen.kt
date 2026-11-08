@@ -1,6 +1,7 @@
 package org.techascent.aifinder.presentation.spaces
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
@@ -9,6 +10,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.QrCode
+import androidx.compose.material.icons.outlined.QrCodeScanner
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -90,9 +97,21 @@ fun SpaceScreen(
                                         color = AiFinderPalette.Muted, fontSize = 12.sp)
                                 }
                             }
-                        androidx.compose.material3.TextButton(onClick = onQrLabel) {
-                            Text(stringResource(Res.string.qr_label), color = AiFinderPalette.Teal)
-                        }
+                        val chipColors = AssistChipDefaults.assistChipColors(
+                            labelColor = AiFinderPalette.Teal,
+                            leadingIconContentColor = AiFinderPalette.Teal,
+                            disabledLabelColor = AiFinderPalette.Teal.copy(alpha = 0.65f),
+                        )
+                        AssistChip(
+                            onClick = onQrLabel,
+                            shape = RoundedCornerShape(50),
+                            border = BorderStroke(1.dp, AiFinderPalette.Teal.copy(alpha = 0.5f)),
+                            colors = chipColors,
+                            leadingIcon = {
+                                Icon(Icons.Outlined.QrCode, null, modifier = Modifier.size(18.dp))
+                            },
+                            label = { Text(stringResource(Res.string.qr_label)) },
+                        )
                     }
                 }
                 item(key = "overview") {

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.techascent.aifinder.domain.inventory.InventoryRepository
 import org.techascent.aifinder.domain.location.LocationRepository
@@ -30,5 +31,6 @@ class InventorySyncViewModel(
             _state.value = InventorySyncState(failed = failure != null)
         }
     }
+    fun dismissError() { _state.update { it.copy(failed = false) } }
     fun reset() { job?.cancel(); job = null; _state.value = InventorySyncState() }
 }

@@ -7,10 +7,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Diamond
+import androidx.compose.material.icons.outlined.FileDownload
+import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -45,6 +46,7 @@ fun AccountScreen(
     onSignedOut: () -> Unit,
     onSubscription: () -> Unit,
     onPrivacy: () -> Unit,
+    onExport: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
@@ -83,7 +85,9 @@ fun AccountScreen(
                     onClick = onSubscription,
                 )
                 CellDivider()
-                SettingsCell(Icons.Outlined.Diamond, stringResource(Res.string.account_privacy), onClick = onPrivacy)
+                SettingsCell(Icons.Outlined.FileDownload, stringResource(Res.string.export_title), onClick = onExport)
+                CellDivider()
+                SettingsCell(Icons.Outlined.PrivacyTip, stringResource(Res.string.account_privacy), onClick = onPrivacy)
             }
         }
         item(key = "account") {
@@ -197,7 +201,7 @@ private fun SettingsCell(
         when {
             isLoading -> CircularProgressIndicator(Modifier.size(18.dp), color = contentColor, strokeWidth = 2.dp)
             showChevron -> Icon(
-                Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                Icons.Outlined.ChevronRight,
                 contentDescription = null,
                 tint = AiFinderPalette.Muted
             )

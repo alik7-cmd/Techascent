@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import org.techascent.aifinder.config.AnalysisConfig
+import org.techascent.aifinder.config.AppConfig
 import org.techascent.aifinder.presentation.components.*
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
@@ -99,7 +99,7 @@ private fun AiAnalysisFeedback() {
                     Icon(Icons.Outlined.AutoAwesome, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(24.dp))
                 }
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(if (AnalysisConfig.USE_FAKE_ANALYSIS)
+                    Text(stringResource(if (AppConfig.USE_FAKE_ANALYSIS)
                         Res.string.scan_preparing_samples else Res.string.scan_finding_feedback),
                         color = AiFinderPalette.Ink, fontWeight = FontWeight.SemiBold)
                     Text(stringResource(Res.string.scan_feedback_hint), color = AiFinderPalette.Muted,

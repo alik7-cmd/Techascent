@@ -3,27 +3,41 @@ package org.techascent.aifinder.presentation.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.annotation.KoinExperimentalAPI
 import apphub.aifinder.generated.resources.Res
 import apphub.aifinder.generated.resources.home_spaces_error_title
-import apphub.aifinder.generated.resources.subscription_access_error
 import apphub.aifinder.generated.resources.inventory_sync_error
+import apphub.aifinder.generated.resources.inventory_sync_error_title
+import apphub.aifinder.generated.resources.error_card_retry
+import apphub.aifinder.generated.resources.login_error_dismiss
 import apphub.aifinder.generated.resources.inventory_syncing
 import apphub.aifinder.generated.resources.inventory_refresh
 import apphub.aifinder.generated.resources.qr_scan_action
@@ -34,9 +48,9 @@ import org.techascent.aifinder.presentation.theme.AiFinderPalette
 import org.techascent.aifinder.presentation.scan.ScanBalanceCardV3
 import org.techascent.aifinder.presentation.scan.ScanContent
 import org.techascent.aifinder.presentation.scan.CreditCardComparison
-import org.techascent.aifinder.config.CreditCardPreviewConfig
+import org.techascent.aifinder.config.AppConfig
+import org.techascent.aifinder.config.HomeLayout
 
-@OptIn(KoinExperimentalAPI::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel<HomeViewModel>(),
@@ -52,9 +66,12 @@ fun HomeScreen(
     onAddLocation: () -> Unit,
     syncState: org.techascent.aifinder.presentation.inventory.InventorySyncState,
     onSync: () -> Unit,
+    onDismissSyncError: () -> Unit,
     onScanLabel: () -> Unit,
+    onItem: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val dashboard = AppConfig.HOME_LAYOUT == HomeLayout.DASHBOARD
 
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -67,14 +84,22 @@ fun HomeScreen(
         ) {
             item(key = "header") { HomeHeader(onAccount) }
             item(key = "search") { HomeSearch(onSearch) }
-            item(key = "scan") { ScanPrompt(onScan, isCheckingScan) }
+            if (dashboard) {
+                when (val state = uiState) {
+                    is HomeUiState.Success -> item(key = "overview") { HomeInventoryOverview(state.data) }
+                    is HomeUiState.Loading -> item(key = "overview-loading") { HomeOverviewSkeleton() }
+                    is HomeUiState.Error -> Unit
+                }
+                item(key = "quick-actions") {
+                    HomeQuickActions(onScan, isCheckingScan, onAddLocation, onSeeAll)
+                }
+            } else {
+                item(key = "scan") { ScanPrompt(onScan, isCheckingScan, compact = true) }
+            }
             item(key = "sync") {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (syncState.failed) {
-                        androidx.compose.material3.Text(
-                            stringResource(apphub.aifinder.generated.resources.Res.string.inventory_sync_error),
-                            color = androidx.compose.material3.MaterialTheme.colorScheme.error,
-                        )
+                        InventoryRefreshError(onDismissSyncError)
                     }
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -92,8 +117,11 @@ fun HomeScreen(
                             colors = chipColors,
                             leadingIcon = { Icon(Icons.Outlined.Refresh, null, modifier = Modifier.size(18.dp)) },
                             label = { Text(
-                                stringResource(if (syncState.busy) Res.string.inventory_syncing
-                                    else Res.string.inventory_refresh),
+                                stringResource(when {
+                                    syncState.busy -> Res.string.inventory_syncing
+                                    syncState.failed -> Res.string.error_card_retry
+                                    else -> Res.string.inventory_refresh
+                                }),
                             ) },
                         )
                         AssistChip(
@@ -107,11 +135,8 @@ fun HomeScreen(
                             label = { Text(stringResource(Res.string.qr_scan_action)) },
                         )
                     }
+
                 }
-            }
-            item(key = "credits") { ScanBalanceCardV3(scanBalance, onRetryBalance, onGetScans) }
-            if (CreditCardPreviewConfig.SHOW_COMPARISON) {
-                item(key = "credit-design-comparison") { CreditCardComparison() }
             }
             when (val state = uiState) {
                 is HomeUiState.Loading -> {
@@ -149,7 +174,50 @@ fun HomeScreen(
                             coverPhotoId = entry.coverPhotoId,
                         )
                     }
+                    if (dashboard && state.data.recentItems.isNotEmpty()) {
+                        item(key = "recent-heading") { HomeRecentHeading() }
+                        items(state.data.recentItems, key = { "recent-${it.item.id}" }) { entry ->
+                            HomeRecentItem(entry, onClick = { onItem(entry.item.id) })
+                        }
+                    }
                 }
+            }
+            item(key = "credits") { ScanBalanceCardV3(scanBalance, onRetryBalance, onGetScans) }
+            if (AppConfig.SHOW_COMPARISON) {
+                item(key = "credit-design-comparison") { CreditCardComparison() }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InventoryRefreshError(onDismiss: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
+        shape = RoundedCornerShape(20.dp),
+        color = Color(0xFFFDECEA),
+        border = BorderStroke(1.dp, Color(0xFFF6C9C4)),
+    ) {
+        Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(
+                Modifier.size(36.dp).background(Color(0xFFC62828).copy(alpha = 0.12f), CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Rounded.ErrorOutline, null, tint = Color(0xFFC62828), modifier = Modifier.size(20.dp))
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(Res.string.inventory_sync_error_title),
+                    color = Color(0xFF5F1A16), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(Res.string.inventory_sync_error),
+                    color = Color(0xFF5F1A16).copy(alpha = 0.85f), fontSize = 14.sp, lineHeight = 20.sp)
+            }
+            IconButton(onClick = onDismiss) {
+                Icon(
+                    Icons.Rounded.Close,
+                    contentDescription = stringResource(Res.string.login_error_dismiss),
+                    tint = Color(0xFF5F1A16).copy(alpha = 0.7f),
+                    modifier = Modifier.size(18.dp),
+                )
             }
         }
     }

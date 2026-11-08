@@ -9,8 +9,10 @@ import androidx.compose.material.icons.outlined.GridOn
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.ViewAgenda
 import androidx.compose.material.icons.outlined.Widgets
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,8 +49,8 @@ internal fun SpaceCard(location: StorageLocation, onClick: () -> Unit, parentPat
         ) {
             Icon(icon, contentDescription = null, tint = AiFinderPalette.Teal, modifier = Modifier.size(26.dp))
         }
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            parentPath?.let { Text(it, color = AiFinderPalette.Muted, fontSize = 13.sp) }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            parentPath?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp) }
             Text(location.name, color = AiFinderPalette.Ink, fontSize = 19.sp, fontWeight = FontWeight.Bold)
             Text(
                 if (location.boxCount != null) {
@@ -56,9 +58,10 @@ internal fun SpaceCard(location: StorageLocation, onClick: () -> Unit, parentPat
                 } else {
                     stringResource(Res.string.home_space_summary, location.spaceCount, location.itemCount)
                 },
-                color = AiFinderPalette.Muted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 14.sp
             )
         }
+        Icon(Icons.Outlined.ChevronRight, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(20.dp))
     }
 }

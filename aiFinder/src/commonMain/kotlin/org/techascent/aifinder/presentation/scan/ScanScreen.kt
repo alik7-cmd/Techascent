@@ -6,7 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -48,7 +48,7 @@ fun ScanScreen(
                         Text(stringResource(if (needsPlace) Res.string.location_choose_title else Res.string.scan_change_place),
                             modifier = Modifier.weight(1f),
                             color = AiFinderPalette.Teal, fontWeight = FontWeight.SemiBold)
-                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, null, tint = AiFinderPalette.Teal)
+                        Icon(Icons.Outlined.ChevronRight, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(20.dp))
                     }
                 }
             }

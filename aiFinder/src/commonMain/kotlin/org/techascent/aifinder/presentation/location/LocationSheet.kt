@@ -8,7 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Home
@@ -215,7 +215,7 @@ fun LocationSheet(
                             onClick = { browsingId = place.id; query = "" },
                             trailingContent = {
                                 Icon(
-                                    Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                                    Icons.Outlined.ChevronRight,
                                     contentDescription = null,
                                     tint = AiFinderPalette.Muted,
                                 )

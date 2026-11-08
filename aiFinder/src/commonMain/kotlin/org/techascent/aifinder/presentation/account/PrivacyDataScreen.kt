@@ -1,8 +1,15 @@
 package org.techascent.aifinder.presentation.account
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.TableChart
+import androidx.compose.material.icons.outlined.PictureAsPdf
+import androidx.compose.material.icons.outlined.IosShare
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,13 +42,13 @@ internal fun InventorySnapshot.exportCsv(): String = buildString {
 }
 
 @Composable
-fun PrivacyDataScreen(onBack: () -> Unit) {
+fun ExportInventoryScreen(onBack: () -> Unit) {
     val inventory = koinInject<ObserveInventoryUseCase>()
     val scope = rememberCoroutineScope()
     var busy by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     val emptyMessage = stringResource(Res.string.data_export_empty)
-    val title = stringResource(Res.string.data_title)
+    val title = stringResource(Res.string.export_title)
     val export: (String) -> Unit = { format ->
         if (busy == null) scope.launch {
             busy = format; error = null
@@ -64,18 +71,89 @@ fun PrivacyDataScreen(onBack: () -> Unit) {
         }
     }
     ScreenLayout(topBar = { ScreenTopBar(title, onBack) }) {
-        item { SectionTitle(stringResource(Res.string.data_intro)) }
+        item {
+            InfoCard(
+                title = stringResource(Res.string.export_intro),
+                subtitle = stringResource(Res.string.export_intro_hint),
+                leadingContent = { Icon(Icons.Outlined.IosShare, null, tint = AiFinderPalette.Teal) },
+            )
+        }
+        item {
+            ExportFormatCard(
+                Icons.Outlined.TableChart,
+                stringResource(Res.string.export_csv_title),
+                stringResource(Res.string.export_csv_hint),
+                stringResource(Res.string.data_export_csv),
+                busy == "csv", busy == null,
+            ) { export("csv") }
+        }
+        item {
+            ExportFormatCard(
+                Icons.Outlined.PictureAsPdf,
+                stringResource(Res.string.export_pdf_title),
+                stringResource(Res.string.export_pdf_hint),
+                stringResource(Res.string.data_export_pdf),
+                busy == "pdf", busy == null,
+            ) { export("pdf") }
+        }
+        error?.let { message ->
+            item {
+                Surface(color = MaterialTheme.colorScheme.errorContainer, shape = RoundedCornerShape(16.dp)) {
+                    Text(message, Modifier.fillMaxWidth().padding(16.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer)
+                }
+            }
+        }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(stringResource(Res.string.data_photo_notice), color = AiFinderPalette.Ink)
-                Text(stringResource(Res.string.data_export_notice), color = AiFinderPalette.Muted)
-                PrimaryAction(stringResource(Res.string.data_export_csv), { export("csv") },
-                    enabled = busy == null, isLoading = busy == "csv")
-                PrimaryAction(stringResource(Res.string.data_export_pdf), { export("pdf") },
-                    enabled = busy == null, isLoading = busy == "pdf")
-                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                Text(stringResource(Res.string.data_delete_notice), color = AiFinderPalette.Muted)
+                Text(stringResource(Res.string.export_before_title), color = AiFinderPalette.Ink,
+                    fontWeight = FontWeight.SemiBold)
+                Text(stringResource(Res.string.data_export_notice), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+        }
+    }
+}
+
+@Composable
+private fun ExportFormatCard(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    action: String,
+    loading: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(24.dp)) {
+        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Surface(color = AiFinderPalette.Mint, shape = RoundedCornerShape(12.dp)) {
+                    Icon(icon, null, Modifier.padding(12.dp).size(24.dp), tint = AiFinderPalette.Teal)
+                }
+                Text(title, Modifier.weight(1f), color = AiFinderPalette.Ink,
+                    style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            }
+            Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            PrimaryAction(action, onClick, enabled = enabled, isLoading = loading)
+        }
+    }
+}
+
+@Composable
+fun PrivacyDataScreen(onBack: () -> Unit) {
+    ScreenLayout(topBar = { ScreenTopBar(stringResource(Res.string.data_title), onBack) }) {
+        item { SectionTitle(stringResource(Res.string.data_intro)) }
+        item {
+            InfoCard(
+                stringResource(Res.string.privacy_control_title),
+                stringResource(Res.string.privacy_control_hint),
+            )
+        }
+        item {
+            InfoCard(
+                stringResource(Res.string.privacy_sharing_title),
+                stringResource(Res.string.privacy_sharing_hint),
+            )
         }
     }
 }

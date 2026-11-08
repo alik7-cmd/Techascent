@@ -13,7 +13,7 @@ import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.automirrored.outlined.DriveFileMove
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -178,7 +178,7 @@ private fun LazyListScope.searchContent(
                 AssistChip(
                     onClick = { onItemSelected(record.item.id) },
                     shape = RoundedCornerShape(50),
-                    trailingIcon = { Icon(Icons.AutoMirrored.Outlined.ArrowForward, null, Modifier.size(18.dp)) },
+                    trailingIcon = { Icon(Icons.Outlined.ChevronRight, null, Modifier.size(20.dp)) },
                     label = { Text(stringResource(Res.string.search_details)) },
                 )
             }

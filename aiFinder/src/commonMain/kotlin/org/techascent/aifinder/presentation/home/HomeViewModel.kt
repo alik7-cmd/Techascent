@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.stateIn
 import org.techascent.aifinder.domain.inventory.usecase.ObserveInventoryUseCase
 import org.techascent.aifinder.presentation.inventory.InventoryBackedViewModel
 import org.techascent.aifinder.presentation.inventory.InventoryLoad
-import org.techascent.aifinder.presentation.spaces.SpaceListEntry
 
 class HomeViewModel(observeInventory: ObserveInventoryUseCase) :
     InventoryBackedViewModel(observeInventory) {
@@ -15,15 +14,7 @@ class HomeViewModel(observeInventory: ObserveInventoryUseCase) :
         when (load) {
             InventoryLoad.Loading -> HomeUiState.Loading
             is InventoryLoad.Failed -> HomeUiState.Error(load.message)
-            is InventoryLoad.Ready -> HomeUiState.Success(
-                HomeContent(load.snapshot.allSpaces.map { space ->
-                    val parentPath =
-                        space.parentId?.let(load.snapshot::pathOf)?.takeIf { it.isNotEmpty() }
-                    SpaceListEntry(space, parentPath, load.snapshot.items
-                        .filter { it.location.id == space.id && it.item.photoId != null }
-                        .maxByOrNull { it.createdAt }?.item?.photoId)
-                }.take(3))
-            )
+            is InventoryLoad.Ready -> HomeUiState.Success(load.snapshot.toHomeContent())
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeUiState.Loading)
 }

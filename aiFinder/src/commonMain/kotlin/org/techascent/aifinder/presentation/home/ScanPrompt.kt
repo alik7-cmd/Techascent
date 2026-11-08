@@ -22,18 +22,25 @@ import org.techascent.aifinder.presentation.components.SectionTitle
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @Composable
-internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false) {
+internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false, compact: Boolean = false) {
     Column(
         modifier = Modifier.fillMaxWidth()
             .padding(top = 6.dp)
             .clip(RoundedCornerShape(28.dp))
             .background(AiFinderPalette.Mint)
-            .padding(24.dp),
+            .padding(if (compact) 20.dp else 24.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        SectionTitle(stringResource(Res.string.home_scan_title))
+        if (compact) {
+            Text(
+                stringResource(Res.string.home_scan_compact_title),
+                color = AiFinderPalette.Ink,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        } else SectionTitle(stringResource(Res.string.home_scan_title))
         Text(
-            stringResource(Res.string.home_scan_description),
+            stringResource(if (compact) Res.string.home_scan_compact_description else Res.string.home_scan_description),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 16.sp,
             lineHeight = 24.sp
@@ -42,7 +49,7 @@ internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false) {
         Button(
             onClick = onScan,
             enabled = !isChecking,
-            modifier = Modifier.widthIn(min = 220.dp).heightIn(min = 50.dp)
+            modifier = (if (compact) Modifier.fillMaxWidth() else Modifier.widthIn(min = 220.dp)).heightIn(min = 50.dp)
                 .semantics { if (isChecking) stateDescription = checkingLabel },
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(

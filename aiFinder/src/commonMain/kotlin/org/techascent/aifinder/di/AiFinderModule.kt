@@ -4,7 +4,7 @@ import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import kotlinx.coroutines.Dispatchers
 import org.techascent.aifinder.config.VertexAiConfig
-import org.techascent.aifinder.config.AnalysisConfig
+import org.techascent.aifinder.config.AppConfig
 import org.techascent.aifinder.data.vision.FakePhotoAnalyzer
 import org.techascent.aifinder.data.inventory.InventoryRepositoryImpl
 import org.techascent.aifinder.data.inventory.ItemLocalDataSource
@@ -70,7 +70,7 @@ val aiFinderModule = module {
     viewModel { SubscriptionViewModel(repository = get(), purchases = get()) }
     single<PhotoAnalyzer> {
         MeteredPhotoAnalyzer(
-            analyzer = if (AnalysisConfig.USE_FAKE_ANALYSIS) {
+            analyzer = if (AppConfig.USE_FAKE_ANALYSIS) {
                 FakePhotoAnalyzer()
             } else {
                 VertexGeminiPhotoAnalyzer(

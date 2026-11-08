@@ -13,6 +13,7 @@ import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.domain.model.InventoryItem
 import org.techascent.aifinder.domain.model.LocatedItem
+import org.techascent.aifinder.domain.model.LocationType
 import org.techascent.aifinder.presentation.components.PrimaryAction
 import org.techascent.aifinder.presentation.components.SectionTitle
 import org.techascent.aifinder.presentation.location.LocationUiState
@@ -35,6 +36,8 @@ fun ItemEditorSheet(
     var aliases by rememberSaveable { mutableStateOf(entry?.item?.tags?.joinToString(", ").orEmpty()) }
     var locationId by rememberSaveable { mutableStateOf(entry?.location?.id ?: initialLocationId) }
     var expanded by remember { mutableStateOf(false) }
+    val availablePlaces = locations.locations.filter { it.type != LocationType.HOME }
+    val canChoosePlace = !action.busy && !locations.isLoading && availablePlaces.isNotEmpty()
     val draftId = rememberSaveable { kotlin.uuid.Uuid.random().toString() }
     ModalBottomSheet(
         onDismissRequest = { if (!action.busy) onDismiss() },
@@ -62,17 +65,46 @@ fun ItemEditorSheet(
                 OutlinedTextField(notes, { notes = it }, label = { Text(stringResource(Res.string.details_notes)) },
                     enabled = !action.busy, modifier = Modifier.fillMaxWidth())
             }
-            Text(stringResource(Res.string.place_where), color = AiFinderPalette.Muted)
-            Box {
-                OutlinedButton(onClick = { expanded = true }, enabled = !action.busy,
-                    shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
-                    Text(locationId?.let(locations::path).orEmpty().ifBlank { stringResource(Res.string.location_choose_title) },
-                        color = AiFinderPalette.Teal)
-                }
-                DropdownMenu(expanded, { expanded = false }, modifier = Modifier.heightIn(max = 280.dp)) {
-                    locations.locations.filter { it.type != org.techascent.aifinder.domain.model.LocationType.HOME }.forEach { place ->
+            if (moveOnly && entry != null) {
+                Text(stringResource(Res.string.item_move_intro, entry.item.name),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            ExposedDropdownMenuBox(
+                expanded = expanded && canChoosePlace,
+                onExpandedChange = { if (canChoosePlace) expanded = it },
+            ) {
+                OutlinedTextField(
+                    value = locationId?.takeIf { id -> availablePlaces.any { it.id == id } }
+                        ?.let(locations::path).orEmpty(),
+                    onValueChange = {},
+                    readOnly = true,
+                    enabled = canChoosePlace,
+                    label = { Text(stringResource(Res.string.place_where)) },
+                    placeholder = { Text(stringResource(Res.string.location_choose_title)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded && canChoosePlace) },
+                    supportingText = {
+                        Text(stringResource(when {
+                            locations.isLoading -> Res.string.item_places_loading
+                            availablePlaces.isEmpty() && locations.loadError == null -> Res.string.item_places_empty
+                            else -> Res.string.item_place_picker_hint
+                        }))
+                    },
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth().menuAnchor(
+                        ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = canChoosePlace,
+                    ),
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded && canChoosePlace,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.heightIn(max = 280.dp),
+                ) {
+                    availablePlaces.sortedBy { locations.path(it.id).lowercase() }.forEach { place ->
                         DropdownMenuItem(
-                            text = { Text(locations.path(place.id)) },
+                            text = {
+                                Text(locations.path(place.id),
+                                    color = if (place.id == locationId) AiFinderPalette.Teal else AiFinderPalette.Ink)
+                            },
                             onClick = { locationId = place.id; expanded = false },
                         )
                     }
@@ -81,7 +113,7 @@ fun ItemEditorSheet(
             locations.loadError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             action.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             PrimaryAction(
-                stringResource(Res.string.item_save),
+                stringResource(if (moveOnly) Res.string.details_move else Res.string.item_save),
                 onClick = {
                     val id = locationId ?: return@PrimaryAction
                     onSave(
@@ -92,7 +124,7 @@ fun ItemEditorSheet(
                         ), id,
                     )
                 },
-                enabled = name.isNotBlank() && locations.locations.any { it.id == locationId },
+                enabled = name.isNotBlank() && availablePlaces.any { it.id == locationId },
                 isLoading = action.busy,
             )
         }

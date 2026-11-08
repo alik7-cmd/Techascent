@@ -20,7 +20,7 @@ import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.*
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
-import org.techascent.aifinder.config.AnalysisConfig
+import org.techascent.aifinder.config.AppConfig
 
 @Composable
 fun ReviewScreen(
@@ -239,7 +239,7 @@ private fun ReviewResultsNotice() {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     stringResource(
-                        if (AnalysisConfig.USE_FAKE_ANALYSIS) Res.string.review_sample_title
+                        if (AppConfig.USE_FAKE_ANALYSIS) Res.string.review_sample_title
                         else Res.string.review_ai_title
                     ),
                     color = AiFinderPalette.Teal,
@@ -248,7 +248,7 @@ private fun ReviewResultsNotice() {
                 )
                 Text(
                     stringResource(
-                        if (AnalysisConfig.USE_FAKE_ANALYSIS) Res.string.review_sample_message
+                        if (AppConfig.USE_FAKE_ANALYSIS) Res.string.review_sample_message
                         else Res.string.review_ai_message
                     ),
                     color = AiFinderPalette.Ink.copy(alpha = 0.72f),

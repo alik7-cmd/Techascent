@@ -253,11 +253,13 @@ fun AiFinderNavigation() {
                 onGetScans = preparePurchase,
                 syncState = syncState,
                 onSync = inventorySync::refresh,
+                onDismissSyncError = inventorySync::dismissError,
                 onAddLocation = addLocation,
                 onAccount = { navController.navigate(AiFinderScreen.Account.route) },
                 onSpace = { navController.navigate(AiFinderScreen.Space.createRoute(it)) },
                 onSeeAll = { navController.navigate(AiFinderScreen.Spaces.route) },
                 onScanLabel = { qrPlaceId = null; showingQr = true },
+                onItem = { navController.navigate(AiFinderScreen.Details.createRoute(it)) },
             )
         }
         composable(AiFinderScreen.Spaces.route) {
@@ -298,6 +300,7 @@ fun AiFinderNavigation() {
                 onBack = onBack,
                 onSubscription = { navController.navigate(AiFinderScreen.PurchaseHistory.route) { launchSingleTop = true } },
                 onPrivacy = { navController.navigate(AiFinderScreen.PrivacyData.route) { launchSingleTop = true } },
+                onExport = { navController.navigate(AiFinderScreen.ExportInventory.route) { launchSingleTop = true } },
                 onSignedOut = {
                     scan.reset()
                     inventorySync.reset()
@@ -323,6 +326,7 @@ fun AiFinderNavigation() {
             PurchaseHistoryScreen(viewModel = koinViewModel<PurchaseHistoryViewModel>(), onBack = onBack)
         }
         composable(AiFinderScreen.PrivacyData.route) { PrivacyDataScreen(onBack) }
+        composable(AiFinderScreen.ExportInventory.route) { ExportInventoryScreen(onBack) }
         composable(AiFinderScreen.Scan.route) {
             ScanScreen(
                 onOpenCamera = {
