@@ -1,4 +1,4 @@
-# Where Did I Put It? — aiFinder
+# AI Finder: Where Did I Put It? — aiFinder
 
 Figma reference: https://www.figma.com/design/1jdKJp7TJxJLVcSBRZalzr
 

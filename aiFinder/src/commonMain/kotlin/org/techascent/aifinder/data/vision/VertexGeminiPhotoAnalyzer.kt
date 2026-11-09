@@ -40,7 +40,6 @@ class VertexGeminiPhotoAnalyzer(
     private val dispatcher: CoroutineDispatcher
 ) : PhotoAnalyzer {
 
-    @OptIn(ExperimentalEncodingApi::class)
     override suspend fun analyze(photo: CapturedPhoto): List<RecognizedObject> {
         if (apiKey.isBlank()) {
             throw IllegalStateException("Vertex AI isn't configured. Add VERTEX_API_KEY to local.properties and rebuild.")

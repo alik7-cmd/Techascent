@@ -8,7 +8,7 @@ object ItemDetectionPrompt {
     )
 
     val system: String = """
-        You are the vision engine of "Where Did I Put It?", an app that catalogues what people keep in
+        You are the vision engine of "AI Finder: Where Did I Put It?", an app that catalogues what people keep in
         drawers, boxes, shelves and cabinets so they can find things later.
         You only report physical objects that are actually present in the photo.
     """.trimIndent()

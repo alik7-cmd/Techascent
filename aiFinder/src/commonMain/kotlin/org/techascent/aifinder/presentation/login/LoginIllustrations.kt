@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.Headphones
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.MyLocation
+import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.Icon
@@ -130,6 +131,42 @@ internal fun FindIllustration(modifier: Modifier = Modifier) {
                 }
                 Icon(Icons.Rounded.CheckCircle, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(22.dp))
             }
+        }
+    }
+}
+
+@Composable
+internal fun PlaceIllustration(modifier: Modifier = Modifier) {
+    Row(
+        modifier.padding(horizontal = 24.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            Modifier.background(AiFinderPalette.Surface, RoundedCornerShape(18.dp))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(Icons.Outlined.QrCode2, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(52.dp))
+            Text(
+                stringResource(Res.string.login_illustration_place_label),
+                color = AiFinderPalette.Muted,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        Column(
+            Modifier.weight(1f).background(AiFinderPalette.Surface, RoundedCornerShape(18.dp))
+                .padding(14.dp)
+        ) {
+            Icon(Icons.Outlined.Inventory2, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(24.dp))
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(Res.string.login_illustration_place_path),
+                color = AiFinderPalette.Ink,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

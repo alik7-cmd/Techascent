@@ -97,11 +97,11 @@
     <string name="history_empty_message">Your scan-pack purchases will appear here.</string>
     <string name="history_error_title">Couldn't load purchases</string>
     <string name="history_error_message">Check your connection and try again. Your existing scan credits are unchanged.</string>
-    <string name="app_name">Muslim – Namaz &amp; Halal Scanner</string>
+    <string name="app_name">AI Finder: Where Did I Put It?</string>
 
     <string name="welcome_title">Stop searching, Start finding!</string>
     <string name="welcome_description">Remember where everything is, from the smallest drawer to the biggest storage box.</string>
-    <string name="welcome_app_name">Where Did I Put It?</string>
+    <string name="welcome_app_name">AI Finder: Where Did I Put It?</string>
     <string name="welcome_illustration_description">An open drawer with a passport, keys and cables next to a storage box, under a magnifying glass.</string>
     <string name="get_started">Get started</string>
     <string name="welcome_tagline">Your home, searchable.</string>
@@ -130,7 +130,7 @@
     <string name="subscription_billing_notice">Purchases are not available yet. Selecting a pack will not charge you or add credits.</string>
     <string name="subscription_no_subscription">One-time packs. No subscription.</string>
 
-    <string name="home_title">Where Did I Put It?</string>
+    <string name="home_title">AI Finder: Where Did I Put It?</string>
     <string name="home_greeting">Find the things you've saved.</string>
     <string name="home_search_hint">Where is my HDMI cable?</string>
     <string name="home_scan_title">Make your home\nsearchable</string>
@@ -289,9 +289,14 @@
     <string name="login_slide_scan_title">Snap it once</string>
     <string name="login_slide_scan_description">Take a photo of a drawer, shelf or box. AI suggests names for visible items, ready for you to review.</string>
     <string name="login_slide_find_title">Find it in seconds</string>
-    <string name="login_slide_find_description">Search for anything and see exactly which room, shelf or box it's in.</string>
+    <string name="login_slide_find_description">Search by item name or nickname to see its last saved place. Your saved inventory is searchable offline, too.</string>
+    <string name="login_slide_places_title">Every place, easy to find</string>
+    <string name="login_slide_places_description">Organize items by room and storage spot. Print a QR label for a place, then scan it later to jump straight to what's there.</string>
     <string name="login_slide_scan_illustration_description">A photo of a drawer with keys, a cable and headphones tagged by AI</string>
     <string name="login_slide_find_illustration_description">A search for a passport showing it is in the bedroom wardrobe, top drawer</string>
+    <string name="login_slide_places_illustration_description">A QR label for the bedroom wardrobe and its saved items</string>
+    <string name="login_illustration_place_label">Scan a place</string>
+    <string name="login_illustration_place_path">Bedroom · Wardrobe</string>
     <string name="login_slide_position">Slide %1$d of %2$d</string>
     <string name="login_illustration_tag_keys">Keys</string>
     <string name="login_illustration_tag_cable">HDMI cable</string>

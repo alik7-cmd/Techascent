@@ -30,6 +30,7 @@ private enum class OnboardingSlide(val title: StringResource, val description: S
     Welcome(Res.string.welcome_title, Res.string.welcome_description),
     Scan(Res.string.login_slide_scan_title, Res.string.login_slide_scan_description),
     Find(Res.string.login_slide_find_title, Res.string.login_slide_find_description),
+    Places(Res.string.login_slide_places_title, Res.string.login_slide_places_description),
 }
 
 @Composable
@@ -95,6 +96,12 @@ private fun SlideContent(slide: OnboardingSlide, modifier: Modifier = Modifier) 
             OnboardingSlide.Find -> {
                 val description = stringResource(Res.string.login_slide_find_illustration_description)
                 FindIllustration(illustrationModifier.semantics(mergeDescendants = true) {
+                    contentDescription = description
+                })
+            }
+            OnboardingSlide.Places -> {
+                val description = stringResource(Res.string.login_slide_places_illustration_description)
+                PlaceIllustration(illustrationModifier.semantics(mergeDescendants = true) {
                     contentDescription = description
                 })
             }

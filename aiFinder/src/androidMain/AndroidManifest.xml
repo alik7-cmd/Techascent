@@ -7,7 +7,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="AI Finder"
+        android:label="AI Finder: Where Did I Put It?"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"

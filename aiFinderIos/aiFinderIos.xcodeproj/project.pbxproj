@@ -213,7 +213,7 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = aiFinderIos/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Where Did I Put It?";
+				INFOPLIST_KEY_CFBundleDisplayName = "AI Finder: Where Did I Put It?";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -248,7 +248,7 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = aiFinderIos/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Where Did I Put It?";
+				INFOPLIST_KEY_CFBundleDisplayName = "AI Finder: Where Did I Put It?";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
