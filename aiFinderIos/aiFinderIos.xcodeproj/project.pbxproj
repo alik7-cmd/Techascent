@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F50000000000000000000001 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = F50000000000000000000002; };
 		E40000000000000000000001 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = E40000000000000000000002; };
 		D30000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D30000000000000000000002 /* Assets.xcassets */; };
 		C20000000000000000000001 = {isa = PBXBuildFile; fileRef = C20000000000000000000002; };
@@ -33,6 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F50000000000000000000001 /* FirebaseFunctions in Frameworks */,
 				C20000000000000000000003,
 				C20000000000000000000005,
 				C20000000000000000000007,
@@ -91,6 +93,7 @@
 			);
 			name = aiFinderIos;
 			packageProductDependencies = (
+				F50000000000000000000002 /* FirebaseFunctions */,
 				E40000000000000000000002 /* FirebaseStorage */,
 				C20000000000000000000004,
 				C20000000000000000000006,
@@ -314,6 +317,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F50000000000000000000002 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
 		E40000000000000000000002 /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

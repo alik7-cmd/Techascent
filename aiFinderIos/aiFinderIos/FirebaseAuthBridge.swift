@@ -2,6 +2,7 @@ import AiFinder
 import FirebaseAuth
 import FirebaseCore
 import FirebaseDatabase
+import FirebaseFunctions
 import FirebaseStorage
 import GoogleSignIn
 import UIKit
@@ -120,6 +121,22 @@ extension FirebaseAuthBridge {
             guard let payload = try JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any],
                   ["load", "consume", "purchase"].contains(operation) else {
                 throw bridgeError("Invalid wallet operation.")
+            }
+            if operation == "load" {
+                Functions.functions(region: "us-central1").httpsCallable("ensureScanWallet").call { result, error in
+                    if let error { completion(nil, error.localizedDescription); return }
+                    guard Auth.auth().currentUser?.uid == userId else {
+                        completion(nil, "The signed-in user changed. Please try again.")
+                        return
+                    }
+                    do {
+                        guard let value = result?.data as? [String: Any] else {
+                            throw self.bridgeError("Invalid scan balance returned by the server.")
+                        }
+                        completion(try self.jsonText(value), nil)
+                    } catch { completion(nil, error.localizedDescription) }
+                }
+                return
             }
             let scanId = payload["scanId"] as? String ?? ""
             if operation == "consume" && (scanId.isEmpty || scanId.contains(where: { ".#$[]/".contains($0) })) {

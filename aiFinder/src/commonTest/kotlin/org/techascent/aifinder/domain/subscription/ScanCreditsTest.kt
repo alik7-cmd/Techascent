@@ -54,6 +54,30 @@ class ScanCreditsTest {
     }
 
     @Test
+    fun threeWelcomeCreditsAllowThreeAnalysesAndBlockTheFourth() = runTest {
+        var wallet = ScanCreditWallet(3)
+        val access = object : ScanAccessRepository {
+            override suspend fun refresh() = ScanAccess("user", wallet.remainingScans)
+            override suspend fun consume(userId: String, scanId: String): ScanAccess {
+                wallet = wallet.consume(scanId)
+                return ScanAccess(userId, wallet.remainingScans)
+            }
+            override suspend fun recordPurchase(purchase: ScanPurchase) = error("Unused")
+        }
+        val delegate = FakeAnalyzer()
+        val analyzer = MeteredPhotoAnalyzer(delegate, access)
+        repeat(3) { index ->
+            analyzer.analyze(CapturedPhoto("welcome-$index", byteArrayOf()))
+            assertEquals(2L - index, wallet.remainingScans)
+        }
+        assertFailsWith<ScanAccessRequiredException> {
+            analyzer.analyze(CapturedPhoto("fourth", byteArrayOf()))
+        }
+        assertEquals(3, delegate.calls)
+        assertFalse(wallet.activeSubscription)
+    }
+
+    @Test
     fun failedAccessCheckBlocksAiCall() = runTest {
         val analyzer = FakeAnalyzer()
         val access = object : ScanAccessRepository {

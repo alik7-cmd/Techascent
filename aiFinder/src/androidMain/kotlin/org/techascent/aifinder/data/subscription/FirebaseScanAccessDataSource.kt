@@ -6,6 +6,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.MutableData
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.Transaction
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.functions.FirebaseFunctions
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import org.techascent.aifinder.BuildConfig
@@ -19,31 +21,16 @@ import kotlin.coroutines.resumeWithException
 
 class FirebaseScanAccessDataSource(
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance(BuildConfig.FIREBASE_DATABASE_URL),
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val functions: FirebaseFunctions = FirebaseFunctions.getInstance("us-central1"),
 ) : ScanAccessRemoteDataSource {
     override suspend fun load(userId: String): ScanAccess {
-        val ref = database.getReference(RealtimeDatabasePaths.scanWallet(userId))
-        ref.get().await()
-        return suspendCancellableCoroutine { continuation ->
-            ref.runTransaction(object : Transaction.Handler {
-                override fun doTransaction(data: MutableData): Transaction.Result {
-                    val raw = data.child("remainingScans").value
-                    val count = if (raw == null) 0L else validCount(raw) ?: return Transaction.abort()
-                    data.child("remainingScans").value = count
-                    data.child("activeSubscription").value = ScanCreditWallet(count).activeSubscription
-                    return Transaction.success(data)
-                }
-
-                override fun onComplete(error: DatabaseError?, committed: Boolean, snapshot: DataSnapshot?) {
-                    if (!continuation.isActive) return
-                    when {
-                        error != null -> continuation.resumeWithException(error.toException())
-                        !committed || snapshot == null ->
-                            continuation.resumeWithException(IllegalStateException("Could not initialize scan wallet: invalid balance."))
-                        else -> continuation.resumeWith(runCatching { ScanAccess(userId, remaining(snapshot)) })
-                    }
-                }
-            }, false)
-        }
+        check(auth.currentUser?.uid == userId) { "The signed-in user changed. Please try again." }
+        val response = functions.getHttpsCallable("ensureScanWallet").call().await().data as? Map<*, *>
+        val count = response?.get("remainingScans")?.let(::validCount)
+        checkNotNull(count) { "Invalid scan balance returned by the server." }
+        check(auth.currentUser?.uid == userId) { "The signed-in user changed. Please try again." }
+        return ScanAccess(userId, count)
     }
 
     override suspend fun consume(userId: String, scanId: String): ScanAccess {

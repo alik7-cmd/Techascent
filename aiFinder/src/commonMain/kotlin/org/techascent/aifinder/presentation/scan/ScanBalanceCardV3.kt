@@ -80,18 +80,46 @@ internal fun ScanBalanceCardV3(
                         fontWeight = FontWeight.Medium,
                     )
                 }
+                if (!hasBalance) {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            stringResource(Res.string.scan_welcome_offer_title),
+                            color = Color.White,
+                            fontSize = 22.sp,
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            stringResource(Res.string.scan_welcome_offer_description),
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp,
+                            lineHeight = 19.sp,
+                        )
+                    }
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         when {
-                            data.isLoadingBalance -> CircularProgressIndicator(
-                                Modifier.size(24.dp), color = accent, strokeWidth = 2.dp,
-                            )
+                            data.isLoadingBalance -> Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                CircularProgressIndicator(
+                                    Modifier.size(20.dp), color = accent, strokeWidth = 2.dp,
+                                )
+                                Text(
+                                    stringResource(Res.string.scan_balance_checking),
+                                    color = Color.White,
+                                    fontSize = 14.sp,
+                                    lineHeight = 20.sp,
+                                )
+                            }
 
                             !hasBalance -> Text(
-                                stringResource(Res.string.scan_balance_error),
+                                stringResource(Res.string.scan_balance_unconfirmed),
                                 color = Color.White,
                                 fontSize = 14.sp,
                                 lineHeight = 20.sp,

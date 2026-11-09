@@ -306,6 +306,10 @@
     <string name="login_illustration_search_path">Bedroom › Wardrobe › Top drawer</string>
     <string name="login_continue_apple">Continue with Apple</string>
     <string name="login_continue_google">Continue with Google</string>
+    <string name="scan_welcome_offer_title">3 free scans for new accounts</string>
+    <string name="scan_welcome_offer_description">Eligible new accounts receive 3 AI scans once, with no card required. We'll confirm your credits before you scan.</string>
+    <string name="scan_balance_checking">Checking your credits…</string>
+    <string name="scan_balance_unconfirmed">Your credits aren't confirmed yet. Retry to check your balance before scanning.</string>
     <string name="login_terms">By continuing, you agree to our Terms of Service and Privacy Policy.</string>
     <string name="login_error_title">Couldn't sign you in</string>
     <string name="login_error_dismiss">Dismiss error</string>

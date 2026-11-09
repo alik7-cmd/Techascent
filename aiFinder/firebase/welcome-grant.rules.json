@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "aifinder": {
+      "users": {
+        "$uid": {
+          "scanWallet": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid && newData.exists() && newData.child('welcomeGrant').exists() === data.child('welcomeGrant').exists() && newData.child('welcomeGrant/version').val() === data.child('welcomeGrant/version').val() && newData.child('welcomeGrant/scansGranted').val() === data.child('welcomeGrant/scansGranted').val() && newData.child('welcomeGrant/grantedAt').val() === data.child('welcomeGrant/grantedAt').val()",
+            ".validate": "newData.hasChildren(['remainingScans', 'activeSubscription']) && newData.child('remainingScans').isNumber() && newData.child('remainingScans').val() >= 0 && newData.child('remainingScans').val() % 1 === 0 && newData.child('activeSubscription').val() === (newData.child('remainingScans').val() > 0)",
+            "welcomeGrant": {
+              "$field": {
+                ".validate": "($field === 'version' || $field === 'scansGranted' || $field === 'grantedAt') && newData.val() === data.val()"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

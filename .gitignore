@@ -20,3 +20,19 @@ captures
 # Firebase config (local only)
 google-services.json
 GoogleService-Info.plist
+
+# Local environment, credentials and Firebase tooling artifacts
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.p8
+*service-account*.json
+*serviceAccount*.json
+firebase-adminsdk-*.json
+*-firebase-adminsdk-*.json
+.firebase/
+firebase-debug.log*
+database-debug.log*
+ui-debug.log*
