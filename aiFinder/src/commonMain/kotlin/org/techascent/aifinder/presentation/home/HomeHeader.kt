@@ -15,29 +15,37 @@ import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.SectionTitle
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
+import org.techascent.aifinder.presentation.scan.ScanContent
 
 @Composable
-internal fun HomeHeader(onAccount: () -> Unit) {
-    Row(
+internal fun HomeHeader(
+    onAccount: () -> Unit,
+    scanBalance: ScanContent,
+    onRetryBalance: () -> Unit,
+    onGetScans: () -> Unit,
+) {
+    Column(
         modifier = Modifier.padding(bottom = 8.dp),
-        verticalAlignment = Alignment.Top
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SectionTitle(stringResource(Res.string.home_title))
-            Text(
-                stringResource(Res.string.home_greeting),
-                color = AiFinderPalette.Muted,
-                fontSize = 14.sp,
-                lineHeight = 20.sp
-            )
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            HomeCreditChip(scanBalance, onRetryBalance, onGetScans)
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = onAccount) {
+                Icon(
+                    Icons.Outlined.AccountCircle,
+                    contentDescription = stringResource(Res.string.account_open),
+                    tint = AiFinderPalette.Teal,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
         }
-        IconButton(onClick = onAccount) {
-            Icon(
-                Icons.Outlined.AccountCircle,
-                contentDescription = stringResource(Res.string.account_open),
-                tint = AiFinderPalette.Teal,
-                modifier = Modifier.size(30.dp)
-            )
-        }
+        SectionTitle(stringResource(Res.string.home_title))
+        Text(
+            stringResource(Res.string.home_greeting),
+            color = AiFinderPalette.Muted,
+            fontSize = 14.sp,
+            lineHeight = 20.sp
+        )
     }
 }

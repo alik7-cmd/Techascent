@@ -45,9 +45,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.ErrorCard
 import org.techascent.aifinder.presentation.components.EmptyListCard
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
-import org.techascent.aifinder.presentation.scan.ScanBalanceCardV3
 import org.techascent.aifinder.presentation.scan.ScanContent
-import org.techascent.aifinder.presentation.scan.CreditCardComparison
 import org.techascent.aifinder.config.AppConfig
 import org.techascent.aifinder.config.HomeLayout
 
@@ -82,7 +80,9 @@ fun HomeScreen(
             contentPadding = PaddingValues(horizontal = 24.dp, vertical = 28.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item(key = "header") { HomeHeader(onAccount) }
+            item(key = "header") {
+                HomeHeader(onAccount, scanBalance, onRetryBalance, onGetScans)
+            }
             item(key = "search") { HomeSearch(onSearch) }
             if (dashboard) {
                 when (val state = uiState) {
@@ -181,10 +181,6 @@ fun HomeScreen(
                         }
                     }
                 }
-            }
-            item(key = "credits") { ScanBalanceCardV3(scanBalance, onRetryBalance, onGetScans) }
-            if (AppConfig.SHOW_COMPARISON) {
-                item(key = "credit-design-comparison") { CreditCardComparison() }
             }
         }
     }

@@ -24,7 +24,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @Composable
-internal fun ScanBalanceCardV3(
+internal fun ScanCreditDetails(
     data: ScanContent,
     onRetry: () -> Unit,
     onGetScans: () -> Unit,
@@ -34,7 +34,7 @@ internal fun ScanBalanceCardV3(
     val hasBalance = !data.isLoadingBalance && !data.balanceError && data.access != null
     Surface(
         modifier = modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(28.dp),
         color = AiFinderPalette.Teal,
     ) {
         Box(
@@ -60,8 +60,8 @@ internal fun ScanBalanceCardV3(
                 )
             }
             Column(
-                Modifier.fillMaxWidth().padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                Modifier.fillMaxWidth().padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -73,27 +73,18 @@ internal fun ScanBalanceCardV3(
                         tint = accent,
                         modifier = Modifier.size(18.dp)
                     )
-                    Text(
-                        stringResource(Res.string.scan_balance_title),
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                    )
-                }
-                if (!hasBalance) {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Column(Modifier.weight(1f)) {
                         Text(
-                            stringResource(Res.string.scan_welcome_offer_title),
+                            stringResource(Res.string.credits_card_brand),
                             color = Color.White,
-                            fontSize = 22.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.4.sp,
                         )
                         Text(
-                            stringResource(Res.string.scan_welcome_offer_description),
+                            stringResource(Res.string.scan_balance_title),
                             color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 13.sp,
-                            lineHeight = 19.sp,
+                            fontSize = 12.sp,
                         )
                     }
                 }
@@ -117,7 +108,6 @@ internal fun ScanBalanceCardV3(
                                     lineHeight = 20.sp,
                                 )
                             }
-
                             !hasBalance -> Text(
                                 stringResource(Res.string.scan_balance_unconfirmed),
                                 color = Color.White,
@@ -125,23 +115,38 @@ internal fun ScanBalanceCardV3(
                                 lineHeight = 20.sp,
                             )
 
-                            else -> Text(
-                                text = data.access.remainingScans.generateText(),
-                                color = Color.White,
-                                fontSize = 24.sp,
-                                lineHeight = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
+                            else -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = data.access.remainingScans.toString(),
+                                    color = Color.White,
+                                    fontSize = 48.sp,
+                                    lineHeight = 54.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                                Text(
+                                    stringResource(Res.string.credits_card_available),
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    fontSize = 13.sp,
+                                )
+                            }
                         }
                         if (hasBalance && !data.access.canScan) {
                             Text(
-                                stringResource(Res.string.credit_preview_add_credits),
+                                stringResource(Res.string.scan_credit_add),
                                 color = Color.White.copy(alpha = 0.8f),
                                 fontSize = 12.sp,
                                 lineHeight = 18.sp,
                             )
                         }
                     }
+                }
+                Text(
+                    stringResource(Res.string.scan_credit_notice),
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 13.sp,
+                    lineHeight = 19.sp,
+                )
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     when {
                         data.isPreparingPurchase -> Box(
                             Modifier.size(48.dp), contentAlignment = Alignment.Center,
@@ -158,17 +163,18 @@ internal fun ScanBalanceCardV3(
                             colors = ButtonDefaults.textButtonColors(contentColor = accent),
                         ) { Text(stringResource(Res.string.scan_balance_retry)) }
 
-                        hasBalance -> TextButton(
+                        hasBalance -> Button(
                             onClick = onGetScans,
                             enabled = !data.isAnalyzing,
-                            colors = ButtonDefaults.textButtonColors(
-                                containerColor = Color.White.copy(alpha = 0.12f),
-                                contentColor = accent,
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = accent,
+                                contentColor = AiFinderPalette.Teal,
                                 disabledContentColor = Color.White.copy(alpha = 0.5f),
                             ),
                         ) {
                             Text(
-                                stringResource(Res.string.scan_balance_get_more_compact),
+                                stringResource(Res.string.scan_get_scans),
                                 fontWeight = FontWeight.SemiBold,
                             )
                         }
@@ -184,14 +190,5 @@ internal fun ScanBalanceCardV3(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun Long.generateText(): String {
-    val remainingScan = checkNotNull(this)
-    return when (remainingScan > 0) {
-        true -> stringResource(Res.string.subscription_scans_remaining, remainingScan)
-        false -> stringResource(Res.string.subscription_no_scan_left)
     }
 }

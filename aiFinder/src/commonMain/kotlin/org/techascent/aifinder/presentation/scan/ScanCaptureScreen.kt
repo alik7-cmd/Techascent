@@ -66,6 +66,16 @@ fun ScanCaptureScreen(
                         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
                         Text(stringResource(Res.string.scan_retake), color = AiFinderPalette.Teal)
                     }
+                    Text(
+                        stringResource(when {
+                            data.isLoadingBalance -> Res.string.scan_balance_checking
+                            data.balanceError || data.access == null -> Res.string.scan_credit_unconfirmed
+                            !data.access.canScan -> Res.string.scan_credit_empty
+                            else -> Res.string.scan_credit_cost_balance
+                        }, data.access?.remainingScans ?: 0L),
+                        color = AiFinderPalette.Muted,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
                 }
                 PrimaryAction(
                     stringResource(if (data.previewPhoto == null) Res.string.scan_take_photo else Res.string.scan_analyze),
