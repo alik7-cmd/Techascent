@@ -16,6 +16,8 @@ import org.techascent.aifinder.presentation.details.*
 import org.techascent.aifinder.presentation.home.*
 import org.techascent.aifinder.presentation.location.*
 import org.techascent.aifinder.presentation.login.*
+import org.techascent.aifinder.presentation.legal.LegalDocument
+import org.techascent.aifinder.presentation.legal.LegalScreen
 import org.techascent.aifinder.presentation.review.*
 import org.techascent.aifinder.presentation.scan.*
 import org.techascent.aifinder.presentation.search.*
@@ -238,7 +240,20 @@ fun AiFinderNavigation() {
             )
         }
         composable(AiFinderScreen.Login.route) {
-            LoginScreen(viewModel = login, onSignedIn = { replaceRoot(AiFinderScreen.Home) })
+            LoginScreen(
+                viewModel = login,
+                onSignedIn = { replaceRoot(AiFinderScreen.Home) },
+                onTerms = { navController.navigate(AiFinderScreen.Terms.route) { launchSingleTop = true } },
+                onPrivacyPolicy = {
+                    navController.navigate(AiFinderScreen.PrivacyPolicy.route) { launchSingleTop = true }
+                },
+            )
+        }
+        composable(AiFinderScreen.Terms.route) {
+            LegalScreen(LegalDocument.Terms, onBack)
+        }
+        composable(AiFinderScreen.PrivacyPolicy.route) {
+            LegalScreen(LegalDocument.PrivacyPolicy, onBack)
         }
         composable(AiFinderScreen.Home.route) {
             HomeScreen(

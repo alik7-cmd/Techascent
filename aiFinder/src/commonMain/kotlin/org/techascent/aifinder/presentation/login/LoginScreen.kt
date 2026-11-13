@@ -2,7 +2,6 @@ package org.techascent.aifinder.presentation.login
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,11 +10,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,7 +26,6 @@ import apphub.aifinder.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.domain.auth.AuthProvider
-import org.techascent.aifinder.presentation.components.SectionTitle
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 import org.techascent.aifinder.util.Platform
 import org.techascent.aifinder.util.getPlatform
@@ -32,6 +34,8 @@ import org.techascent.aifinder.util.getPlatform
 fun LoginScreen(
     viewModel: LoginViewModel,
     onSignedIn: () -> Unit,
+    onTerms: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(state) {
@@ -40,7 +44,13 @@ fun LoginScreen(
             onSignedIn()
         }
     }
-    LoginContent(state, onSignIn = viewModel::onSignIn, onDismissError = viewModel::dismissError)
+    LoginContent(
+        state,
+        onSignIn = viewModel::onSignIn,
+        onDismissError = viewModel::dismissError,
+        onTerms = onTerms,
+        onPrivacyPolicy = onPrivacyPolicy,
+    )
 }
 
 @Composable
@@ -48,6 +58,8 @@ private fun LoginContent(
     state: LoginUiState,
     onSignIn: (AuthProvider) -> Unit,
     onDismissError: () -> Unit,
+    onTerms: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
 ) {
     val platform = remember { getPlatform() }
     var selectedProvider by remember { mutableStateOf<AuthProvider?>(null) }
@@ -113,7 +125,23 @@ private fun LoginContent(
                         onClick = { onProviderSelected(AuthProvider.Google) }
                     )
                     Text(
-                        stringResource(Res.string.login_terms),
+                        buildAnnotatedString {
+                            append(stringResource(Res.string.login_legal_prefix))
+                            val styles = TextLinkStyles(
+                                style = SpanStyle(
+                                    color = AiFinderPalette.Teal,
+                                    textDecoration = TextDecoration.Underline,
+                                )
+                            )
+                            withLink(LinkAnnotation.Clickable("terms", styles) { onTerms() }) {
+                                append(stringResource(Res.string.legal_terms_title))
+                            }
+                            append(stringResource(Res.string.login_legal_between))
+                            withLink(LinkAnnotation.Clickable("privacy", styles) { onPrivacyPolicy() }) {
+                                append(stringResource(Res.string.legal_privacy_title))
+                            }
+                            append(stringResource(Res.string.login_legal_suffix))
+                        },
                         color = AiFinderPalette.Muted,
                         fontSize = 12.sp,
                         lineHeight = 18.sp,

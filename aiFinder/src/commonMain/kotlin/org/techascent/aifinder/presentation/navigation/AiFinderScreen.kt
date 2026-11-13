@@ -5,6 +5,8 @@ import io.ktor.http.encodeURLPathPart
 sealed class AiFinderScreen(val route: String) {
     data object Welcome : AiFinderScreen("welcome")
     data object Login : AiFinderScreen("login")
+    data object Terms : AiFinderScreen("terms")
+    data object PrivacyPolicy : AiFinderScreen("privacyPolicy")
     data object Home : AiFinderScreen("home")
     data object Spaces : AiFinderScreen("spaces")
     data object Space : AiFinderScreen("space/{spaceId}") {
