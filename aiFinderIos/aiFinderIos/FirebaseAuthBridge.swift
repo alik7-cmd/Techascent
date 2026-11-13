@@ -9,6 +9,23 @@ import UIKit
 import CoreImage.CIFilterBuiltins
 
 extension FirebaseAuthBridge {
+    func deleteProfile(userId: String, completion: @escaping (String?) -> Void) {
+        guard Auth.auth().currentUser?.uid == userId else {
+            completion("The signed-in account changed.")
+            return
+        }
+        let callable = Functions.functions(region: "us-central1").httpsCallable("deleteProfile")
+        callable.timeoutInterval = 540
+        callable.call { result, error in
+            if let error { completion(error.localizedDescription); return }
+            guard let response = result?.data as? [String: Any], response["deleted"] as? Bool == true else {
+                completion("The server did not confirm account deletion.")
+                return
+            }
+            completion(nil)
+        }
+    }
+
     private func reference(_ path: String) throws -> DatabaseReference {
         try authorize(path)
         guard let url = FirebaseApp.app()?.options.databaseURL, !url.isEmpty else {
@@ -285,13 +302,29 @@ final class FirebaseAuthBridge: NSObject, IosAuthBridge, IosPurchaseHistoryBridg
         }
     }
 
+    func clearSharedFiles(completion: @escaping (String?) -> Void) {
+        do {
+            let manager = FileManager.default
+            let directory = manager.temporaryDirectory.appendingPathComponent("aifinder-exports", isDirectory: true)
+            if manager.fileExists(atPath: directory.path) { try manager.removeItem(at: directory) }
+            // Remove the exact legacy filenames previously used outside the export directory.
+            for name in ["inventory.csv", "inventory.pdf", "place-label.png"] {
+                let url = manager.temporaryDirectory.appendingPathComponent(name)
+                if manager.fileExists(atPath: url.path) { try manager.removeItem(at: url) }
+            }
+            completion(nil)
+        } catch { completion(error.localizedDescription) }
+    }
+
     func share(name: String, base64: String, mimeType: String, completion: @escaping (String?) -> Void) {
         guard name.range(of: "^[A-Za-z0-9._-]+$", options: .regularExpression) != nil,
               let data = Data(base64Encoded: base64), let presenter = Self.presentingViewController() else {
             completion("Couldn't prepare the export."); return
         }
         do {
-            let url = FileManager.default.temporaryDirectory.appendingPathComponent(name)
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent("aifinder-exports", isDirectory: true)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            let url = directory.appendingPathComponent(name)
             try data.write(to: url, options: .atomic)
             let controller = UIActivityViewController(activityItems: [url], applicationActivities: nil)
             controller.popoverPresentationController?.sourceView = presenter.view

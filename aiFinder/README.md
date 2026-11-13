@@ -99,6 +99,30 @@ All back-enabled screens use the shared `ScreenTopBar`: a fixed back chevron and
 `AiFinderNavigation` uses Navigation Compose's multiplatform `NavHost`, with all routes defined in the sealed `AiFinderScreen` class. Space and item details receive encoded IDs as navigation arguments. Back returns to the actual originating screen, including when opening Scan from a space. Welcome completion, sign-in and sign-out replace the back stack, preventing Back from reopening authentication screens or a signed-out session. Saving a review returns to Home and removes the scan/review flow from the stack. Shared ViewModels retain the scan-to-review handoff and existing logout cleanup.
 
 ## Account settings
+### Delete profile
+Account includes a destructive Delete profile bottom sheet with a permanent-loss
+warning, explicit acknowledgement, non-dismissible progress, and retryable
+failure feedback. The sheet has a bold heading that scrolls with the warnings, an in-button deletion
+spinner, and inline errors above the actions; a failed request keeps the same
+sheet and acknowledgement open for an explicit retry. Both Android and iOS call the authenticated `deleteProfile`
+function in `us-central1`; deploy it before releasing this UI (see
+`firebase/DEPLOYMENT.md`). It requires a sign-in within the last 15 minutes.
+
+The backend removes the RevenueCat subscriber, all live/noncurrent objects under
+the user's Storage prefix (including orphaned images), the user's entire database
+node and feedback, then Firebase Auth last. Failed steps are surfaced, not
+silently skipped; retries can finish partially completed deletion. Local
+inventory, wallet, photo caches, and app-owned temporary exports are cleared.
+Successful deletion uses the existing signed-out navigation cleanup and returns
+to Login. Deleting the Firebase Auth user affects every app sharing that Firebase
+Auth account.
+
+The warning distinguishes loss of app credits/purchase access from cancellation
+of a store-billed subscription or refunds. Store records, provider retention,
+exports shared outside the app, and other devices' cached files are not erased.
+No live deployment or destructive test against a real account is performed by
+implementing this feature.
+
 ### Legal documents
 Login's Terms of Service and Privacy Policy links open separate, scrollable in-app
 documents without requiring sign-in. Both use the shared legal screen, selectable
@@ -106,8 +130,8 @@ text, and localized string resources; Back returns to Login. The documents expla
 AI photo processing, inventory storage, scan credits, purchases, exports, retention,
 and privacy requests, with `bdtechascent@gmail.com` as the contact. Update the
 effective date and both documents when these practices change. These screens do
-not implement account deletion or replace the public privacy-policy and
-account-deletion URLs required for store submission. Have the operator review the
+not replace the public privacy-policy and account-deletion URLs required for store
+submission. Have the operator review the
 legal text and actual provider/retention settings before publishing.
 
 Account's Purchase history row opens a read-only list of the signed-in user's Firebase `aifinder/users/{uid}/purchases` records, newest first. It shows the scan pack, local purchase date and crediting status, with shimmer loading, empty and retry states. Android reads Firebase directly; iOS uses the native Firebase bridge. This list reflects recorded scan-pack purchases, not a recurring subscription or a full store billing/refund ledger; prices are not invented. Firebase rules must allow the owner to read their purchases. Home retains its Get more purchase flow.

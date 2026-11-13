@@ -5,3 +5,4 @@ expect suspend fun generateQrPng(value: String, label: String = ""): ByteArray
 expect suspend fun decodeQrPhoto(jpeg: ByteArray): String?
 expect suspend fun shareFile(name: String, data: ByteArray, mimeType: String)
 expect suspend fun createInventoryPdf(lines: List<String>): ByteArray
+expect suspend fun clearSharedFiles()

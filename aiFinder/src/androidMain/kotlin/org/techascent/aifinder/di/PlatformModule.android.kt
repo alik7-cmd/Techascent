@@ -21,6 +21,9 @@ import org.techascent.aifinder.data.subscription.ScanAccessRemoteDataSource
 import org.techascent.aifinder.data.subscription.FirebaseScanAccessDataSource
 
 actual val platformModule = module {
+    single<org.techascent.aifinder.domain.auth.usecase.ProfileDeletionRemote> {
+        org.techascent.aifinder.data.auth.FirebaseProfileDeletion()
+    }
     single<ScanAccessRemoteDataSource> { FirebaseScanAccessDataSource() }
     single<GoogleAuthDataSource> { FirebaseGoogleAuthDataSource() }
     single<SignInRemoteDataSource> { FirebaseSignInDataSource() }

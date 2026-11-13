@@ -21,6 +21,9 @@ import org.techascent.aifinder.data.subscription.UnavailableScanAccessDataSource
 import org.techascent.aifinder.data.firebase.*
 
 actual val platformModule = module {
+    single<org.techascent.aifinder.domain.auth.usecase.ProfileDeletionRemote> {
+        org.techascent.aifinder.data.auth.IosProfileDeletion()
+    }
     single<ScanAccessRemoteDataSource> { IosScanAccessDataSource() }
     single<GoogleAuthDataSource> { IosGoogleAuthDataSource(IosAuthBridgeRegistry.requireBridge()) }
     single<SignInRemoteDataSource> { IosSignInDataSource(IosAuthBridgeRegistry.requireBridge()) }

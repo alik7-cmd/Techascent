@@ -8,6 +8,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 interface IosDeviceFilesBridge {
+    fun clearSharedFiles(completion: (String?) -> Unit)
     fun inventoryPdf(lines: List<String>, completion: (String?, String?) -> Unit)
     fun generateQr(value: String, label: String, completion: (String?, String?) -> Unit)
     fun decodeQr(base64: String, completion: (String?, String?) -> Unit)
@@ -30,6 +31,10 @@ actual suspend fun decodeQrPhoto(jpeg: ByteArray): String? = deviceCall {
 
 actual suspend fun shareFile(name: String, data: ByteArray, mimeType: String) {
     deviceCall { bridge, done -> bridge.share(name, Base64.encode(data), mimeType) { done("", it) } }
+}
+
+actual suspend fun clearSharedFiles() {
+    deviceCall { bridge, done -> bridge.clearSharedFiles { done("", it) } }
 }
 
 actual suspend fun createInventoryPdf(lines: List<String>): ByteArray = Base64.decode(deviceCall {

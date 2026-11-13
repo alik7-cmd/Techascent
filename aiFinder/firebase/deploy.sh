@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
     printf 'Usage: %s FIREBASE_PROJECT_ID\n' "$0"
-    printf 'Deploys ensureScanWallet only. Database rules must be merged separately.\n'
+    printf 'Deploys ensureScanWallet and deleteProfile. Database rules must be merged separately.\n'
 }
 
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
@@ -41,7 +41,7 @@ fi
 env_file=".env.$project_id"
 if [[ ! -f "$env_file" ]]; then
     printf 'Missing %s/functions/%s\n' "$script_dir" "$env_file" >&2
-    printf 'Create that file with AIFINDER_DATABASE_URL and WELCOME_SCANS_START_AT.\n' >&2
+    printf 'Create that file with AIFINDER_DATABASE_URL, WELCOME_SCANS_START_AT and AIFINDER_STORAGE_BUCKET.\n' >&2
     printf 'See %s/DEPLOYMENT.md for instructions.\n' "$script_dir" >&2
     exit 1
 fi
@@ -73,9 +73,14 @@ if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(cutoff) ||
 }
 console.log(`Database: ${url.href}`);
 console.log(`Eligible accounts created from: ${cutoff}`);
+if (!/^(?:gs:\/\/)?[a-z0-9][a-z0-9._-]+(?:\/)?$/.test(config.AIFINDER_STORAGE_BUCKET ?? "")) {
+    console.error("Set AIFINDER_STORAGE_BUCKET to the same bucket used by the app (gs:// prefix optional).");
+    process.exit(1);
+}
+console.log(`Photo bucket: ${config.AIFINDER_STORAGE_BUCKET}`);
 NODE
 
-printf '\nDeploying ensureScanWallet to project %s in us-central1.\n' "$project_id"
+printf '\nDeploying ensureScanWallet and deleteProfile to project %s in us-central1.\n' "$project_id"
 printf 'Database rules will NOT be deployed by this script.\n\n'
 npm ci --no-audit --no-fund
 npm test
@@ -83,6 +88,6 @@ npx --no-install firebase login
 npx --no-install firebase deploy \
     --project "$project_id" \
     --config "$script_dir/firebase.json" \
-    --only functions:aifinder-welcome:ensureScanWallet
+    --only functions:aifinder-welcome:ensureScanWallet,functions:aifinder-welcome:deleteProfile
 
 printf '\nFunction deployed. Merge/publish welcome-grant.rules.json separately, then retry the balance in the app.\n'

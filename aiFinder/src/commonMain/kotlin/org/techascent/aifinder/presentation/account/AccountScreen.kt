@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -63,6 +64,14 @@ fun AccountScreen(
         }
     }
     val success = state as? AccountUiState.Success ?: return
+    if (success.showDeleteConfirmation) {
+        DeleteProfileSheet(
+            busy = success.isDeleting,
+            failed = success.deletionFailed,
+            onConfirm = viewModel::confirmDeletion,
+            onDismiss = viewModel::dismissDeletion,
+        )
+    }
     if (success.showLogoutConfirmation) {
         NativeConfirmDialog(
             title = stringResource(Res.string.account_logout_title),
@@ -110,6 +119,15 @@ fun AccountScreen(
                     showChevron = false,
                     isLoading = success.isSigningOut,
                     onClick = viewModel::requestLogout,
+                )
+                CellDivider()
+                SettingsCell(
+                    icon = Icons.Outlined.DeleteForever,
+                    title = stringResource(Res.string.account_delete_profile),
+                    contentColor = LogoutRed,
+                    iconBackground = LogoutRed.copy(alpha = 0.1f),
+                    isLoading = success.isDeleting,
+                    onClick = viewModel::requestDeletion,
                 )
             }
         }

@@ -93,6 +93,17 @@ val aiFinderModule = module {
     factory {
         val database = get<AiFinderDatabase>()
         val photos = get<ItemPhotoRepositoryImpl>()
+        org.techascent.aifinder.domain.auth.usecase.DeleteProfileUseCase(get(), get()) { userId ->
+            photos.clearCache(userId)
+            database.itemDao().deleteForUser(userId)
+            database.locationDao().deleteForUser(userId)
+            database.scanWalletDao().deleteForUser(userId)
+            org.techascent.aifinder.util.clearSharedFiles()
+        }
+    }
+    factory {
+        val database = get<AiFinderDatabase>()
+        val photos = get<ItemPhotoRepositoryImpl>()
         SignOutUseCase(get()) { userId ->
             photos.clearCache(userId)
             database.itemDao().deleteForUser(userId)
@@ -114,7 +125,7 @@ val aiFinderModule = module {
     factory { ResolveWelcomeDestinationUseCase(auth = get(), welcome = get()) }
     viewModel { WelcomeViewModel(resolveDestination = get()) }
     viewModel { LoginViewModel(signIn = get(), getCurrentUser = get(), scanAccess = get(), purchases = get()) }
-    viewModel { AccountViewModel(getCurrentUser = get(), signOut = get(), purchases = get()) }
+    viewModel { AccountViewModel(getCurrentUser = get(), signOut = get(), purchases = get(), deleteProfile = get()) }
     viewModel { HomeViewModel(observeInventory = get()) }
     viewModel { ScanViewModel(analyzer = get(), access = get()) }
     viewModel { ReviewViewModel(saveDetections = get(), observeInventory = get()) }

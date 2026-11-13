@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.core.content.FileProvider
+import androidx.core.graphics.createBitmap
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.QRCodeWriter
@@ -12,7 +13,12 @@ import kotlinx.coroutines.withContext
 import org.techascent.aifinder.data.auth.CurrentActivityHolder
 import java.io.ByteArrayOutputStream
 import java.io.File
-import androidx.core.graphics.createBitmap
+import org.techascent.aifinder.data.cache.AppContextHolder
+
+actual suspend fun clearSharedFiles(): Unit = withContext(Dispatchers.IO) {
+    val directory = File(AppContextHolder.context.cacheDir, "exports")
+    check(!directory.exists() || directory.deleteRecursively()) { "Couldn't clear temporary exports." }
+}
 
 actual suspend fun generateQrPng(value: String, label: String): ByteArray = withContext(Dispatchers.Default) {
     val matrix = QRCodeWriter().encode(value, BarcodeFormat.QR_CODE, 768, 768,

@@ -9,6 +9,7 @@ import kotlin.coroutines.resumeWithException
 
 /** Native SDK bridge; paths are scoped and authorized again by the Swift host. */
 interface IosFirebaseBridge {
+    fun deleteProfile(userId: String, completion: (String?) -> Unit)
     fun read(path: String, completion: (String?, String?) -> Unit)
     fun write(path: String, json: String, completion: (String?) -> Unit)
     fun update(path: String, json: String, completion: (String?) -> Unit)

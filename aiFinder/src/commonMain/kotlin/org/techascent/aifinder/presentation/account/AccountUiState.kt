@@ -18,6 +18,9 @@ sealed interface AccountUiState {
         val showLogoutConfirmation: Boolean = false,
         val isSigningOut: Boolean = false,
         val logoutFailed: Boolean = false,
+        val showDeleteConfirmation: Boolean = false,
+        val isDeleting: Boolean = false,
+        val deletionFailed: Boolean = false,
     ) : AccountUiState
 }
 
