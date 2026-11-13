@@ -5,6 +5,7 @@ android-minSdk = "24"
 android-targetSdk = "36"
 androidx-activityCompose = "1.9.0"
 compose-plugin = "1.9.3"
+core = "3.5.3"
 koinCore = "4.1.1"
 kotlin = "2.3.20"
 kotlinxCoroutinesCore = "1.10.2"
@@ -41,6 +42,8 @@ ksp = "2.3.13"
 robolectric = "4.14.1"
 
 [libraries]
+core = { module = "com.google.zxing:core", version.ref = "core" }
+firebase-functions = { module = "com.google.firebase:firebase-functions" }
 revenuecat-purchases-core = { module = "com.revenuecat.purchases:purchases-kmp-core", version.ref = "revenuecatKmp" }
 revenuecat-purchases-ui = { module = "com.revenuecat.purchases:purchases-kmp-ui", version.ref = "revenuecatKmp" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }

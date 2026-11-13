@@ -13,6 +13,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+val isDebug = System.getenv("CONFIGURATION")?.equals("Debug", ignoreCase = true) == true ||
+        gradle.startParameter.taskNames.any {
+            it.contains("debug", ignoreCase = true) || it.contains("dev", ignoreCase = true)
+        }
+
 // Vertex AI settings come from the git-ignored local.properties so the key is never committed.
 val localProperties = Properties().apply {
     rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
@@ -25,8 +30,8 @@ val firebaseDatabaseUrl = localProperties.getProperty("FIREBASE_DATABASE_URL")?.
 // Firebase Storage bucket for scan photos, e.g. gs://<project>.firebasestorage.app.
 val firebaseStorageBucket = localProperties.getProperty("FIREBASE_STORAGE_BUCKET")?.trim().orEmpty()
 // RevenueCat public SDK keys (Test Store / sandbox keys work too). Blank keys disable purchases.
-val revenueCatAndroidApiKey = localProperties.getProperty("REVENUECAT_ANDROID_API_KEY")?.trim().orEmpty()
-val revenueCatIosApiKey = localProperties.getProperty("REVENUECAT_IOS_API_KEY")?.trim().orEmpty()
+val revenueCatAndroidApiKey = if(isDebug)localProperties.getProperty("REVENUECAT_TEST_KEY")?.trim().orEmpty() else localProperties.getProperty("REVENUECAT_ANDROID_API_KEY")?.trim().orEmpty()
+val revenueCatIosApiKey = if(isDebug)localProperties.getProperty("REVENUECAT_TEST_KEY")?.trim().orEmpty() else localProperties.getProperty("REVENUECAT_IOS_API_KEY")?.trim().orEmpty()
 val vertexConfigDir = layout.buildDirectory.dir("generated/vertexConfig/commonMain/kotlin")
 
 val generateVertexConfig by tasks.registering {
@@ -69,7 +74,6 @@ val generateVertexConfig by tasks.registering {
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -126,7 +130,7 @@ kotlin {
         }
 
         androidMain.dependencies {
-            implementation("com.google.zxing:core:3.5.3")
+            implementation(libs.core)
             implementation(libs.androidx.activity.compose)
             implementation(libs.bundles.camera)
             implementation(libs.ktor.client.okhttp)
@@ -134,7 +138,7 @@ kotlin {
             implementation(libs.firebase.auth)
             implementation(libs.firebase.database)
             implementation(libs.firebase.storage)
-            implementation("com.google.firebase:firebase-functions")
+            implementation(libs.firebase.functions)
             implementation(libs.androidx.credentials)
             implementation(libs.androidx.credentials.play.services.auth)
             implementation(libs.googleid)

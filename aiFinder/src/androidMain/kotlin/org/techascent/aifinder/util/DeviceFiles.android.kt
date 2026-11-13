@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import org.techascent.aifinder.data.auth.CurrentActivityHolder
 import java.io.ByteArrayOutputStream
 import java.io.File
+import androidx.core.graphics.createBitmap
 
 actual suspend fun generateQrPng(value: String, label: String): ByteArray = withContext(Dispatchers.Default) {
     val matrix = QRCodeWriter().encode(value, BarcodeFormat.QR_CODE, 768, 768,
@@ -19,7 +20,7 @@ actual suspend fun generateQrPng(value: String, label: String): ByteArray = with
     val pixels = IntArray(matrix.width * matrix.height) { index ->
         if (matrix[index % matrix.width, index / matrix.width]) 0xFF193437.toInt() else 0xFFFFFFFF.toInt()
     }
-    val bitmap = Bitmap.createBitmap(matrix.width, matrix.height + if (label.isBlank()) 0 else 176, Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(matrix.width, matrix.height + if (label.isBlank()) 0 else 176)
     try {
         val canvas = android.graphics.Canvas(bitmap)
         canvas.drawColor(android.graphics.Color.WHITE)
