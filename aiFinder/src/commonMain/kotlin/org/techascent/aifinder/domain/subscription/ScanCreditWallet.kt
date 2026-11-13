@@ -2,8 +2,8 @@ package org.techascent.aifinder.domain.subscription
 
 /** Consumable store products and how many scans each one grants. */
 enum class ScanPack(val productId: String, val scans: Long) {
-    Small("scan_pack_3", 3),
-    Large("scan_pack_5", 5);
+    Small("scan_pack_3", 50),
+    Large("scan_pack_5", 200);
 
     companion object {
         /** Matches plain ids and Play-style `productId:basePlan` ids. */

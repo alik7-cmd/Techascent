@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
@@ -30,7 +29,7 @@ val firebaseDatabaseUrl = localProperties.getProperty("FIREBASE_DATABASE_URL")?.
 // Firebase Storage bucket for scan photos, e.g. gs://<project>.firebasestorage.app.
 val firebaseStorageBucket = localProperties.getProperty("FIREBASE_STORAGE_BUCKET")?.trim().orEmpty()
 // RevenueCat public SDK keys (Test Store / sandbox keys work too). Blank keys disable purchases.
-val revenueCatAndroidApiKey = if(isDebug)localProperties.getProperty("REVENUECAT_TEST_KEY")?.trim().orEmpty() else localProperties.getProperty("REVENUECAT_ANDROID_API_KEY")?.trim().orEmpty()
+val revenueCatAndroidApiKey = if(!isDebug)localProperties.getProperty("REVENUECAT_TEST_KEY")?.trim().orEmpty() else localProperties.getProperty("REVENUECAT_ANDROID_API_KEY")?.trim().orEmpty()
 val revenueCatIosApiKey = if(isDebug)localProperties.getProperty("REVENUECAT_TEST_KEY")?.trim().orEmpty() else localProperties.getProperty("REVENUECAT_IOS_API_KEY")?.trim().orEmpty()
 val vertexConfigDir = layout.buildDirectory.dir("generated/vertexConfig/commonMain/kotlin")
 
@@ -177,8 +176,8 @@ android {
         applicationId = "org.techascent.aifinder"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 3
-        versionName = "1.3"
+        versionCode = 4
+        versionName = "1.4"
         buildConfigField("String", "FIREBASE_DATABASE_URL", "\"$firebaseDatabaseUrl\"")
         buildConfigField("String", "FIREBASE_STORAGE_BUCKET", "\"$firebaseStorageBucket\"")
     }
