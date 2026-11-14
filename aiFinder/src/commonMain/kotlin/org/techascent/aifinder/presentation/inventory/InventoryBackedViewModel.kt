@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import apphub.aifinder.generated.resources.Res
+import apphub.aifinder.generated.resources.inventory_load_error
+import org.jetbrains.compose.resources.getString
 import org.techascent.aifinder.domain.inventory.InventorySnapshot
 import org.techascent.aifinder.domain.inventory.usecase.ObserveInventoryUseCase
 
@@ -30,7 +33,9 @@ abstract class InventoryBackedViewModel(
         if (_inventory.value is InventoryLoad.Failed) _inventory.value = InventoryLoad.Loading
         job = viewModelScope.launch {
             observeInventory()
-                .catch { e -> _inventory.value = InventoryLoad.Failed(e.message ?: "Couldn't load your items.") }
+                .catch { e ->
+                    _inventory.value = InventoryLoad.Failed(e.message ?: getString(Res.string.inventory_load_error))
+                }
                 .collect { _inventory.value = InventoryLoad.Ready(it) }
         }
     }

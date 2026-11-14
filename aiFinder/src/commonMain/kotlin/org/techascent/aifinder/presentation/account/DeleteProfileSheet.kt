@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.account
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
@@ -49,13 +51,13 @@ internal fun DeleteProfileSheet(
         ) {
             Column(
                 Modifier.weight(1f).verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                    .padding(horizontal = AiFinderSpacing.dp24, vertical = AiFinderSpacing.dp12),
+                verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16),
             ) {
                 Text(
                     stringResource(Res.string.account_delete_title),
                     modifier = Modifier.fillMaxWidth()
-                        .padding(vertical = 12.dp)
+                        .padding(vertical = AiFinderSpacing.dp12)
                         .semantics { heading() },
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
@@ -76,21 +78,21 @@ internal fun DeleteProfileSheet(
                     Checkbox(checked = acknowledged, onCheckedChange = null, enabled = !busy)
                     Text(
                         stringResource(Res.string.account_delete_acknowledge),
-                        modifier = Modifier.padding(start = 12.dp).weight(1f),
+                        modifier = Modifier.padding(start = AiFinderSpacing.dp12).weight(1f),
                     )
                 }
             }
             HorizontalDivider(color = AiFinderPalette.Border)
             Column(
-                Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                Modifier.fillMaxWidth().padding(horizontal = AiFinderSpacing.dp24, vertical = AiFinderSpacing.dp12),
+                verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4),
             ) {
                 if (failed) {
                     Text(
                         stringResource(Res.string.account_delete_error),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(bottom = 8.dp),
+                        modifier = Modifier.padding(bottom = AiFinderSpacing.dp8),
                     )
                 }
                 Button(
@@ -105,7 +107,7 @@ internal fun DeleteProfileSheet(
                             strokeWidth = 2.dp,
                             color = MaterialTheme.colorScheme.error,
                         )
-                        Spacer(Modifier.width(12.dp))
+                        Spacer(Modifier.width(AiFinderSpacing.dp12))
                     }
                     Text(stringResource(
                         when {

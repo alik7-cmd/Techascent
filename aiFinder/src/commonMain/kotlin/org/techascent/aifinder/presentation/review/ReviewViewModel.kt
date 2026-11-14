@@ -13,6 +13,11 @@ import org.techascent.aifinder.domain.inventory.StoredItem
 import org.techascent.aifinder.domain.inventory.usecase.ObserveInventoryUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
+import apphub.aifinder.generated.resources.Res
+import apphub.aifinder.generated.resources.inventory_save_error
+import apphub.aifinder.generated.resources.scan_existing_items_error
+import apphub.aifinder.generated.resources.scan_existing_items_retry_error
+import org.jetbrains.compose.resources.getString
 
 class ReviewViewModel(
     private val saveDetections: SaveDetectionsUseCase,
@@ -40,13 +45,13 @@ class ReviewViewModel(
             val refreshed = observeInventory.refreshItems()
             if (refreshed.isFailure) {
                 checkingExisting = false
-                existingError = "Couldn't check existing items. Check your connection and retry before saving."
+                existingError = getString(Res.string.scan_existing_items_error)
                 publish()
                 return@launch
             }
             observeInventory.observeItems().catch {
                 checkingExisting = false
-                existingError = "Couldn't check existing items. Try again before saving."
+                existingError = getString(Res.string.scan_existing_items_retry_error)
                 publish(saveError = existingError)
             }.collect {
                 existing = it
@@ -95,7 +100,7 @@ class ReviewViewModel(
     fun rename(itemId: String, name: String) {
         if (isSaving) return
         val trimmedName = name.trim()
-        require(trimmedName.isNotEmpty()) { "Item name must not be blank." }
+        check(trimmedName.isNotEmpty())
         detections = detections.map { detection ->
             if (detection.item.id == itemId) {
                 detection.copy(item = detection.item.copy(name = trimmedName))
@@ -134,7 +139,9 @@ class ReviewViewModel(
                     reset()
                     onSaved()
                 }
-                .onFailure { e -> publish(saveError = e.message ?: "Couldn't save your items.") }
+                .onFailure { e ->
+                    publish(saveError = e.message ?: getString(Res.string.inventory_save_error))
+                }
         }
     }
 

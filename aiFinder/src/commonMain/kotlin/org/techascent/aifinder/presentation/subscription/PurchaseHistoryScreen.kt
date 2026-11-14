@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.subscription
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
@@ -45,9 +47,9 @@ fun PurchaseHistoryScreen(viewModel: PurchaseHistoryViewModel, onBack: () -> Uni
                 if (current.purchases.isEmpty()) item {
                     Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(24.dp)) {
                         Column(
-                            Modifier.fillMaxWidth().padding(32.dp),
+                            Modifier.fillMaxWidth().padding(AiFinderSpacing.dp32),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12),
                         ) {
                             Icon(Icons.AutoMirrored.Outlined.ReceiptLong, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(40.dp))
                             Text(stringResource(Res.string.history_empty_title), color = AiFinderPalette.Ink, fontWeight = FontWeight.SemiBold)
@@ -65,12 +67,12 @@ fun PurchaseHistoryScreen(viewModel: PurchaseHistoryViewModel, onBack: () -> Uni
 private fun PurchaseRowSkeleton() {
     Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(20.dp)) {
         Row(
-            Modifier.fillMaxWidth().padding(18.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.fillMaxWidth().padding(AiFinderSpacing.dp18),
+            horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp14),
             verticalAlignment = Alignment.Top,
         ) {
             ShimmerBlock(Modifier.size(44.dp), RoundedCornerShape(14.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp9)) {
                 ShimmerBlock(Modifier.fillMaxWidth(0.55f).height(20.dp))
                 ShimmerBlock(Modifier.fillMaxWidth(0.8f).height(16.dp))
                 ShimmerBlock(Modifier.width(110.dp).height(26.dp))
@@ -83,8 +85,8 @@ private fun PurchaseRowSkeleton() {
 private fun PurchaseRow(purchase: ScanPurchase) {
     Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(20.dp)) {
         Row(
-            Modifier.fillMaxWidth().padding(18.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.fillMaxWidth().padding(AiFinderSpacing.dp18),
+            horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp14),
             verticalAlignment = Alignment.Top,
         ) {
             Box(
@@ -93,7 +95,7 @@ private fun PurchaseRow(purchase: ScanPurchase) {
             ) {
                 Icon(Icons.AutoMirrored.Outlined.ReceiptLong, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(23.dp))
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp7)) {
                 Text(
                     stringResource(Res.string.history_scan_pack, purchase.scansGranted),
                     color = AiFinderPalette.Ink,
@@ -108,7 +110,7 @@ private fun PurchaseRow(purchase: ScanPurchase) {
                         else -> Res.string.history_status_unknown
                     }),
                     modifier = Modifier.background(AiFinderPalette.Mint, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                        .padding(horizontal = AiFinderSpacing.dp10, vertical = AiFinderSpacing.dp5),
                     color = AiFinderPalette.Teal,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,

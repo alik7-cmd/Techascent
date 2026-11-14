@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.scan
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.BorderStroke
@@ -40,8 +42,8 @@ fun ScanCaptureScreen(
         topBar = { ScreenTopBar(stringResource(
             if (data.previewPhoto == null) Res.string.scan_take_photo else Res.string.scan_photo_preview), onBack) },
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = AiFinderSpacing.dp20),
+            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)) {
             Text(selectedLocation.ifBlank { stringResource(Res.string.scan_place_first) },
                 color = AiFinderPalette.Teal, maxLines = 2)
             Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -84,7 +86,7 @@ fun ScanCaptureScreen(
                     enabled = selectedLocation.isNotBlank() && !data.requiresPurchase && !data.isCapturing,
                 )
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(AiFinderSpacing.dp8))
         }
     }
 }
@@ -97,8 +99,8 @@ private fun AiAnalysisFeedback() {
         infiniteRepeatable(tween(1600, easing = LinearEasing), RepeatMode.Reverse), label = "scan-sweep")
     Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(24.dp),
         border = BorderStroke(1.dp, AiFinderPalette.Teal.copy(alpha = 0.25f))) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(AiFinderSpacing.dp16), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)) {
                 Box(Modifier.size(46.dp), contentAlignment = Alignment.Center) {
                     Canvas(Modifier.fillMaxSize()) {
                         drawCircle(teal.copy(alpha = 0.08f + phase * 0.12f))

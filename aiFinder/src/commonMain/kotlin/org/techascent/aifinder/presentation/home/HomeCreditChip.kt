@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.home
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -64,8 +66,8 @@ internal fun HomeCreditChip(
         ) {
             Column(
                 Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp).padding(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
+                    .padding(horizontal = AiFinderSpacing.dp24).padding(bottom = AiFinderSpacing.dp24),
+                verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp20),
             ) {
                 SectionTitle(stringResource(Res.string.scan_balance_title))
                 Text(

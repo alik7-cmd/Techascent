@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.login
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -48,13 +50,13 @@ internal fun LoginOnboardingPager(modifier: Modifier = Modifier) {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.matchParentSize(),
-                pageSpacing = 16.dp,
+                pageSpacing = AiFinderSpacing.dp16,
                 verticalAlignment = Alignment.Top
             ) { page ->
                 SlideContent(slides[page])
             }
         }
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(AiFinderSpacing.dp20))
         val pagerDescription = stringResource(
             Res.string.login_slide_position,
             pagerState.currentPage + 1,
@@ -62,7 +64,7 @@ internal fun LoginOnboardingPager(modifier: Modifier = Modifier) {
         )
         Row(
             Modifier.semantics { contentDescription = pagerDescription },
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8),
             verticalAlignment = Alignment.CenterVertically
         ) {
             repeat(slides.size) { index ->
@@ -86,7 +88,7 @@ private fun SlideContent(slide: OnboardingSlide, modifier: Modifier = Modifier) 
             .clip(RoundedCornerShape(28.dp))
             .background(AiFinderPalette.IllustrationMint)
         when (slide) {
-            OnboardingSlide.Welcome -> WelcomeIllustration(illustrationModifier.padding(12.dp))
+            OnboardingSlide.Welcome -> WelcomeIllustration(illustrationModifier.padding(AiFinderSpacing.dp12))
             OnboardingSlide.Scan -> {
                 val description = stringResource(Res.string.login_slide_scan_illustration_description)
                 ScanIllustration(illustrationModifier.semantics(mergeDescendants = true) {
@@ -106,7 +108,7 @@ private fun SlideContent(slide: OnboardingSlide, modifier: Modifier = Modifier) 
                 })
             }
         }
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(AiFinderSpacing.dp32))
         SlideText(slide)
     }
 }
@@ -115,7 +117,7 @@ private fun SlideContent(slide: OnboardingSlide, modifier: Modifier = Modifier) 
 private fun SlideText(slide: OnboardingSlide, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth()) {
         SectionTitle(stringResource(slide.title), fontSize = 28.sp, lineHeight = 36.sp)
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(AiFinderSpacing.dp12))
         Text(
             stringResource(slide.description),
             color = AiFinderPalette.Muted,

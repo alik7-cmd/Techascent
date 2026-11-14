@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.home
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -25,8 +27,8 @@ internal fun HomeHeader(
     onGetScans: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(bottom = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(bottom = AiFinderSpacing.dp8),
+        verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8),
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             HomeCreditChip(scanBalance, onRetryBalance, onGetScans)

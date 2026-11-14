@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.spaces
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -48,7 +50,7 @@ fun SpacesScreen(
                 }
                 if (state.spaces.isEmpty()) {
                     item(key = "empty") {
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)) {
                             EmptyListCard()
                             PrimaryAction(
                                 stringResource(Res.string.home_scan_action),

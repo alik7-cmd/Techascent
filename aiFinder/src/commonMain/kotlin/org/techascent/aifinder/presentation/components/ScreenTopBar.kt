@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.components
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,9 +21,9 @@ fun ScreenTopBar(title: String, onBack: () -> Unit, modifier: Modifier = Modifie
         Row(
             modifier = Modifier.windowInsetsPadding(
                 WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
-            ).heightIn(min = 64.dp).padding(start = 12.dp, end = 24.dp, top = 8.dp, bottom = 8.dp),
+            ).heightIn(min = 64.dp).padding(start = AiFinderSpacing.dp12, end = AiFinderSpacing.dp24, top = AiFinderSpacing.dp8, bottom = AiFinderSpacing.dp8),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8),
         ) {
             BackButton(onBack)
             Text(

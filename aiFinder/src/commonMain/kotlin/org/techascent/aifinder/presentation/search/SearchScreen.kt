@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.search
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -97,7 +99,7 @@ private fun LazyListScope.searchContent(
         )
         Text(
             stringResource(Res.string.search_tip),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
+            modifier = Modifier.padding(horizontal = AiFinderSpacing.dp12, vertical = AiFinderSpacing.dp5),
             style = ComposaTheme.typography.caption,
             color = AiFinderPalette.Muted,
             fontSize = 14.sp
@@ -110,7 +112,7 @@ private fun LazyListScope.searchContent(
                 data.results.size
             ),
             color = AiFinderPalette.Muted,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = AiFinderSpacing.dp8)
         )
     }
     if (data.results.isEmpty()) {
@@ -132,19 +134,19 @@ private fun LazyListScope.searchContent(
         Column(
             modifier = Modifier.fillMaxWidth()
                 .background(AiFinderPalette.Surface, RoundedCornerShape(24.dp))
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(AiFinderSpacing.dp16),
+            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)
         ) {
             Row(
                 Modifier.fillMaxWidth().clickable { onItemSelected(record.item.id) },
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp14),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 ItemPhoto(record.item.photoId, record.item.name, RoundedCornerShape(16.dp),
                     modifier = Modifier.size(88.dp), bounds = record.bounds) {
                     Icon(Icons.Outlined.MyLocation, null, tint = AiFinderPalette.Teal)
                 }
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp6)) {
                     Text(record.item.name, color = AiFinderPalette.Ink, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                     Text(record.path, color = AiFinderPalette.Teal, fontSize = 14.sp)
                     if (record.confirmedAt > 0) Text(
@@ -154,7 +156,7 @@ private fun LazyListScope.searchContent(
                     )
                 }
             }
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
                 AssistChip(
                     onClick = { onConfirm(record) },
                     enabled = !busy,

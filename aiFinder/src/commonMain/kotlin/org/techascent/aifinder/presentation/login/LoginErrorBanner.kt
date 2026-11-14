@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.login
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -57,7 +59,7 @@ internal fun LoginErrorBanner(
             border = BorderStroke(1.dp, AiFinderPalette.ErrorBorder)
         ) {
             Row(
-                Modifier.padding(start = 14.dp, top = 14.dp, bottom = 14.dp, end = 4.dp),
+                Modifier.padding(start = AiFinderSpacing.dp14, top = AiFinderSpacing.dp14, bottom = AiFinderSpacing.dp14, end = AiFinderSpacing.dp4),
                 verticalAlignment = Alignment.Top
             ) {
                 Box(
@@ -71,15 +73,15 @@ internal fun LoginErrorBanner(
                         modifier = Modifier.size(20.dp)
                     )
                 }
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f).padding(top = 1.dp)) {
+                Spacer(Modifier.width(AiFinderSpacing.dp12))
+                Column(Modifier.weight(1f).padding(top = AiFinderSpacing.dp1)) {
                     Text(
                         stringResource(Res.string.login_error_title),
                         color = AiFinderPalette.ErrorText,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold
                     )
-                    Spacer(Modifier.height(2.dp))
+                    Spacer(Modifier.height(AiFinderSpacing.dp2))
                     Text(
                         stringResource(message),
                         color = AiFinderPalette.ErrorText.copy(alpha = 0.85f),

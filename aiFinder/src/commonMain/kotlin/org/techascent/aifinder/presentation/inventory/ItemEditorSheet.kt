@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.inventory
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -46,8 +48,8 @@ fun ItemEditorSheet(
         contentColor = AiFinderPalette.Ink,
     ) {
         Column(
-            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(AiFinderSpacing.dp24),
+            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp14),
         ) {
             SectionTitle(stringResource(when {
                 moveOnly -> Res.string.details_move

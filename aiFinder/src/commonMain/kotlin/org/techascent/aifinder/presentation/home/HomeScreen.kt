@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.home
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -76,8 +78,11 @@ fun HomeScreen(
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            contentPadding = PaddingValues(
+                horizontal = AiFinderSpacing.dp24,
+                vertical = AiFinderSpacing.dp28,
+            ),
+            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)
         ) {
             item(key = "header") {
                 HomeHeader(onAccount, scanBalance, onRetryBalance, onGetScans)
@@ -96,12 +101,12 @@ fun HomeScreen(
                 item(key = "scan") { ScanPrompt(onScan, isCheckingScan, compact = true) }
             }
             item(key = "sync") {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
                     if (syncState.failed) {
                         InventoryRefreshError(onDismissSyncError)
                     }
                     FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8),
                     ) {
                         val chipColors = AssistChipDefaults.assistChipColors(
                             labelColor = AiFinderPalette.Teal,
@@ -193,14 +198,14 @@ private fun InventoryRefreshError(onDismiss: () -> Unit) {
         color = AiFinderPalette.ErrorContainer,
         border = BorderStroke(1.dp, AiFinderPalette.ErrorBorder),
     ) {
-        Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.padding(AiFinderSpacing.dp16), horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)) {
             Box(
                 Modifier.size(36.dp).background(AiFinderPalette.Error.copy(alpha = 0.12f), CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(Icons.Rounded.ErrorOutline, null, tint = AiFinderPalette.Error, modifier = Modifier.size(20.dp))
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
                 Text(stringResource(Res.string.inventory_sync_error_title),
                     color = AiFinderPalette.ErrorText, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                 Text(stringResource(Res.string.inventory_sync_error),

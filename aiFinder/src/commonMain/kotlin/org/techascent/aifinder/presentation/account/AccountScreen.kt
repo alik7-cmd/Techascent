@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.account
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -138,7 +140,7 @@ fun AccountScreen(
                 fontSize = 13.sp,
                 lineHeight = 19.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = AiFinderSpacing.dp12)
             )
         }
     }
@@ -156,9 +158,9 @@ private fun ProfileCard(profile: AccountProfile) {
     )
     Row(
         Modifier.fillMaxWidth().clip(CardShape).background(AiFinderPalette.Surface)
-            .border(1.dp, AiFinderPalette.Border, CardShape).padding(20.dp),
+            .border(1.dp, AiFinderPalette.Border, CardShape).padding(AiFinderSpacing.dp20),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)
     ) {
         Box(
             Modifier.size(56.dp).clip(CircleShape).background(AiFinderPalette.Mint),
@@ -166,7 +168,7 @@ private fun ProfileCard(profile: AccountProfile) {
         ) {
             Text(profile.initial, color = AiFinderPalette.Teal, fontWeight = FontWeight.Bold, fontSize = 22.sp)
         }
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
             Text(
                 name, color = AiFinderPalette.Ink, fontWeight = FontWeight.Bold, fontSize = 18.sp,
                 maxLines = 1, overflow = TextOverflow.Ellipsis
@@ -184,10 +186,10 @@ private val CardShape = RoundedCornerShape(18.dp)
 
 @Composable
 private fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10)) {
         Text(
             title, color = AiFinderPalette.Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.2.sp, modifier = Modifier.padding(start = 4.dp)
+            letterSpacing = 1.2.sp, modifier = Modifier.padding(start = AiFinderSpacing.dp4)
         )
         Column(
             Modifier.fillMaxWidth().clip(CardShape).background(AiFinderPalette.Surface)
@@ -198,7 +200,7 @@ private fun SettingsSection(title: String, content: @Composable ColumnScope.() -
 }
 
 @Composable
-private fun CellDivider() = HorizontalDivider(Modifier.padding(start = 68.dp), color = AiFinderPalette.Border)
+private fun CellDivider() = HorizontalDivider(Modifier.padding(start = AiFinderSpacing.dp68), color = AiFinderPalette.Border)
 
 @Composable
 private fun SettingsCell(
@@ -212,9 +214,9 @@ private fun SettingsCell(
 ) {
     Row(
         Modifier.fillMaxWidth().clickable(enabled = !isLoading, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = AiFinderSpacing.dp16, vertical = AiFinderSpacing.dp14),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)
     ) {
         Box(
             Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(iconBackground),

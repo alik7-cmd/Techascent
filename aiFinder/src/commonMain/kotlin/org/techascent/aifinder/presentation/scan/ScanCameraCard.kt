@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.scan
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +38,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import apphub.aifinder.generated.resources.Res
+import apphub.aifinder.generated.resources.scan_camera_analyzing
+import apphub.aifinder.generated.resources.scan_camera_permission_action
+import apphub.aifinder.generated.resources.scan_camera_permission_body
+import apphub.aifinder.generated.resources.scan_camera_permission_title
+import apphub.aifinder.generated.resources.scan_camera_settings_action
+import apphub.aifinder.generated.resources.scan_camera_settings_body
+import apphub.aifinder.generated.resources.scan_camera_settings_title
+import apphub.aifinder.generated.resources.scan_camera_unavailable_body
+import apphub.aifinder.generated.resources.scan_camera_unavailable_title
+import apphub.aifinder.generated.resources.scan_frame_hint
 import dev.icerock.moko.permissions.DeniedAlwaysException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
@@ -47,6 +60,7 @@ import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import kotlinx.coroutines.launch
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
+import org.jetbrains.compose.resources.stringResource
 
 private enum class CameraAccess { Checking, Granted, Denied, DeniedAlways, Unavailable }
 
@@ -65,7 +79,7 @@ fun ScanCameraCard(
     modifier: Modifier = Modifier,
     permissions: PermissionsController = rememberCameraPermissions(),
     expanded: Boolean = false,
-    framingHint: String = "Fit the whole place in the frame",
+    framingHint: String? = null,
 ) {
     val scope = rememberCoroutineScope()
     var access by remember { mutableStateOf(CameraAccess.Checking) }
@@ -92,26 +106,28 @@ fun ScanCameraCard(
                     modifier = Modifier.fillMaxSize(),
                     onUnavailable = { access = CameraAccess.Unavailable }
                 )
-                if (isAnalyzing) AnalyzingOverlay() else ViewfinderOverlay(framingHint)
+                if (isAnalyzing) AnalyzingOverlay() else ViewfinderOverlay(
+                    framingHint ?: stringResource(Res.string.scan_frame_hint),
+                )
             }
             CameraAccess.Denied -> CameraMessage(
                 icon = Icons.Outlined.CameraAlt,
-                title = "Camera access needed",
-                body = "Allow camera access to take a photo of your space.",
-                action = "Allow camera",
+                title = stringResource(Res.string.scan_camera_permission_title),
+                body = stringResource(Res.string.scan_camera_permission_body),
+                action = stringResource(Res.string.scan_camera_permission_action),
                 onAction = { scope.launch { access = permissions.request() } }
             )
             CameraAccess.DeniedAlways -> CameraMessage(
                 icon = Icons.Outlined.NoPhotography,
-                title = "Camera access is off",
-                body = "Turn on camera access in Settings to scan your space.",
-                action = "Open settings",
+                title = stringResource(Res.string.scan_camera_settings_title),
+                body = stringResource(Res.string.scan_camera_settings_body),
+                action = stringResource(Res.string.scan_camera_settings_action),
                 onAction = permissions::openAppSettings
             )
             CameraAccess.Unavailable -> CameraMessage(
                 icon = Icons.Outlined.NoPhotography,
-                title = "Camera unavailable",
-                body = "We couldn't start the camera on this device."
+                title = stringResource(Res.string.scan_camera_unavailable_title),
+                body = stringResource(Res.string.scan_camera_unavailable_body),
             )
         }
     }
@@ -133,17 +149,17 @@ private fun AnalyzingOverlay() {
     Column(
         Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
+        verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12, Alignment.CenterVertically)
     ) {
         CircularProgressIndicator(color = Color.White)
-        Text("Finding items…", color = Color.White, fontWeight = FontWeight.Medium)
+        Text(stringResource(Res.string.scan_camera_analyzing), color = Color.White, fontWeight = FontWeight.Medium)
     }
 }
 
 @Composable
 private fun ViewfinderOverlay(hint: String) {
     Box(Modifier.fillMaxSize()) {
-        Canvas(Modifier.fillMaxSize().padding(20.dp)) {
+        Canvas(Modifier.fillMaxSize().padding(AiFinderSpacing.dp20)) {
             val len = 28.dp.toPx()
             val stroke = 4.dp.toPx()
             val w = size.width
@@ -160,9 +176,9 @@ private fun ViewfinderOverlay(hint: String) {
             hint,
             color = Color.White,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp)
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = AiFinderSpacing.dp32)
                 .background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(50))
-                .padding(horizontal = 14.dp, vertical = 6.dp)
+                .padding(horizontal = AiFinderSpacing.dp14, vertical = AiFinderSpacing.dp6)
         )
     }
 }
@@ -176,9 +192,9 @@ private fun CameraMessage(
     onAction: () -> Unit = {}
 ) {
     Column(
-        Modifier.padding(24.dp),
+        Modifier.padding(AiFinderSpacing.dp24),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)
     ) {
         Box(
             Modifier.size(64.dp).background(Color.White.copy(alpha = 0.7f), CircleShape),

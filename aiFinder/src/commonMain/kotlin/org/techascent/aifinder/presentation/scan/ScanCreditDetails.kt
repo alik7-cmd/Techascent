@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.scan
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -60,12 +62,12 @@ internal fun ScanCreditDetails(
                 )
             }
             Column(
-                Modifier.fillMaxWidth().padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
+                Modifier.fillMaxWidth().padding(AiFinderSpacing.dp24),
+                verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp24),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8),
                 ) {
                     Icon(
                         Icons.Outlined.AutoAwesome,
@@ -90,13 +92,13 @@ internal fun ScanCreditDetails(
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12),
                 ) {
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
                         when {
                             data.isLoadingBalance -> Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8),
                             ) {
                                 CircularProgressIndicator(
                                     Modifier.size(20.dp), color = accent, strokeWidth = 2.dp,
@@ -115,7 +117,7 @@ internal fun ScanCreditDetails(
                                 lineHeight = 20.sp,
                             )
 
-                            else -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            else -> Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
                                 Text(
                                     text = data.access.remainingScans.toString(),
                                     color = Color.White,

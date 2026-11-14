@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.welcome
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -44,7 +46,7 @@ fun WelcomeScreen(
             when (val state = uiState) {
                 WelcomeUiState.Loading, is WelcomeUiState.Navigate -> Unit
 
-                is WelcomeUiState.Error -> Box(Modifier.padding(28.dp)) {
+                is WelcomeUiState.Error -> Box(Modifier.padding(AiFinderSpacing.dp28)) {
                     ErrorContent(state.message, viewModel::retry)
                 }
 
@@ -55,7 +57,7 @@ fun WelcomeScreen(
                         modifier = Modifier.fillMaxWidth()
                             .verticalScroll(rememberScrollState())
                             .heightIn(min = viewportHeight)
-                            .padding(horizontal = 28.dp, vertical = 24.dp),
+                            .padding(horizontal = AiFinderSpacing.dp28, vertical = AiFinderSpacing.dp24),
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
@@ -67,22 +69,22 @@ fun WelcomeScreen(
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
                             )
-                            Spacer(Modifier.height(32.dp))
+                            Spacer(Modifier.height(AiFinderSpacing.dp32))
                             WelcomeIllustration(
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                                     .widthIn(max = 480.dp).fillMaxWidth()
                                     .aspectRatio(770f / 520f)
                                     .clip(RoundedCornerShape(28.dp))
                                     .background(AiFinderPalette.IllustrationMint)
-                                    .padding(12.dp),
+                                    .padding(AiFinderSpacing.dp12),
                             )
-                            Spacer(Modifier.height(40.dp))
+                            Spacer(Modifier.height(AiFinderSpacing.dp40))
                             SectionTitle(
                                 stringResource(content.welcomeTitleRes),
                                 fontSize = 30.sp,
                                 lineHeight = 38.sp
                             )
-                            Spacer(Modifier.height(14.dp))
+                            Spacer(Modifier.height(AiFinderSpacing.dp14))
                             Text(
                                 stringResource(content.descriptionRes),
                                 color = AiFinderPalette.Muted,
@@ -91,9 +93,9 @@ fun WelcomeScreen(
                             )
                         }
                         Column(
-                            modifier = Modifier.padding(top = 40.dp),
+                            modifier = Modifier.padding(top = AiFinderSpacing.dp40),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)
                         ) {
                             PrimaryAction(
                                 stringResource(content.buttonTextRes),

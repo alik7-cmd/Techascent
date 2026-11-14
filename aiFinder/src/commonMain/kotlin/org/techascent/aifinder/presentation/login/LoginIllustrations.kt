@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.login
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,13 +44,13 @@ internal fun ScanIllustration(modifier: Modifier = Modifier) {
                 .border(2.dp, AiFinderPalette.Teal, RoundedCornerShape(22.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10)) {
                 ItemTile(Icons.Outlined.Key)
                 ItemTile(Icons.Outlined.Cable)
                 ItemTile(Icons.Outlined.Headphones)
             }
             Box(
-                Modifier.align(Alignment.BottomCenter).offset(y = 20.dp).size(40.dp)
+                Modifier.align(Alignment.BottomCenter).offset(y = AiFinderSpacing.dp20).size(40.dp)
                     .background(AiFinderPalette.Teal, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -57,15 +59,15 @@ internal fun ScanIllustration(modifier: Modifier = Modifier) {
         }
         TagChip(
             stringResource(Res.string.login_illustration_tag_keys),
-            Modifier.align(Alignment.TopStart).padding(start = 12.dp, top = 18.dp)
+            Modifier.align(Alignment.TopStart).padding(start = AiFinderSpacing.dp12, top = AiFinderSpacing.dp18)
         )
         TagChip(
             stringResource(Res.string.login_illustration_tag_cable),
-            Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)
+            Modifier.align(Alignment.CenterEnd).padding(end = AiFinderSpacing.dp8)
         )
         TagChip(
             stringResource(Res.string.login_illustration_tag_headphones),
-            Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 22.dp)
+            Modifier.align(Alignment.BottomStart).padding(start = AiFinderSpacing.dp16, bottom = AiFinderSpacing.dp22)
         )
     }
 }
@@ -74,19 +76,19 @@ internal fun ScanIllustration(modifier: Modifier = Modifier) {
 @Composable
 internal fun FindIllustration(modifier: Modifier = Modifier) {
     Column(
-        modifier.padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+        modifier.padding(horizontal = AiFinderSpacing.dp20),
+        verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             Modifier.fillMaxWidth()
                 .background(AiFinderPalette.Surface, RoundedCornerShape(50))
                 .border(1.dp, AiFinderPalette.Border, RoundedCornerShape(50))
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = AiFinderSpacing.dp16, vertical = AiFinderSpacing.dp10),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(Icons.Outlined.Search, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(AiFinderSpacing.dp10))
             Text(
                 stringResource(Res.string.login_illustration_search_query),
                 color = AiFinderPalette.Ink,
@@ -101,14 +103,14 @@ internal fun FindIllustration(modifier: Modifier = Modifier) {
             border = BorderStroke(1.dp, AiFinderPalette.Border),
             shadowElevation = 2.dp
         ) {
-            Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.padding(AiFinderSpacing.dp12), verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     Modifier.size(44.dp).background(AiFinderPalette.Mint, RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(Icons.Outlined.Inventory2, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(22.dp))
                 }
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(AiFinderSpacing.dp12))
                 Column(Modifier.weight(1f)) {
                     Text(
                         stringResource(Res.string.login_illustration_search_result),
@@ -116,10 +118,10 @@ internal fun FindIllustration(modifier: Modifier = Modifier) {
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(AiFinderSpacing.dp4))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.MyLocation, null, tint = AiFinderPalette.Muted, modifier = Modifier.size(12.dp))
-                        Spacer(Modifier.width(4.dp))
+                        Spacer(Modifier.width(AiFinderSpacing.dp4))
                         Text(
                             stringResource(Res.string.login_illustration_search_path),
                             color = AiFinderPalette.Muted,
@@ -138,13 +140,13 @@ internal fun FindIllustration(modifier: Modifier = Modifier) {
 @Composable
 internal fun PlaceIllustration(modifier: Modifier = Modifier) {
     Row(
-        modifier.padding(horizontal = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier.padding(horizontal = AiFinderSpacing.dp24),
+        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             Modifier.background(AiFinderPalette.Surface, RoundedCornerShape(18.dp))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = AiFinderSpacing.dp12, vertical = AiFinderSpacing.dp10),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(Icons.Outlined.QrCode2, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(52.dp))
@@ -157,10 +159,10 @@ internal fun PlaceIllustration(modifier: Modifier = Modifier) {
         }
         Column(
             Modifier.weight(1f).background(AiFinderPalette.Surface, RoundedCornerShape(18.dp))
-                .padding(14.dp)
+                .padding(AiFinderSpacing.dp14)
         ) {
             Icon(Icons.Outlined.Inventory2, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(24.dp))
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(AiFinderSpacing.dp8))
             Text(
                 stringResource(Res.string.login_illustration_place_path),
                 color = AiFinderPalette.Ink,
@@ -186,11 +188,11 @@ private fun TagChip(label: String, modifier: Modifier = Modifier) {
     Row(
         modifier.background(AiFinderPalette.Surface, RoundedCornerShape(50))
             .border(1.dp, AiFinderPalette.Border, RoundedCornerShape(50))
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+            .padding(horizontal = AiFinderSpacing.dp10, vertical = AiFinderSpacing.dp6),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(Icons.Outlined.AutoAwesome, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(12.dp))
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(AiFinderSpacing.dp4))
         Text(label, color = AiFinderPalette.Ink, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
     }
 }

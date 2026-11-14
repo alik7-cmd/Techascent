@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.home
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,7 +23,7 @@ internal fun SpacesHeader(
     isLoading: Boolean = false,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = AiFinderSpacing.dp12),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

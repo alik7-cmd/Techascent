@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.spaces
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -50,7 +52,7 @@ fun SpaceScreen(
         bottomBar = {
             if (content?.location != null) {
                 Surface(color = AiFinderPalette.Background) {
-                    Box(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 16.dp)) {
+                    Box(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = AiFinderSpacing.dp24, vertical = AiFinderSpacing.dp16)) {
                         PrimaryAction(
                             stringResource(Res.string.home_scan_action),
                             onScan,
@@ -83,14 +85,14 @@ fun SpaceScreen(
                     return@ScreenLayout
                 }
                 item(key = "title") {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10)) {
                         SectionTitle(location.name)
                         androidx.compose.material3.TextButton(onClick = onAddItem) {
                             Text(stringResource(Res.string.item_add), color = AiFinderPalette.Teal)
                         }
                         state.data.items.filter { it.location.id == location.id && it.item.photoId != null }
                             .maxByOrNull { it.createdAt }?.let { representative ->
-                                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp6)) {
                                     ItemPhoto(representative.item.photoId, location.name, RoundedCornerShape(24.dp),
                                         modifier = Modifier.fillMaxWidth().height(180.dp))
                                     Text(stringResource(Res.string.place_scan_photo, location.name),
@@ -117,10 +119,10 @@ fun SpaceScreen(
                 item(key = "overview") {
                     Surface(color = AiFinderPalette.Mint, shape = RoundedCornerShape(24.dp)) {
                         Column(
-                            Modifier.fillMaxWidth().padding(20.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            Modifier.fillMaxWidth().padding(AiFinderSpacing.dp20),
+                            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12),
                         ) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10)) {
                                 Icon(Icons.Outlined.LocationOn, null, tint = AiFinderPalette.Teal, modifier = Modifier.size(20.dp))
                                 Text(
                                     state.data.path,
@@ -177,9 +179,9 @@ private fun SpaceItemRow(located: LocatedItem, spacePath: String, onClick: () ->
             .clip(RoundedCornerShape(20.dp))
             .background(AiFinderPalette.Surface)
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(AiFinderSpacing.dp16),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)
     ) {
         ItemPhoto(
             photoId = located.item.photoId,
@@ -189,7 +191,7 @@ private fun SpaceItemRow(located: LocatedItem, spacePath: String, onClick: () ->
         ) {
             Icon(Icons.Outlined.Category, contentDescription = null, tint = AiFinderPalette.Teal)
         }
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp5)) {
             Text(
                 located.item.name,
                 color = AiFinderPalette.Ink,

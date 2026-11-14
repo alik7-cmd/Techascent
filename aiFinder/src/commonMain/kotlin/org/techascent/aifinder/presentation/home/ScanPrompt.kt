@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.home
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,11 +27,11 @@ import org.techascent.aifinder.presentation.theme.AiFinderPalette
 internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false, compact: Boolean = false) {
     Column(
         modifier = Modifier.fillMaxWidth()
-            .padding(top = 6.dp)
+            .padding(top = AiFinderSpacing.dp6)
             .clip(RoundedCornerShape(28.dp))
             .background(AiFinderPalette.Mint)
-            .padding(if (compact) 20.dp else 24.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(if (compact) AiFinderSpacing.dp20 else AiFinderSpacing.dp24),
+        verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)
     ) {
         if (compact) {
             Text(
@@ -73,7 +75,7 @@ internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false, compact
                     }
                 }
             }
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(AiFinderSpacing.dp8))
             Text(
                 stringResource(Res.string.home_scan_action),
                 fontSize = 17.sp,

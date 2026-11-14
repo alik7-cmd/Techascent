@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.legal
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,7 +44,7 @@ fun LegalScreen(document: LegalDocument, onBack: () -> Unit) {
             SelectionContainer {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10),
                 ) {
                     Text(
                         section.substringBefore('\n'),

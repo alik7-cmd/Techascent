@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.home
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
@@ -39,9 +41,9 @@ internal fun HomeSearch(onClick: () -> Unit) {
                 RoundedCornerShape(20.dp),
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 20.dp),
+            .padding(horizontal = AiFinderSpacing.dp20, vertical = AiFinderSpacing.dp20),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)
     ) {
         Icon(
             Icons.Outlined.Search,

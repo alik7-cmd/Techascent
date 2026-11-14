@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.location
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -9,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import apphub.aifinder.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.decodeToImageBitmap
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.techascent.aifinder.presentation.components.*
 import org.techascent.aifinder.presentation.scan.CameraCaptureController
@@ -45,13 +48,13 @@ fun PlaceQrSheet(
             busy = true
             try { png = generateQrPng(placeQrValue(placeId), placePath) }
             catch (e: kotlinx.coroutines.CancellationException) { throw e }
-            catch (e: Exception) { error = e.message ?: "Couldn't generate QR label." }
+            catch (e: Exception) { error = e.message ?: getString(Res.string.qr_generate_error) }
             finally { busy = false }
         }
     }
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = AiFinderPalette.Surface,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-        Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(Modifier.fillMaxWidth().padding(AiFinderSpacing.dp24), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)) {
             SectionTitle(stringResource(if (placeId == null) Res.string.qr_scan else Res.string.qr_label))
             Text(
                 if (placeId == null) stringResource(Res.string.qr_scan_hint) else placePath,
@@ -82,7 +85,7 @@ fun PlaceQrSheet(
                     png?.let { bytes -> scope.launch {
                         try { shareFile("place-label.png", bytes, "image/png") }
                         catch (e: kotlinx.coroutines.CancellationException) { throw e }
-                        catch (e: Exception) { error = e.message ?: "Couldn't share label." }
+                        catch (e: Exception) { error = e.message ?: getString(Res.string.qr_share_error) }
                     } }
                 }, enabled = png != null, isLoading = busy)
             }

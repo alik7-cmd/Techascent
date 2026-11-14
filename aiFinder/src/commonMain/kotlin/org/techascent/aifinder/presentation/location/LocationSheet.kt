@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.location
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -64,8 +66,8 @@ fun LocationSheet(
     ) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp).padding(bottom = 24.dp).imePadding(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(horizontal = AiFinderSpacing.dp24).padding(bottom = AiFinderSpacing.dp24).imePadding(),
+            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16),
         ) {
             Text(
                 stringResource(when {
@@ -91,7 +93,7 @@ fun LocationSheet(
                         tint = AiFinderPalette.Teal,
                         modifier = Modifier.size(18.dp),
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(AiFinderSpacing.dp8))
                     Text(stringResource(Res.string.place_help_action), color = AiFinderPalette.Teal)
                 }
                 if (creating) {
@@ -293,8 +295,8 @@ private fun PlaceTextField(
 private fun PlaceGuide() {
     Text(stringResource(Res.string.place_help_intro), color = AiFinderPalette.Muted)
     Column(
-        Modifier.fillMaxWidth().background(AiFinderPalette.Mint, RoundedCornerShape(20.dp)).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        Modifier.fillMaxWidth().background(AiFinderPalette.Mint, RoundedCornerShape(20.dp)).padding(AiFinderSpacing.dp16),
+        verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10),
     ) {
         listOf(
             Res.string.place_example_room to Icons.Outlined.Home,
@@ -303,14 +305,18 @@ private fun PlaceGuide() {
         ).forEachIndexed { index, (label, icon) ->
             Row(
                 Modifier.padding(start = (index * 18).dp)
-                    .background(AiFinderPalette.Surface, RoundedCornerShape(12.dp)).padding(12.dp),
+                    .background(AiFinderPalette.Surface, RoundedCornerShape(12.dp)).padding(AiFinderSpacing.dp12),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10),
             ) {
                 Icon(icon, contentDescription = null, tint = AiFinderPalette.Teal)
                 Text(stringResource(label), color = AiFinderPalette.Ink, fontWeight = FontWeight.SemiBold)
             }
-            if (index < 2) Text("↓", modifier = Modifier.padding(start = (index * 18 + 20).dp), color = AiFinderPalette.Teal)
+            if (index < 2) Text(
+                "↓",
+                modifier = Modifier.padding(start = AiFinderSpacing.dp20 + AiFinderSpacing.dp18 * index.toFloat()),
+                color = AiFinderPalette.Teal,
+            )
         }
         Text(stringResource(Res.string.place_help_items), color = AiFinderPalette.Teal, fontWeight = FontWeight.SemiBold)
     }

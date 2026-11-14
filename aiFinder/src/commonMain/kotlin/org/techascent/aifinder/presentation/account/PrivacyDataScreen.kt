@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.account
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +19,7 @@ import apphub.aifinder.generated.resources.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.techascent.aifinder.domain.inventory.InventorySnapshot
@@ -66,7 +69,7 @@ fun ExportInventoryScreen(onBack: () -> Unit) {
                 }
                 shareFile("inventory.$format", data, if (format == "csv") "text/csv" else "application/pdf")
             } catch (e: CancellationException) { throw e }
-            catch (e: Exception) { error = e.message ?: "Couldn't export inventory." }
+            catch (e: Exception) { error = e.message ?: getString(Res.string.inventory_export_error) }
             finally { busy = null }
         }
     }
@@ -99,13 +102,13 @@ fun ExportInventoryScreen(onBack: () -> Unit) {
         error?.let { message ->
             item {
                 Surface(color = MaterialTheme.colorScheme.errorContainer, shape = RoundedCornerShape(16.dp)) {
-                    Text(message, Modifier.fillMaxWidth().padding(16.dp),
+                    Text(message, Modifier.fillMaxWidth().padding(AiFinderSpacing.dp16),
                         color = MaterialTheme.colorScheme.onErrorContainer)
                 }
             }
         }
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)) {
                 Text(stringResource(Res.string.export_before_title), color = AiFinderPalette.Ink,
                     fontWeight = FontWeight.SemiBold)
                 Text(stringResource(Res.string.data_export_notice), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -125,10 +128,10 @@ private fun ExportFormatCard(
     onClick: () -> Unit,
 ) {
     Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(24.dp)) {
-        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(AiFinderSpacing.dp20), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)) {
                 Surface(color = AiFinderPalette.Mint, shape = RoundedCornerShape(12.dp)) {
-                    Icon(icon, null, Modifier.padding(12.dp).size(24.dp), tint = AiFinderPalette.Teal)
+                    Icon(icon, null, Modifier.padding(AiFinderSpacing.dp12).size(24.dp), tint = AiFinderPalette.Teal)
                 }
                 Text(title, Modifier.weight(1f), color = AiFinderPalette.Ink,
                     style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)

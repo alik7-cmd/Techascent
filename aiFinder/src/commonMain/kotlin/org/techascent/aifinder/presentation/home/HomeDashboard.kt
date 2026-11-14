@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.home
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -26,16 +28,16 @@ import org.techascent.aifinder.presentation.theme.AiFinderPalette
 internal fun HomeInventoryOverview(data: HomeContent) {
     Surface(color = AiFinderPalette.Mint, shape = RoundedCornerShape(24.dp)) {
         Column(
-            Modifier.fillMaxWidth().padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            Modifier.fillMaxWidth().padding(AiFinderSpacing.dp20),
+            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)
         ) {
             Text(
                 stringResource(Res.string.home_overview), color = AiFinderPalette.Ink,
                 style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold
             )
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(28.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp28),
+                verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)
             ) {
                 Column {
                     Text(
@@ -78,12 +80,12 @@ internal fun HomeQuickActions(
     onAddPlace: () -> Unit,
     onPlaces: () -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
         Text(
             stringResource(Res.string.home_quick_actions), color = AiFinderPalette.Ink,
             style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold
         )
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
             AssistChip(
                 onClick = onScan, enabled = !checking, shape = RoundedCornerShape(50),
                 colors = AssistChipDefaults.assistChipColors(
@@ -107,7 +109,7 @@ internal fun HomeQuickActions(
 
 @Composable
 internal fun HomeRecentHeading() {
-    Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(Modifier.padding(top = AiFinderSpacing.dp8), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
         SectionTitle(stringResource(Res.string.home_recent_items))
         Text(
             stringResource(Res.string.home_recent_hint),
@@ -121,8 +123,8 @@ internal fun HomeRecentHeading() {
 internal fun HomeRecentItem(entry: LocatedItem, onClick: () -> Unit) {
     Surface(onClick = onClick, color = AiFinderPalette.Surface, shape = RoundedCornerShape(20.dp)) {
         Row(
-            Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            Modifier.fillMaxWidth().padding(AiFinderSpacing.dp16), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)
         ) {
             ItemPhoto(
                 entry.item.photoId, entry.item.name, RoundedCornerShape(12.dp),
@@ -130,7 +132,7 @@ internal fun HomeRecentItem(entry: LocatedItem, onClick: () -> Unit) {
             ) {
                 Icon(Icons.Outlined.Inventory2, null, tint = AiFinderPalette.Teal)
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
                 Text(
                     entry.item.name, color = AiFinderPalette.Ink,
                     style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold

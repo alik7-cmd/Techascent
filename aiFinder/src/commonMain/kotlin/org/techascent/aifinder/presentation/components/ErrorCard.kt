@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.components
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -40,7 +42,7 @@ internal fun ErrorCard(
         shape = RoundedCornerShape(28.dp),
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(24.dp),
+            modifier = Modifier.fillMaxWidth().padding(AiFinderSpacing.dp24),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
@@ -54,12 +56,12 @@ internal fun ErrorCard(
                     modifier = Modifier.size(36.dp),
                 )
             }
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(AiFinderSpacing.dp20))
             Column(
                 modifier = Modifier.widthIn(max = 320.dp)
                     .semantics { liveRegion = LiveRegionMode.Polite },
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8),
             ) {
                 Text(
                     text = title,
@@ -77,7 +79,7 @@ internal fun ErrorCard(
                     textAlign = TextAlign.Center,
                 )
             }
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(AiFinderSpacing.dp24))
             PrimaryAction(
                 label = stringResource(Res.string.error_card_retry),
                 onClick = onRetry,

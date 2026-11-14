@@ -54,7 +54,7 @@ class LocationViewModel(
     }
 
     fun select(id: String) {
-        require(_state.value.locations.any { it.id == id }) { "Location not found." }
+        check(_state.value.locations.any { it.id == id })
         _state.update { it.copy(selectedId = id) }
     }
 

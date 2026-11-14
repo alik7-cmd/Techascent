@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.details
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,8 +69,8 @@ fun DetailsScreen(
                 Surface(color = AiFinderPalette.Background) {
                     Row(
                         Modifier.fillMaxWidth().navigationBarsPadding()
-                            .padding(horizontal = 24.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            .padding(horizontal = AiFinderSpacing.dp24, vertical = AiFinderSpacing.dp16),
+                        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         OutlinedButton(
@@ -110,7 +112,7 @@ fun DetailsScreen(
                     }
                 } else {
                     item(key = "identity") {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)) {
                             Text(
                                 entry.item.name,
                                 color = AiFinderPalette.Ink,
@@ -121,7 +123,7 @@ fun DetailsScreen(
                             Surface(color = AiFinderPalette.Mint, shape = RoundedCornerShape(12.dp)) {
                                 Text(
                                     entry.item.category,
-                                    Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    Modifier.padding(horizontal = AiFinderSpacing.dp12, vertical = AiFinderSpacing.dp6),
                                     color = AiFinderPalette.Teal,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.SemiBold,
@@ -142,9 +144,9 @@ fun DetailsScreen(
                                     matchImageAspectRatio = true,
                                 ) {
                                     Column(
-                                        Modifier.padding(24.dp),
+                                        Modifier.padding(AiFinderSpacing.dp24),
                                         horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                                        verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12),
                                     ) {
                                         Icon(
                                             Icons.Outlined.Image, null,
@@ -162,7 +164,7 @@ fun DetailsScreen(
                                 }
                                 Text(
                                     stringResource(Res.string.details_source_photo),
-                                    Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                    Modifier.padding(horizontal = AiFinderSpacing.dp16, vertical = AiFinderSpacing.dp12),
                                     color = AiFinderPalette.Muted,
                                     fontSize = 13.sp,
                                 )
@@ -174,12 +176,12 @@ fun DetailsScreen(
                             .ifEmpty { listOf(entry.location.name) }
                         Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(24.dp)) {
                             Column(
-                                Modifier.fillMaxWidth().padding(20.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                Modifier.fillMaxWidth().padding(AiFinderSpacing.dp20),
+                                verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16),
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp10),
                                 ) {
                                     Icon(Icons.Outlined.LocationOn, null, tint = AiFinderPalette.Teal)
                                     Text(
@@ -194,12 +196,12 @@ fun DetailsScreen(
                                         Icon(
                                             Icons.Outlined.ArrowDownward, null,
                                             tint = AiFinderPalette.Teal,
-                                            modifier = Modifier.padding(start = 4.dp).size(20.dp),
+                                            modifier = Modifier.padding(start = AiFinderSpacing.dp4).size(20.dp),
                                         )
                                     }
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12),
                                     ) {
                                         Box(
                                             Modifier.size(28.dp).background(AiFinderPalette.Mint, RoundedCornerShape(8.dp)),
@@ -207,7 +209,7 @@ fun DetailsScreen(
                                         ) {
                                             Text("${index + 1}", color = AiFinderPalette.Teal, fontSize = 12.sp)
                                         }
-                                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
                                             Text(
                                                 stringResource(if (index == 0) Res.string.location_go_to else Res.string.location_then_look),
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -241,7 +243,7 @@ fun DetailsScreen(
                                     ),
                                 ) {
                                     Icon(Icons.Outlined.CheckCircle, null, Modifier.size(20.dp))
-                                    Spacer(Modifier.width(8.dp))
+                                    Spacer(Modifier.width(AiFinderSpacing.dp8))
                                     Text(
                                         stringResource(Res.string.item_confirm),
                                         fontWeight = FontWeight.SemiBold,
@@ -251,7 +253,7 @@ fun DetailsScreen(
                         }
                     }
                     item(key = "item-actions") {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)) {
                             actionError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                             if (entry.item.photoId != null) {
                                 OutlinedButton(
@@ -267,7 +269,7 @@ fun DetailsScreen(
                                     ),
                                 ) {
                                     Icon(Icons.Outlined.HideImage, null, Modifier.size(20.dp))
-                                    Spacer(Modifier.width(10.dp))
+                                    Spacer(Modifier.width(AiFinderSpacing.dp10))
                                     Text(stringResource(Res.string.photo_delete))
                                 }
                                 Text(
@@ -287,7 +289,7 @@ fun DetailsScreen(
                                 ),
                             ) {
                                 Icon(Icons.Outlined.DeleteOutline, null, Modifier.size(20.dp))
-                                Spacer(Modifier.width(10.dp))
+                                Spacer(Modifier.width(AiFinderSpacing.dp10))
                                 Text(stringResource(Res.string.item_delete), fontWeight = FontWeight.SemiBold)
                             }
                         }
@@ -295,7 +297,7 @@ fun DetailsScreen(
                     if (entry.item.description.isNotBlank()) {
                         item(key = "description") {
                             Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(24.dp)) {
-                                Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Column(Modifier.fillMaxWidth().padding(AiFinderSpacing.dp20), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
                                     Text(
                                         stringResource(Res.string.details_notes),
                                         color = AiFinderPalette.Ink,

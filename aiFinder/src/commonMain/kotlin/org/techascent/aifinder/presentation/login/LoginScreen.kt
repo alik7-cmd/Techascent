@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.login
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -77,7 +79,7 @@ private fun LoginContent(
                 Modifier.fillMaxWidth()
                     .verticalScroll(rememberScrollState())
                     .heightIn(min = maxHeight)
-                    .padding(horizontal = 28.dp, vertical = 24.dp),
+                    .padding(horizontal = AiFinderSpacing.dp28, vertical = AiFinderSpacing.dp24),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
@@ -89,18 +91,18 @@ private fun LoginContent(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
-                    Spacer(Modifier.height(28.dp))
+                    Spacer(Modifier.height(AiFinderSpacing.dp28))
                     LoginOnboardingPager(Modifier.fillMaxWidth())
                 }
                 Column(
-                    Modifier.padding(top = 40.dp),
+                    Modifier.padding(top = AiFinderSpacing.dp40),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)
                 ) {
                     LoginErrorBanner(
                         errorRes = (state as? LoginUiState.Error)?.errorRes,
                         onDismiss = onDismissError,
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        modifier = Modifier.padding(bottom = AiFinderSpacing.dp4)
                     )
                     if (platform.isIos()) {
                         ProviderButton(
@@ -147,7 +149,7 @@ private fun LoginContent(
                         lineHeight = 18.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
-                            .padding(top = 4.dp, start = 12.dp, end = 12.dp)
+                            .padding(top = AiFinderSpacing.dp4, start = AiFinderSpacing.dp12, end = AiFinderSpacing.dp12)
                     )
                 }
             }
@@ -191,7 +193,7 @@ private fun ProviderButton(
                 Image(icon, contentDescription = null, modifier = Modifier.size(20.dp))
             }
         }
-        Spacer(Modifier.width(14.dp))
+        Spacer(Modifier.width(AiFinderSpacing.dp14))
         Text(label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
     }
 }

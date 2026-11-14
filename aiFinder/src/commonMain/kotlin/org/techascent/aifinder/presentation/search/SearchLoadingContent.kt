@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.search
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
@@ -20,7 +22,7 @@ internal fun LazyListScope.searchLoadingContent() {
         ShimmerBlock(Modifier.fillMaxWidth().height(56.dp), RoundedCornerShape(20.dp))
     }
     item(key = "count-skeleton") {
-        ShimmerBlock(Modifier.padding(vertical = 8.dp).width(110.dp).height(16.dp))
+        ShimmerBlock(Modifier.padding(vertical = AiFinderSpacing.dp8).width(110.dp).height(16.dp))
     }
     items(SEARCH_SKELETON_CARDS, key = { "result-skeleton-$it" }) { SearchResultSkeleton() }
 }
@@ -31,13 +33,13 @@ internal fun SearchResultSkeleton() {
     Column(
         modifier = Modifier.fillMaxWidth()
             .background(AiFinderPalette.Surface, RoundedCornerShape(24.dp))
-            .padding(18.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .padding(AiFinderSpacing.dp18),
+        verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp20)
     ) {
         ShimmerBlock(Modifier.fillMaxWidth().height(180.dp), RoundedCornerShape(18.dp))
         ShimmerBlock(Modifier.fillMaxWidth(0.6f).height(28.dp))
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ShimmerBlock(Modifier.size(16.dp), CircleShape)

@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.review
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +39,7 @@ fun DetectionCard(detection: ItemDetection, onEdit: () -> Unit, onDelete: () -> 
         else -> Icons.Outlined.Category
     }
     Surface(color = AiFinderPalette.Surface, shape = RoundedCornerShape(24.dp)) {
-        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+        Column(Modifier.fillMaxWidth().padding(AiFinderSpacing.dp16)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     Modifier.size(48.dp).background(AiFinderPalette.Mint, RoundedCornerShape(14.dp)),
@@ -45,8 +47,8 @@ fun DetectionCard(detection: ItemDetection, onEdit: () -> Unit, onDelete: () -> 
                 ) {
                     Icon(categoryIcon, contentDescription = null, tint = AiFinderPalette.Teal)
                 }
-                Spacer(Modifier.width(14.dp))
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Spacer(Modifier.width(AiFinderSpacing.dp14))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
                     Text(
                         detection.item.name,
                         color = AiFinderPalette.Ink,
@@ -56,7 +58,7 @@ fun DetectionCard(detection: ItemDetection, onEdit: () -> Unit, onDelete: () -> 
                     Text(detection.item.category, color = AiFinderPalette.Muted, fontSize = 14.sp)
                 }
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(AiFinderSpacing.dp8))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (confidence != null) {
                     Text(

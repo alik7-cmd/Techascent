@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.scan
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,13 +40,13 @@ fun ScanScreen(
                 border = BorderStroke(if (needsPlace) 2.dp else 1.dp,
                     if (needsPlace) AiFinderPalette.Teal else AiFinderPalette.Border),
             ) {
-                Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.fillMaxWidth().padding(AiFinderSpacing.dp20), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)) {
                     Icon(Icons.Outlined.Place, null, tint = AiFinderPalette.Teal)
                     Text(stringResource(if (needsPlace) Res.string.scan_place_first else Res.string.location_save_into),
                         color = AiFinderPalette.Ink, fontWeight = FontWeight.Bold)
                     Text(if (needsPlace) stringResource(Res.string.scan_place_reason) else selectedLocation,
                         color = if (needsPlace) AiFinderPalette.Ink else AiFinderPalette.Teal)
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
                         Text(stringResource(if (needsPlace) Res.string.location_choose_title else Res.string.scan_change_place),
                             modifier = Modifier.weight(1f),
                             color = AiFinderPalette.Teal, fontWeight = FontWeight.SemiBold)
@@ -54,7 +56,7 @@ fun ScanScreen(
             }
         }
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)) {
                 InfoCard(
                     stringResource(Res.string.scan_camera_step),
                     stringResource(Res.string.scan_capture_guidance),

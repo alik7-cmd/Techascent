@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.subscription
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.*
@@ -42,9 +44,9 @@ fun SubscriptionSheet(
         Dialog(onDismissRequest = onDismiss) {
             Surface(shape = MaterialTheme.shapes.extraLarge, color = AiFinderPalette.Surface) {
                 Column(
-                    Modifier.padding(24.dp),
+                    Modifier.padding(AiFinderSpacing.dp24),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16),
                 ) {
                     if (state is SubscriptionUiState.Loading || state is SubscriptionUiState.AddingScans) {
                         CircularProgressIndicator(color = AiFinderPalette.Teal)

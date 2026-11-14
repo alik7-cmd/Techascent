@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.components
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -25,8 +27,8 @@ fun ScreenLayout(
     ) { padding ->
         LazyColumn(
             Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(24.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
+            contentPadding = PaddingValues(AiFinderSpacing.dp24),
+            verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp18),
             content = content
         )
     }

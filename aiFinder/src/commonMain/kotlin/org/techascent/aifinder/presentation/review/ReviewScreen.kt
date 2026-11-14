@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.review
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.BorderStroke
@@ -85,8 +87,8 @@ fun ReviewScreen(
             if (state is ReviewUiState.Success && detections.isNotEmpty()) {
                 Column(
                     Modifier.fillMaxWidth().navigationBarsPadding()
-                        .padding(horizontal = 24.dp, vertical = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                        .padding(horizontal = AiFinderSpacing.dp24, vertical = AiFinderSpacing.dp24),
+                    verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)
                 ) {
                     state.data.saveError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                     if (state.data.saveError != null) {
@@ -107,7 +109,7 @@ fun ReviewScreen(
         }
     ) {
         item(key = "header") {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
                 Text(
                     stringResource(Res.string.review_intro),
                     color = AiFinderPalette.Muted,
@@ -123,7 +125,7 @@ fun ReviewScreen(
                 state.data.photo?.let { photo ->
                     item(key = "source-photo") {
                         val pointed = detections.firstOrNull { it.item.id == pointedId } ?: detections.firstOrNull()
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
                             ItemPhoto(photo.id, pointed?.item?.name, RoundedCornerShape(24.dp),
                                 modifier = Modifier.fillMaxWidth().height(240.dp),
                                 bounds = pointed?.bounds, jpegBytes = photo.jpegBytes,
@@ -141,12 +143,12 @@ fun ReviewScreen(
                         border = BorderStroke(1.dp, AiFinderPalette.Border),
                     ) {
                         Row(
-                            Modifier.fillMaxWidth().padding(20.dp),
+                            Modifier.fillMaxWidth().padding(AiFinderSpacing.dp20),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12),
                         ) {
                             Icon(Icons.Outlined.LocationOn, null, tint = AiFinderPalette.Teal)
-                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp4)) {
                                 Text(stringResource(Res.string.location_save_into), color = AiFinderPalette.Muted, fontSize = 13.sp)
                                 Text(
                                     selectedLocation.ifBlank { stringResource(Res.string.review_choose_location) },
@@ -171,7 +173,7 @@ fun ReviewScreen(
                     }
                 }
                 items(state.data.detections, key = { it.item.id }) { detection ->
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp8)) {
                     DetectionCard(
                         detection,
                         onEdit = {
@@ -214,7 +216,7 @@ fun ReviewScreen(
 
                 if (detections.isEmpty()) {
                     item(key = "empty") {
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)) {
                             EmptyListCard(
                                 titleRes = Res.string.review_empty_title,
                                 descriptionRes = Res.string.review_empty_message,
@@ -232,11 +234,11 @@ fun ReviewScreen(
 private fun ReviewResultsNotice() {
     Surface(color = AiFinderPalette.Mint, shape = RoundedCornerShape(24.dp)) {
         Row(
-            Modifier.fillMaxWidth().padding(20.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().padding(AiFinderSpacing.dp20),
+            horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12),
         ) {
             Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = AiFinderPalette.Teal)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp6)) {
                 Text(
                     stringResource(
                         if (AppConfig.USE_FAKE_ANALYSIS) Res.string.review_sample_title

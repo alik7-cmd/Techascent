@@ -5,6 +5,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import apphub.aifinder.generated.resources.Res
+import apphub.aifinder.generated.resources.inventory_update_error
+import apphub.aifinder.generated.resources.item_name_required
+import apphub.aifinder.generated.resources.item_place_required
+import org.jetbrains.compose.resources.getString
 import org.techascent.aifinder.domain.inventory.InventoryRepository
 import org.techascent.aifinder.domain.inventory.StoredItem
 import org.techascent.aifinder.domain.model.InventoryItem
@@ -32,8 +37,8 @@ class InventoryActionsViewModel(
     fun clearError() { if (!_state.value.busy) _state.value = InventoryActionState() }
 
     fun save(entry: LocatedItem?, item: InventoryItem, locationId: String, onSaved: () -> Unit) = perform(onSaved) {
-        require(item.name.isNotBlank()) { "Enter an item name." }
-        require(locationId.isNotBlank()) { "Choose a place." }
+        if (item.name.isBlank()) throw IllegalArgumentException(getString(Res.string.item_name_required))
+        if (locationId.isBlank()) throw IllegalArgumentException(getString(Res.string.item_place_required))
         val now = Clock.System.now().toEpochMilliseconds()
         if (entry == null) {
             repository.saveDetections(locationId, listOf(ItemDetection("", item))).map { Unit }
@@ -68,10 +73,15 @@ class InventoryActionsViewModel(
         _state.value = InventoryActionState(busy = true)
         actionJob = viewModelScope.launch {
             try {
-                action().onSuccess {
+                val result = action()
+                result.onSuccess {
                     _state.value = InventoryActionState()
                     onSuccess()
-                }.onFailure { _state.value = InventoryActionState(error = it.message ?: "Couldn't update your inventory.") }
+                }.onFailure {
+                    _state.value = InventoryActionState(
+                        error = it.message ?: getString(Res.string.inventory_update_error),
+                    )
+                }
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: IllegalArgumentException) {

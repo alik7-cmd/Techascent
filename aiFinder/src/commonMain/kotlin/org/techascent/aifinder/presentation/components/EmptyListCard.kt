@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.components
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,7 +43,7 @@ private fun EmptyStateBody(
     onAction: (() -> Unit)?,
 ) {
     Column(
-        Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 24.dp),
+        Modifier.fillMaxWidth().padding(horizontal = AiFinderSpacing.dp24, vertical = AiFinderSpacing.dp24),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
@@ -49,7 +51,7 @@ private fun EmptyStateBody(
             contentDescription = null,
             modifier = Modifier.widthIn(max = 260.dp).fillMaxWidth().aspectRatio(320f / 220f),
         )
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(AiFinderSpacing.dp16))
         Text(
             stringResource(titleRes),
             color = AiFinderPalette.Ink,
@@ -58,7 +60,7 @@ private fun EmptyStateBody(
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(AiFinderSpacing.dp8))
         Text(
             description,
             color = AiFinderPalette.Ink.copy(alpha = 0.72f),
@@ -68,7 +70,7 @@ private fun EmptyStateBody(
             modifier = Modifier.widthIn(max = 320.dp),
         )
         if (actionLabel != null && onAction != null) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(AiFinderSpacing.dp16))
             TextButton(onClick = onAction) {
                 Text(actionLabel, color = AiFinderPalette.Teal, fontWeight = FontWeight.SemiBold)
             }

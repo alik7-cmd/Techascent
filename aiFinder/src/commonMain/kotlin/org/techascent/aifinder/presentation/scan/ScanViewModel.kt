@@ -10,6 +10,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import apphub.aifinder.generated.resources.Res
+import apphub.aifinder.generated.resources.scan_analyze_error
+import apphub.aifinder.generated.resources.scan_capture_error
+import apphub.aifinder.generated.resources.scan_no_items
+import org.jetbrains.compose.resources.getString
 import org.techascent.aifinder.domain.model.ItemDetection
 import org.techascent.aifinder.domain.vision.CapturedPhoto
 import org.techascent.aifinder.domain.vision.PhotoAnalyzer
@@ -45,7 +50,8 @@ class ScanViewModel(
                 updateContent { it.copy(previewPhoto = photo) }
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
-                updateContent { it.copy(errorMessage = e.message ?: "Couldn't capture photo. Try again.") }
+                val message = e.message ?: getString(Res.string.scan_capture_error)
+                updateContent { it.copy(errorMessage = message) }
             } finally { updateContent { it.copy(isCapturing = false) } }
         }
     }
@@ -103,9 +109,8 @@ class ScanViewModel(
                 val detections = recognized.toItemDetections(photo.id)
                 logTransformed(detections)
                 if (detections.isEmpty()) {
-                    updateContent {
-                        it.copy(isAnalyzing = false, errorMessage = "No items recognized. Try moving closer or adding more light.")
-                    }
+                    val message = getString(Res.string.scan_no_items)
+                    updateContent { it.copy(isAnalyzing = false, errorMessage = message) }
                 } else {
                     updateContent { it.copy(isAnalyzing = false, previewPhoto = null) }
                     _detections.value = ScanResult(photo, detections)
@@ -116,8 +121,9 @@ class ScanViewModel(
                 updateContent { it.copy(isAnalyzing = false, requiresPurchase = true) }
             } catch (e: Exception) {
                 pendingPhoto = null
+                val message = e.message ?: getString(Res.string.scan_analyze_error)
                 updateContent {
-                    it.copy(isAnalyzing = false, errorMessage = e.message ?: "Couldn't analyze the photo. Please try again.")
+                    it.copy(isAnalyzing = false, errorMessage = message)
                 }
             } finally {
                 if (coroutineContext[Job]?.isActive == true) loadBalance()

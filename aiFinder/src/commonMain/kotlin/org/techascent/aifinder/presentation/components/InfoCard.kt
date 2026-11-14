@@ -1,5 +1,7 @@
 package org.techascent.aifinder.presentation.components
 
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,12 +35,12 @@ fun InfoCard(
         modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
             .background(containerColor)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(20.dp),
+            .padding(AiFinderSpacing.dp20),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp16)
     ) {
         leadingContent?.invoke()
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp7)) {
             Text(title, fontWeight = FontWeight.Bold, color = titleColor, fontSize = titleFontSize)
             Text(subtitle, color = subtitleColor)
         }
