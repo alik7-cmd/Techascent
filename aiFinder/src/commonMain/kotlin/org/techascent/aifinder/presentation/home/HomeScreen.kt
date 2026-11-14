@@ -24,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -191,27 +190,27 @@ private fun InventoryRefreshError(onDismiss: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
         shape = RoundedCornerShape(20.dp),
-        color = Color(0xFFFDECEA),
-        border = BorderStroke(1.dp, Color(0xFFF6C9C4)),
+        color = AiFinderPalette.ErrorContainer,
+        border = BorderStroke(1.dp, AiFinderPalette.ErrorBorder),
     ) {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Box(
-                Modifier.size(36.dp).background(Color(0xFFC62828).copy(alpha = 0.12f), CircleShape),
+                Modifier.size(36.dp).background(AiFinderPalette.Error.copy(alpha = 0.12f), CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Rounded.ErrorOutline, null, tint = Color(0xFFC62828), modifier = Modifier.size(20.dp))
+                Icon(Icons.Rounded.ErrorOutline, null, tint = AiFinderPalette.Error, modifier = Modifier.size(20.dp))
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(stringResource(Res.string.inventory_sync_error_title),
-                    color = Color(0xFF5F1A16), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    color = AiFinderPalette.ErrorText, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                 Text(stringResource(Res.string.inventory_sync_error),
-                    color = Color(0xFF5F1A16).copy(alpha = 0.85f), fontSize = 14.sp, lineHeight = 20.sp)
+                    color = AiFinderPalette.ErrorText.copy(alpha = 0.85f), fontSize = 14.sp, lineHeight = 20.sp)
             }
             IconButton(onClick = onDismiss) {
                 Icon(
                     Icons.Rounded.Close,
                     contentDescription = stringResource(Res.string.login_error_dismiss),
-                    tint = Color(0xFF5F1A16).copy(alpha = 0.7f),
+                    tint = AiFinderPalette.ErrorText.copy(alpha = 0.7f),
                     modifier = Modifier.size(18.dp),
                 )
             }

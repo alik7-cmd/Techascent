@@ -114,8 +114,8 @@ fun AccountScreen(
                 SettingsCell(
                     icon = Icons.AutoMirrored.Outlined.Logout,
                     title = stringResource(Res.string.account_logout),
-                    contentColor = LogoutRed,
-                    iconBackground = LogoutRed.copy(alpha = 0.1f),
+                    contentColor = AiFinderPalette.Error,
+                    iconBackground = AiFinderPalette.Error.copy(alpha = 0.1f),
                     showChevron = false,
                     isLoading = success.isSigningOut,
                     onClick = viewModel::requestLogout,
@@ -124,8 +124,8 @@ fun AccountScreen(
                 SettingsCell(
                     icon = Icons.Outlined.DeleteForever,
                     title = stringResource(Res.string.account_delete_profile),
-                    contentColor = LogoutRed,
-                    iconBackground = LogoutRed.copy(alpha = 0.1f),
+                    contentColor = AiFinderPalette.Error,
+                    iconBackground = AiFinderPalette.Error.copy(alpha = 0.1f),
                     isLoading = success.isDeleting,
                     onClick = viewModel::requestDeletion,
                 )
@@ -143,8 +143,6 @@ fun AccountScreen(
         }
     }
 }
-
-private val LogoutRed = Color(0xFFB04A4A)
 
 @Composable
 private fun ProfileCard(profile: AccountProfile) {

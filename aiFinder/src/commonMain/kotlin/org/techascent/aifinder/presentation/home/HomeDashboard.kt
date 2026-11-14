@@ -87,8 +87,8 @@ internal fun HomeQuickActions(
             AssistChip(
                 onClick = onScan, enabled = !checking, shape = RoundedCornerShape(50),
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = AiFinderPalette.Teal, labelColor = AiFinderPalette.Surface,
-                    leadingIconContentColor = AiFinderPalette.Surface,
+                    containerColor = AiFinderPalette.Teal, labelColor = AiFinderPalette.OnTeal,
+                    leadingIconContentColor = AiFinderPalette.OnTeal,
                 ),
                 label = { Text(stringResource(if (checking) Res.string.subscription_checking else Res.string.home_scan_action)) },
                 leadingIcon = { Icon(Icons.Outlined.CameraAlt, null, Modifier.size(18.dp)) },

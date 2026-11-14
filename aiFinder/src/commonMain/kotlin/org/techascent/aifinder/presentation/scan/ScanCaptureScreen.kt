@@ -91,6 +91,7 @@ fun ScanCaptureScreen(
 
 @Composable
 private fun AiAnalysisFeedback() {
+    val teal = AiFinderPalette.Teal
     val transition = rememberInfiniteTransition(label = "ai-analysis")
     val phase by transition.animateFloat(0f, 1f,
         infiniteRepeatable(tween(1600, easing = LinearEasing), RepeatMode.Reverse), label = "scan-sweep")
@@ -100,9 +101,9 @@ private fun AiAnalysisFeedback() {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Box(Modifier.size(46.dp), contentAlignment = Alignment.Center) {
                     Canvas(Modifier.fillMaxSize()) {
-                        drawCircle(AiFinderPalette.Teal.copy(alpha = 0.08f + phase * 0.12f))
-                        drawCircle(AiFinderPalette.Teal.copy(alpha = 0.4f), style = Stroke(1.dp.toPx()))
-                        drawLine(AiFinderPalette.Teal.copy(alpha = 0.5f),
+                        drawCircle(teal.copy(alpha = 0.08f + phase * 0.12f))
+                        drawCircle(teal.copy(alpha = 0.4f), style = Stroke(1.dp.toPx()))
+                        drawLine(teal.copy(alpha = 0.5f),
                             Offset(size.width * 0.2f, size.height * (0.25f + phase * 0.5f)),
                             Offset(size.width * 0.8f, size.height * (0.25f + phase * 0.5f)), 2.dp.toPx())
                     }

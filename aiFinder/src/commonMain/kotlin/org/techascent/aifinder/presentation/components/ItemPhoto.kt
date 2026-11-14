@@ -82,6 +82,7 @@ fun ItemPhoto(
                 contentScale = contentScale)
             if (bounds != null && bounds.size == 4 && bounds.all { it.isFinite() && it in 0f..1f } &&
                 bounds[2] > bounds[0] && bounds[3] > bounds[1]) {
+                val teal = AiFinderPalette.Teal
                 Canvas(Modifier.fillMaxSize()) {
                     val scale = contentScale.computeScaleFactor(
                         Size(bitmap.width.toFloat(), bitmap.height.toFloat()), size)
@@ -91,12 +92,12 @@ fun ItemPhoto(
                     val dy = (size.height - height) / 2
                     val topLeft = Offset(dx + bounds[0] * width, dy + bounds[1] * height)
                     val area = Size((bounds[2] - bounds[0]) * width, (bounds[3] - bounds[1]) * height)
-                    drawRect(AiFinderPalette.Teal.copy(alpha = 0.12f), topLeft, area)
+                    drawRect(teal.copy(alpha = 0.12f), topLeft, area)
                     drawRect(androidx.compose.ui.graphics.Color.White, topLeft, area, style = Stroke(5.dp.toPx()))
-                    drawRect(AiFinderPalette.Teal, topLeft, area, style = Stroke(2.dp.toPx()))
+                    drawRect(teal, topLeft, area, style = Stroke(2.dp.toPx()))
                     val center = Offset(topLeft.x + area.width / 2, topLeft.y + area.height / 2)
                     drawCircle(androidx.compose.ui.graphics.Color.White, 7.dp.toPx(), center)
-                    drawCircle(AiFinderPalette.Teal, 4.dp.toPx(), center)
+                    drawCircle(teal, 4.dp.toPx(), center)
                 }
             }
         } else {

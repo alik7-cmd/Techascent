@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import org.techascent.composa.button.primary.ButtonState
 import org.techascent.composa.button.primary.ComposaButton
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.graphics.Color
 import org.techascent.aifinder.presentation.theme.AiFinderPalette
 
 @Composable
@@ -28,7 +27,7 @@ fun PrimaryAction(
         label = "primaryActionContainer"
     )
     val contentColor by animateColorAsState(
-        targetValue = if (isInteractive || isLoading) Color.White else AiFinderPalette.DisabledContent,
+        targetValue = if (isInteractive || isLoading) AiFinderPalette.OnTeal else AiFinderPalette.DisabledContent,
         label = "primaryActionContent"
     )
     ComposaButton(

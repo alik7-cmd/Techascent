@@ -54,9 +54,9 @@ internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false, compact
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = AiFinderPalette.Teal,
-                contentColor = AiFinderPalette.Surface,
+                contentColor = AiFinderPalette.OnTeal,
                 disabledContainerColor = AiFinderPalette.Teal,
-                disabledContentColor = AiFinderPalette.Surface
+                disabledContentColor = AiFinderPalette.OnTeal
             )
         ) {
             // Keep the label so the button doesn't change width; only the leading icon swaps.
@@ -65,7 +65,7 @@ internal fun ScanPrompt(onScan: () -> Unit, isChecking: Boolean = false, compact
                     if (checking) {
                         CircularProgressIndicator(
                             Modifier.size(18.dp),
-                            color = AiFinderPalette.Surface,
+                            color = AiFinderPalette.OnTeal,
                             strokeWidth = 2.dp
                         )
                     } else {

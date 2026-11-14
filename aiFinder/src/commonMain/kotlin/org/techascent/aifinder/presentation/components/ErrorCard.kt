@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -45,13 +44,13 @@ internal fun ErrorCard(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
-                modifier = Modifier.size(80.dp).background(Color(0xFFFDECEA), CircleShape),
+                modifier = Modifier.size(80.dp).background(AiFinderPalette.ErrorContainer, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Rounded.ErrorOutline,
                     contentDescription = null,
-                    tint = Color(0xFFC62828),
+                    tint = AiFinderPalette.Error,
                     modifier = Modifier.size(36.dp),
                 )
             }

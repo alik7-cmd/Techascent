@@ -35,14 +35,14 @@ internal fun ScanCreditDetails(
     Surface(
         modifier = modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
         shape = RoundedCornerShape(28.dp),
-        color = AiFinderPalette.Teal,
+        color = AiFinderPalette.CreditSurface,
     ) {
         Box(
             Modifier.background(
                 Brush.linearGradient(
                     listOf(
-                        Color(0xFF174A48),
-                        AiFinderPalette.Teal
+                        AiFinderPalette.CreditGradientStart,
+                        AiFinderPalette.CreditSurface
                     )
                 )
             )
