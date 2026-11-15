@@ -50,7 +50,6 @@ fun AccountScreen(
     onSubscription: () -> Unit,
     onPrivacy: () -> Unit,
     onExport: () -> Unit,
-    onFeedback: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
@@ -102,15 +101,7 @@ fun AccountScreen(
                 SettingsCell(Icons.Outlined.PrivacyTip, stringResource(Res.string.account_privacy), onClick = onPrivacy)
             }
         }
-        item(key = "early-access") {
-            SettingsSection(stringResource(Res.string.feedback_section)) {
-                SettingsCell(
-                    Icons.Outlined.ChatBubbleOutline,
-                    stringResource(Res.string.feedback_title),
-                    onClick = onFeedback,
-                )
-            }
-        }
+
         item(key = "account") {
             SettingsSection(stringResource(Res.string.account_section_account)) {
                 SettingsCell(

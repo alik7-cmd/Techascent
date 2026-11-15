@@ -316,7 +316,6 @@ fun AiFinderNavigation() {
                 onSubscription = { navController.navigate(AiFinderScreen.PurchaseHistory.route) { launchSingleTop = true } },
                 onPrivacy = { navController.navigate(AiFinderScreen.PrivacyData.route) { launchSingleTop = true } },
                 onExport = { navController.navigate(AiFinderScreen.ExportInventory.route) { launchSingleTop = true } },
-                onFeedback = { navController.navigate(AiFinderScreen.Feedback.route) { launchSingleTop = true } },
                 onSignedOut = {
                     scan.reset()
                     inventorySync.reset()

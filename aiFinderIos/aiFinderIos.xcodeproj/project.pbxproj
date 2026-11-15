@@ -7,26 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F50000000000000000000001 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = F50000000000000000000002; };
-		E40000000000000000000001 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = E40000000000000000000002; };
-		D30000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D30000000000000000000002 /* Assets.xcassets */; };
-		C20000000000000000000001 = {isa = PBXBuildFile; fileRef = C20000000000000000000002; };
-		C20000000000000000000003 = {isa = PBXBuildFile; productRef = C20000000000000000000004; };
-		C20000000000000000000005 = {isa = PBXBuildFile; productRef = C20000000000000000000006; };
-		C20000000000000000000007 = {isa = PBXBuildFile; productRef = C20000000000000000000008; };
 		A10000000000000000000001 /* AiFinderIosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* AiFinderIosApp.swift */; };
 		B5AEEE25309BE0D700CFEBE4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5AEEE24309BE0D700CFEBE4 /* GoogleService-Info.plist */; };
 		B5AEEE29309BE45700CFEBE4 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B5AEEE28309BE45700CFEBE4 /* GoogleSignIn */; };
 		B5AEEE2B309BE45700CFEBE4 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B5AEEE2A309BE45700CFEBE4 /* GoogleSignInSwift */; };
+		C20000000000000000000001 /* FirebaseAuthBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000002 /* FirebaseAuthBridge.swift */; };
+		C20000000000000000000003 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C20000000000000000000004 /* FirebaseCore */; };
+		C20000000000000000000005 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = C20000000000000000000006 /* FirebaseAuth */; };
+		C20000000000000000000007 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = C20000000000000000000008 /* FirebaseDatabase */; };
+		D30000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D30000000000000000000002 /* Assets.xcassets */; };
+		E40000000000000000000001 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = E40000000000000000000002 /* FirebaseStorage */; };
+		F50000000000000000000001 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = F50000000000000000000002 /* FirebaseFunctions */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		D30000000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		C20000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthBridge.swift; sourceTree = "<group>"; };
 		A10000000000000000000002 /* AiFinderIosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AiFinderIosApp.swift; sourceTree = "<group>"; };
 		A10000000000000000000003 /* AiFinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = AiFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000016 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B5AEEE24309BE0D700CFEBE4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		C20000000000000000000002 /* FirebaseAuthBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthBridge.swift; sourceTree = "<group>"; };
+		D30000000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,9 +35,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				F50000000000000000000001 /* FirebaseFunctions in Frameworks */,
-				C20000000000000000000003,
-				C20000000000000000000005,
-				C20000000000000000000007,
+				C20000000000000000000003 /* FirebaseCore in Frameworks */,
+				C20000000000000000000005 /* FirebaseAuth in Frameworks */,
+				C20000000000000000000007 /* FirebaseDatabase in Frameworks */,
 				E40000000000000000000001 /* FirebaseStorage in Frameworks */,
 				B5AEEE29309BE45700CFEBE4 /* GoogleSignIn in Frameworks */,
 				B5AEEE2B309BE45700CFEBE4 /* GoogleSignInSwift in Frameworks */,
@@ -59,7 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000002 /* AiFinderIosApp.swift */,
-				C20000000000000000000002,
+				C20000000000000000000002 /* FirebaseAuthBridge.swift */,
 				A10000000000000000000016 /* Info.plist */,
 				D30000000000000000000002 /* Assets.xcassets */,
 				B5AEEE24309BE0D700CFEBE4 /* GoogleService-Info.plist */,
@@ -95,9 +95,9 @@
 			packageProductDependencies = (
 				F50000000000000000000002 /* FirebaseFunctions */,
 				E40000000000000000000002 /* FirebaseStorage */,
-				C20000000000000000000004,
-				C20000000000000000000006,
-				C20000000000000000000008,
+				C20000000000000000000004 /* FirebaseCore */,
+				C20000000000000000000006 /* FirebaseAuth */,
+				C20000000000000000000008 /* FirebaseDatabase */,
 				B5AEEE28309BE45700CFEBE4 /* GoogleSignIn */,
 				B5AEEE2A309BE45700CFEBE4 /* GoogleSignInSwift */,
 			);
@@ -172,7 +172,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000001 /* AiFinderIosApp.swift in Sources */,
-				C20000000000000000000001,
+				C20000000000000000000001 /* FirebaseAuthBridge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,6 +210,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CA57ZUB646;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../aiFinder/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
@@ -245,6 +246,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CA57ZUB646;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../aiFinder/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
@@ -317,31 +319,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F50000000000000000000002 /* FirebaseFunctions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFunctions;
-		};
-		E40000000000000000000002 /* FirebaseStorage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseStorage;
-		};
-		C20000000000000000000004 = {
-			isa = XCSwiftPackageProductDependency;
-			package = B5AEEE26309BE41A00CFEBE4;
-			productName = FirebaseCore;
-		};
-		C20000000000000000000006 = {
-			isa = XCSwiftPackageProductDependency;
-			package = B5AEEE26309BE41A00CFEBE4;
-			productName = FirebaseAuth;
-		};
-		C20000000000000000000008 = {
-			isa = XCSwiftPackageProductDependency;
-			package = B5AEEE26309BE41A00CFEBE4;
-			productName = FirebaseDatabase;
-		};
 		B5AEEE28309BE45700CFEBE4 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B5AEEE27309BE45700CFEBE4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
@@ -351,6 +328,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B5AEEE27309BE45700CFEBE4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		C20000000000000000000004 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		C20000000000000000000006 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		C20000000000000000000008 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		E40000000000000000000002 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		F50000000000000000000002 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5AEEE26309BE41A00CFEBE4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
