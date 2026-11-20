@@ -1,0 +1,201 @@
+package org.techascent.aifinder.presentation.login
+
+import org.techascent.aifinder.presentation.theme.AiFinderSpacing
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import apphub.aifinder.generated.resources.*
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import org.techascent.aifinder.domain.auth.AuthProvider
+import org.techascent.aifinder.presentation.theme.AiFinderPalette
+import org.techascent.aifinder.util.Platform
+import org.techascent.aifinder.util.getPlatform
+
+@Composable
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    onSignedIn: () -> Unit,
+    onTerms: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
+) {
+    val state by viewModel.state.collectAsState()
+    LaunchedEffect(state) {
+        if (state is LoginUiState.SignedIn) {
+            viewModel.onSignedInHandled()
+            onSignedIn()
+        }
+    }
+    LoginContent(
+        state,
+        onSignIn = viewModel::onSignIn,
+        onDismissError = viewModel::dismissError,
+        onTerms = onTerms,
+        onPrivacyPolicy = onPrivacyPolicy,
+    )
+}
+
+@Composable
+private fun LoginContent(
+    state: LoginUiState,
+    onSignIn: (AuthProvider) -> Unit,
+    onDismissError: () -> Unit,
+    onTerms: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
+) {
+    val platform = remember { getPlatform() }
+    var selectedProvider by remember { mutableStateOf<AuthProvider?>(null) }
+    val isLoading = state is LoginUiState.Loading
+    val onProviderSelected: (AuthProvider) -> Unit = { provider ->
+        selectedProvider = provider
+        onSignIn(provider)
+    }
+    Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = AiFinderPalette.Background
+    ) { padding ->
+        BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
+            Column(
+                Modifier.fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = maxHeight)
+                    .padding(horizontal = AiFinderSpacing.dp28, vertical = AiFinderSpacing.dp24),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        stringResource(Res.string.welcome_app_name),
+                        modifier = Modifier.fillMaxWidth(),
+                        color = AiFinderPalette.Teal,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(AiFinderSpacing.dp28))
+                    LoginOnboardingPager(Modifier.fillMaxWidth())
+                }
+                Column(
+                    Modifier.padding(top = AiFinderSpacing.dp40),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(AiFinderSpacing.dp12)
+                ) {
+                    LoginErrorBanner(
+                        errorRes = (state as? LoginUiState.Error)?.errorRes,
+                        onDismiss = onDismissError,
+                        modifier = Modifier.padding(bottom = AiFinderSpacing.dp4)
+                    )
+                    if (platform.isIos()) {
+                        ProviderButton(
+                            label = stringResource(Res.string.login_continue_apple),
+                            icon = painterResource(Res.drawable.ic_apple),
+                            containerColor = Color.Black,
+                            contentColor = Color.White,
+                            border = null,
+                            isLoading = isLoading && selectedProvider == AuthProvider.Apple,
+                            enabled = !isLoading,
+                            onClick = { onProviderSelected(AuthProvider.Apple) }
+                        )
+                    }
+                    ProviderButton(
+                        label = stringResource(Res.string.login_continue_google),
+                        icon = painterResource(Res.drawable.ic_google),
+                        containerColor = AiFinderPalette.Surface,
+                        contentColor = AiFinderPalette.Ink,
+                        border = BorderStroke(1.dp, AiFinderPalette.Border),
+                        isLoading = isLoading && selectedProvider == AuthProvider.Google,
+                        enabled = !isLoading,
+                        onClick = { onProviderSelected(AuthProvider.Google) }
+                    )
+                    Text(
+                        buildAnnotatedString {
+                            append(stringResource(Res.string.login_legal_prefix))
+                            val styles = TextLinkStyles(
+                                style = SpanStyle(
+                                    color = AiFinderPalette.Teal,
+                                    textDecoration = TextDecoration.Underline,
+                                )
+                            )
+                            withLink(LinkAnnotation.Clickable("terms", styles) { onTerms() }) {
+                                append(stringResource(Res.string.legal_terms_title))
+                            }
+                            append(stringResource(Res.string.login_legal_between))
+                            withLink(LinkAnnotation.Clickable("privacy", styles) { onPrivacyPolicy() }) {
+                                append(stringResource(Res.string.legal_privacy_title))
+                            }
+                            append(stringResource(Res.string.login_legal_suffix))
+                        },
+                        color = AiFinderPalette.Muted,
+                        fontSize = 12.sp,
+                        lineHeight = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(top = AiFinderSpacing.dp4, start = AiFinderSpacing.dp12, end = AiFinderSpacing.dp12)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProviderButton(
+    label: String,
+    icon: Painter,
+    containerColor: Color,
+    contentColor: Color,
+    border: BorderStroke?,
+    isLoading: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+        shape = RoundedCornerShape(28.dp),
+        border = border,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContainerColor = containerColor.copy(alpha = 0.7f),
+            disabledContentColor = contentColor.copy(alpha = 0.7f),
+        ),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp)
+    ) {
+        Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    Modifier.size(18.dp),
+                    color = contentColor,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Image(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+            }
+        }
+        Spacer(Modifier.width(AiFinderSpacing.dp14))
+        Text(label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+private fun Platform.isIos() = this == Platform.IOS

@@ -1,24 +1,27 @@
 [versions]
-agp = "8.11.2"
-android-compileSdk = "36"
+agp = "8.13.2"
+android-compileSdk = "37"
 android-minSdk = "24"
 android-targetSdk = "36"
 androidx-activityCompose = "1.9.0"
-compose-plugin = "1.8.2"
-koinCore = "3.5.3"
-kotlin = "2.1.21"
+compose-plugin = "1.9.3"
+core = "3.5.3"
+koinCore = "4.1.1"
+kotlin = "2.3.20"
 kotlinxCoroutinesCore = "1.10.2"
 kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.8.1"
 kscan = "0.3.2"
 ktor = "3.1.3"
 androidx-lifecycle = "2.8.3"
-koinComposeViewModel = "1.2.0-Beta4"
-koinCompose = "1.1.5"
+koinComposeViewModel = "4.1.1"
+koinCompose = "4.1.1"
 datastore = "1.1.1"
 navigationCompose = "2.8.0-alpha02"
+navigationAiFinder = "2.9.1"
 size = "0.5.0"
 moko = "0.18.0"
+moko-aiFinder = "0.20.1"
 lifecycleViewModel = "2.8.3"
 lifecycleViewModelCompose = "2.8.0"
 material = "1.12.0"
@@ -28,14 +31,28 @@ klint = "13.1.0"
 mlkitBarcodeScanning-android = "17.3.0"
 androidx-camera = "1.5.1"
 appcompat = "1.7.1"
+firebaseBom = "34.4.0"
+revenuecatKmp = "4.0.0"
+googleServices = "4.4.4"
+credentials = "1.5.0"
+googleId = "1.1.1"
+room = "2.7.2"
+sqlite = "2.5.2"
+ksp = "2.3.13"
+robolectric = "4.14.1"
 
 [libraries]
+core = { module = "com.google.zxing:core", version.ref = "core" }
+firebase-functions = { module = "com.google.firebase:firebase-functions" }
+revenuecat-purchases-core = { module = "com.revenuecat.purchases:purchases-kmp-core", version.ref = "revenuecatKmp" }
+revenuecat-purchases-ui = { module = "com.revenuecat.purchases:purchases-kmp-ui", version.ref = "revenuecatKmp" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kscan = { module = "io.github.ismai117:KScan", version.ref = "kscan" }
@@ -53,9 +70,13 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+navigation-aifinder = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationAiFinder" }
 screen-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "size" }
 moko-permissions = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
+moko-aifinder-core = { module = "dev.icerock.moko:permissions", version.ref = "moko-aiFinder" }
+moko-aifinder-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko-aiFinder" }
+moko-aifinder-camera = { module = "dev.icerock.moko:permissions-camera", version.ref = "moko-aiFinder" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 android-mlkitBarcodeScanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkitBarcodeScanning-android" }
 androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "androidx-camera" }
@@ -64,6 +85,19 @@ androidx-camera-extensions = { group = "androidx.camera", name = "camera-extensi
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "androidx-camera" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "androidx-camera" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-database = { module = "com.google.firebase:firebase-database" }
+firebase-storage = { module = "com.google.firebase:firebase-storage" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleId" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesCore" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-sqlite-framework = { module = "androidx.sqlite:sqlite-framework", version.ref = "sqlite" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 [bundles]
 camera = ["androidx-camera-core", "androidx-camera-lifecycle", "androidx-camera-camera2", "androidx-camera-view", "androidx-camera-extensions"]
@@ -78,4 +112,6 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "klint" }
-
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+room = { id = "androidx.room", version.ref = "room" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
